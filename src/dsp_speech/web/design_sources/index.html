@@ -491,27 +491,32 @@
                     <p class="description" vid="142">对着麦克风说 0 到 9 中的一个数字，停止后查看匹配结果。系统将提取梅尔倒谱系数并与本地模板进行动态时间规整匹配。</p>
                     
                     <div class="digit-grid" vid="143">
-                        <div class="digit-pill" vid="144">0</div>
-                        <div class="digit-pill" vid="145">1</div>
-                        <div class="digit-pill active" vid="146">2</div>
-                        <div class="digit-pill" vid="147">3</div>
-                        <div class="digit-pill" vid="148">4</div>
-                        <div class="digit-pill" vid="149">5</div>
-                        <div class="digit-pill" vid="150">6</div>
-                        <div class="digit-pill" vid="151">7</div>
-                        <div class="digit-pill" vid="152">8</div>
-                        <div class="digit-pill" vid="153">9</div>
+                        <div class="digit-pill" data-digit="0" vid="144">0</div>
+                        <div class="digit-pill" data-digit="1" vid="145">1</div>
+                        <div class="digit-pill" data-digit="2" vid="146">2</div>
+                        <div class="digit-pill" data-digit="3" vid="147">3</div>
+                        <div class="digit-pill" data-digit="4" vid="148">4</div>
+                        <div class="digit-pill" data-digit="5" vid="149">5</div>
+                        <div class="digit-pill" data-digit="6" vid="150">6</div>
+                        <div class="digit-pill" data-digit="7" vid="151">7</div>
+                        <div class="digit-pill" data-digit="8" vid="152">8</div>
+                        <div class="digit-pill" data-digit="9" vid="153">9</div>
                     </div>
 
                     <div class="controls" vid="154">
-                        <button class="btn" vid="155">开始录音</button>
-                        <button class="btn" vid="156">停止并识别</button>
-                        <span class="status-badge" vid="157">识别完成 00:03</span>
+                        <button class="btn" id="digit-start" type="button" vid="155">开始录音</button>
+                        <button class="btn" id="digit-stop" type="button" disabled vid="156">停止并识别</button>
+                        <span class="status-badge" id="mic-status" vid="157">等待录音</span>
+                        <label class="desktop-mic-controls">输入设备
+                            <select id="mic-select" aria-label="选择麦克风"><option value="">系统默认麦克风</option></select>
+                        </label>
+                        <button class="btn desktop-mic-refresh" id="mic-refresh" type="button">授权 / 刷新</button>
+                        <span id="mic-hint" class="desktop-mic-hint">设备名称需先授权后显示。</span>
                     </div>
 
                     <div class="waveform-panel" vid="158">
-                        <div class="section-tag" vid="159">MIC INPUT / WAVEFORM · 48000 Hz / mono</div>
-                        <div class="waveform-viz" vid="160">
+                        <div class="section-tag" vid="159">MIC INPUT / WAVEFORM · <span id="input-format">等待录音</span></div>
+                        <div class="waveform-viz" id="wave-digit" vid="160">
                             <div class="wave-bar" style="height: 20%;" vid="161"></div>
                             <div class="wave-bar" style="height: 40%;" vid="162"></div>
                             <div class="wave-bar" style="height: 30%;" vid="163"></div>
@@ -531,32 +536,15 @@
                 <div class="data-col" vid="173">
                     <div class="prediction-card" vid="174">
                         <div class="section-tag" vid="175">识别结果 / PREDICTION</div>
-                        <div class="prediction-val" vid="176">2</div>
-                        <div class="card-footer" vid="177">
-                            <span vid="178">最小 DTW 距离 22.698</span>
-                            <span vid="179">有效语音 2.33 s</span>
+                        <div class="prediction-val" id="result-digit" vid="176">—</div>
+                        <div class="card-footer" id="result-meta" vid="177">
+                            <span vid="178">等待本次录音结果</span>
                         </div>
                     </div>
 
                     <div vid="180">
                         <div class="section-tag" style="margin-bottom: 24px;" vid="181">各数字的最小 DTW 距离 / 越小越接近</div>
-                        <div class="dtw-list" vid="182">
-                            <div class="dtw-row" vid="183">
-                                <span class="dtw-label" vid="184">2</span>
-                                <div class="dtw-bar-bg" vid="185"><div class="dtw-bar-fill" style="width: 20%;" vid="186"></div></div>
-                                <span class="dtw-value" vid="187">22.70</span>
-                            </div>
-                            <div class="dtw-row" vid="188">
-                                <span class="dtw-label" vid="189">8</span>
-                                <div class="dtw-bar-bg" vid="190"><div class="dtw-bar-fill" style="width: 25%;" vid="191"></div></div>
-                                <span class="dtw-value" vid="192">23.22</span>
-                            </div>
-                            <div class="dtw-row" vid="193">
-                                <span class="dtw-label" vid="194">9</span>
-                                <div class="dtw-bar-bg" vid="195"><div class="dtw-bar-fill" style="width: 35%;" vid="196"></div></div>
-                                <span class="dtw-value" vid="197">24.36</span>
-                            </div>
-                        </div>
+                        <div class="dtw-list" id="score-list" vid="182"></div>
                     </div>
                 </div>
             </div>

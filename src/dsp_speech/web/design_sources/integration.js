@@ -11,12 +11,12 @@
   screenByPath["/index.html"] = "screen-overview";
   screenByPath["/templates.html"] = "screen-docs";
   const screens = [...document.querySelectorAll("#app-container .screen")];
-  if (!screens.length) return;
-  window.stopCycle?.();
+  if (screens.length) window.stopCycle?.();
 
   const fadeMs = 240;
   let activeScreenId = screenByPath[window.location.pathname] || "screen-overview";
   let isTransitioning = false;
+  if (screens.length) {
 
   function setInitialScreen() {
     screens.forEach((screen) => {
@@ -124,6 +124,14 @@
     row.addEventListener("pointerdown", selectRow, { passive: true });
   });
   if (activeScreenId === "screen-overview") startCycle();
+  } else {
+    const desktopPageByPath = {
+      "/": "page-home", "/index.html": "page-home", "/speaker.html": "page-speaker",
+      "/digits.html": "page-digits", "/docs.html": "page-docs", "/templates.html": "page-docs",
+    };
+    const initialPage = document.documentElement.dataset.startPage || desktopPageByPath[window.location.pathname] || "page-home";
+    if (initialPage !== "page-home") window.showPage?.(initialPage);
+  }
 
   const startButton = document.getElementById("digit-start");
   const stopButton = document.getElementById("digit-stop");
@@ -139,11 +147,14 @@
   if (!startButton || !stopButton || !waveformContainer) return;
 
   const scoreRows = new Map();
+  const desktopScores = scoreList.classList.contains("dtw-list");
   for (let digit = 0; digit <= 9; digit += 1) {
     const row = document.createElement("div");
-    row.className = "chart-item score-row";
+    row.className = desktopScores ? "dtw-row score-row" : "chart-item score-row";
     row.hidden = true;
-    row.innerHTML = `<div class="chart-labels"><span class="score-label">数字 ${digit}</span><span class="score-value">—</span></div><div class="chart-bar-bg"><div class="chart-bar-fill score-fill"></div></div>`;
+    row.innerHTML = desktopScores
+      ? `<span class="dtw-label score-label">${digit}</span><div class="dtw-bar-bg"><div class="dtw-bar-fill score-fill"></div></div><span class="dtw-value score-value">—</span>`
+      : `<div class="chart-labels"><span class="score-label">数字 ${digit}</span><span class="score-value">—</span></div><div class="chart-bar-bg"><div class="chart-bar-fill score-fill"></div></div>`;
     scoreList.appendChild(row);
     scoreRows.set(String(digit), row);
   }
@@ -404,4 +415,3 @@
     stopWithoutRecognition: () => stopRecording({ recognize: false }),
   };
 })();
-

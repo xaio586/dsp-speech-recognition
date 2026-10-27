@@ -16,15 +16,25 @@ from .recognize import load_digit_templates, recognize_utterance
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DESIGN_DIR = Path(__file__).resolve().parent / "web" / "design_sources"
 PAGE_ROUTES = {
-    "/": "mobile.html",
-    "/index.html": "mobile.html",
-    "/speaker.html": "mobile.html",
-    "/digits.html": "mobile.html",
-    "/docs.html": "mobile.html",
-    "/templates.html": "mobile.html",
+    "/": "overview",
+    "/index.html": "overview",
+    "/speaker.html": "speaker",
+    "/digits.html": "digits",
+    "/docs.html": "docs",
+    "/templates.html": "docs",
 }
 MAX_AUDIO_BYTES = 8 * 96_000 * 4
-INTEGRATION_TAG = b'<script src="/integration.js?v=mobile-spa-1"></script>'
+INTEGRATION_TAG = b'<script src="/integration.js?v=split-layout-2"></script>'
+DESKTOP_STYLE = b"""<style id=\"e3-desktop-mic-style\">
+    #page-digits .desktop-mic-controls{display:flex;align-items:center;gap:8px;font-size:12px;white-space:nowrap}
+    #page-digits #mic-select{max-width:min(28vw,260px);min-height:36px;padding:0 10px;border:1px solid rgba(0,0,0,.42);border-radius:2px;background:rgba(255,255,255,.36);color:#111;font:inherit}
+    #page-digits .desktop-mic-refresh{padding:8px 12px;font-size:11px}
+    #page-digits .desktop-mic-hint{flex-basis:100%;font-size:11px;opacity:.72}
+    #page-digits #wave-digit canvas{display:block;width:100%;height:100%}
+    #page-digits .dtw-row[hidden]{display:none!important}
+    #page-digits .dtw-row.is-best .dtw-label,#page-digits .dtw-row.is-best .dtw-value{font-weight:700}
+    @media(max-width:900px){#page-digits .desktop-mic-controls{white-space:normal}#page-digits #mic-select{max-width:45vw}}
+    </style>"""
 TRANSITION_STYLE = b"""<style id=\"e3-page-transition\">
     :root{--e3-enter:cubic-bezier(.23,1,.32,1)}
     html,body{width:100%;height:100%;height:100dvh;min-height:100%;overflow:hidden}
@@ -69,21 +79,31 @@ class RecognitionHandler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:  # noqa: N802
         path = urlparse(self.path).path
         if path in PAGE_ROUTES:
-            page_path = DESIGN_DIR / PAGE_ROUTES[path]
+            mobile = self._is_mobile_client()
+            page_path = DESIGN_DIR / ("mobile.html" if mobile else "index.html")
             try:
                 body = page_path.read_bytes()
             except OSError as error:
                 self._json(500, {"error": f"界面文件读取失败：{error}"})
                 return
             if b"</head>" in body:
-                initial_view = {
-                    "/speaker.html": "screen-speaker",
-                    "/digits.html": "screen-digit",
-                    "/docs.html": "screen-docs",
-                    "/templates.html": "screen-docs",
-                }.get(path, "screen-overview")
-                boot = f'<script>document.documentElement.dataset.startView="{initial_view}";</script>'.encode("ascii")
-                body = body.replace(b"</head>", TRANSITION_STYLE + boot + b"</head>", 1)
+                if mobile:
+                    initial_view = {
+                        "/speaker.html": "screen-speaker",
+                        "/digits.html": "screen-digit",
+                        "/docs.html": "screen-docs",
+                        "/templates.html": "screen-docs",
+                    }.get(path, "screen-overview")
+                    boot = f'<script>document.documentElement.dataset.startView="{initial_view}";</script>'.encode("ascii")
+                else:
+                    initial_page = {
+                        "/speaker.html": "page-speaker",
+                        "/digits.html": "page-digits",
+                        "/docs.html": "page-docs",
+                        "/templates.html": "page-docs",
+                    }.get(path, "page-home")
+                    boot = f'<script>document.documentElement.dataset.startPage="{initial_page}";</script>'.encode("ascii")
+                body = body.replace(b"</head>", (TRANSITION_STYLE if mobile else DESKTOP_STYLE) + boot + b"</head>", 1)
             if b"</body>" in body:
                 body = body.replace(b"</body>", INTEGRATION_TAG + b"</body>", 1)
             self._send(200, body, "text/html; charset=utf-8")
@@ -107,6 +127,11 @@ class RecognitionHandler(BaseHTTPRequestHandler):
             )
             return
         self._json(404, {"error": "页面不存在"})
+
+    def _is_mobile_client(self) -> bool:
+        user_agent = self.headers.get("User-Agent", "").lower()
+        client_hint = self.headers.get("Sec-CH-UA-Mobile", "")
+        return client_hint == "?1" or any(token in user_agent for token in ("iphone", "ipad", "ipod", "android", "mobile"))
 
     def do_POST(self) -> None:  # noqa: N802
         if urlparse(self.path).path != "/recognize":
