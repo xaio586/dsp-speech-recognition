@@ -28,7 +28,7 @@ INTEGRATION_TAG = b'<script src="/integration.js?v=waveform-live-2"></script>'
 DESKTOP_STYLE = b"""<style id=\"e3-desktop-mic-style\">
     #page-digits .desktop-mic-row{display:flex;align-items:center;gap:10px;min-width:0}
     #page-digits .desktop-mic-controls{display:flex;align-items:center;gap:10px;min-width:0;font-size:12px;white-space:nowrap}
-    #page-digits .desktop-mic-controls select{flex:1;min-width:0;max-width:100%;min-height:42px;padding:0 10px;border:1px solid rgba(0,0,0,.42);border-radius:2px;background:rgba(255,255,255,.36);color:#111;font:inherit}
+    #page-digits .desktop-mic-controls select{flex:1;min-width:0;max-width:100%;min-height:42px;padding:0 28px 0 10px;border:1px solid rgba(24,34,30,.28);border-radius:2px;appearance:none;background-color:rgba(250,226,177,.24);background-image:linear-gradient(45deg,transparent 50%,#1f201b 50%),linear-gradient(135deg,#1f201b 50%,transparent 50%);background-position:calc(100% - 13px) 50%,calc(100% - 8px) 50%;background-size:5px 5px;background-repeat:no-repeat;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);color:#111;font:inherit}
     #page-digits .desktop-mic-refresh{min-height:42px;padding:0 14px;font-size:12px;white-space:nowrap;flex:0 0 auto}
     #page-digits .desktop-mic-hint{font-size:11px;line-height:1.45;opacity:.72}
     #page-digits .frame-top .sys-title,#page-digits .frame-top .sys-subtitle{text-shadow:none;filter:none;mix-blend-mode:normal}
