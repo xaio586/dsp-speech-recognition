@@ -24,16 +24,21 @@ PAGE_ROUTES = {
     "/templates.html": "docs",
 }
 MAX_AUDIO_BYTES = 8 * 96_000 * 4
-INTEGRATION_TAG = b'<script src="/integration.js?v=split-layout-3"></script>'
+INTEGRATION_TAG = b'<script src="/integration.js?v=record-toggle-1"></script>'
 DESKTOP_STYLE = b"""<style id=\"e3-desktop-mic-style\">
-    #page-digits .desktop-mic-controls{display:flex;align-items:center;gap:8px;font-size:12px;white-space:nowrap}
-    #page-digits #mic-select{max-width:min(28vw,260px);min-height:36px;padding:0 10px;border:1px solid rgba(0,0,0,.42);border-radius:2px;background:rgba(255,255,255,.36);color:#111;font:inherit}
-    #page-digits .desktop-mic-refresh{padding:8px 12px;font-size:11px}
-    #page-digits .desktop-mic-hint{flex-basis:100%;font-size:11px;opacity:.72}
+    #page-digits .desktop-mic-controls{display:flex;align-items:center;gap:10px;min-width:0;font-size:12px;white-space:nowrap}
+    #page-digits .desktop-mic-controls select{flex:1;min-width:0;max-width:100%;min-height:42px;padding:0 10px;border:1px solid rgba(0,0,0,.42);border-radius:2px;background:rgba(255,255,255,.36);color:#111;font:inherit}
+    #page-digits .desktop-mic-refresh{min-height:42px;padding:0 14px;font-size:12px;white-space:nowrap}
+    #page-digits .desktop-mic-hint{font-size:11px;line-height:1.45;opacity:.72}
+    #page-digits .frame-top .sys-title,#page-digits .frame-top .sys-subtitle{text-shadow:none;filter:none;mix-blend-mode:normal}
+    #page-digits .recognition-progress{display:none;width:100%;height:4px;overflow:hidden;background:rgba(0,0,0,.14)}
+    #page-digits .recognition-progress.is-active{display:block}
+    #page-digits .recognition-progress span{display:block;width:34%;height:100%;background:#17574c;animation:e3-progress 1.2s ease-in-out infinite}
+    @keyframes e3-progress{0%{transform:translateX(-110%)}100%{transform:translateX(330%)}}
     #page-digits #wave-digit canvas{display:block;width:100%;height:100%}
     #page-digits .dtw-row[hidden]{display:none!important}
     #page-digits .dtw-row.is-best .dtw-label,#page-digits .dtw-row.is-best .dtw-value{font-weight:700}
-    @media(max-width:900px){#page-digits .desktop-mic-controls{white-space:normal}#page-digits #mic-select{max-width:45vw}}
+    @media(max-width:900px){#page-digits .desktop-mic-controls{white-space:normal}}
     </style>"""
 TRANSITION_STYLE = b"""<style id=\"e3-page-transition\">
     :root{--e3-enter:cubic-bezier(.23,1,.32,1)}

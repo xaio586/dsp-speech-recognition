@@ -134,7 +134,7 @@
   }
 
   const startButton = document.getElementById("digit-start");
-  const stopButton = document.getElementById("digit-stop");
+  const recognitionProgress = document.getElementById("recognition-progress");
   const micSelect = document.getElementById("mic-select");
   const micRefresh = document.getElementById("mic-refresh");
   const micHint = document.getElementById("mic-hint");
@@ -144,7 +144,7 @@
   const resultDigit = document.getElementById("result-digit");
   const resultMeta = document.getElementById("result-meta");
   const scoreList = document.getElementById("score-list");
-  if (!startButton || !stopButton || !waveformContainer) return;
+  if (!startButton || !waveformContainer) return;
 
   const scoreRows = new Map();
   const desktopScores = scoreList.classList.contains("dtw-list");
@@ -171,9 +171,20 @@
   let recordingStartedAt = 0;
   let timerId = null;
   let recordedSamples = new Float32Array(0);
+  let isStopping = false;
+  let isRecognizing = false;
 
   function setStatus(text) {
     micStatus.textContent = text;
+  }
+
+  function setRecordButton(state, label, disabled = false) {
+    startButton.dataset.state = state;
+    startButton.textContent = label;
+    startButton.disabled = disabled;
+    startButton.setAttribute("aria-pressed", String(state === "recording"));
+    recognitionProgress?.classList.toggle("is-active", state === "recognizing");
+    recognitionProgress?.setAttribute("aria-hidden", String(state !== "recognizing"));
   }
 
   function resizeCanvas() {
@@ -310,12 +321,15 @@
   }
 
   async function startRecording() {
+    if (isRecognizing || audioContext) return;
     if (!navigator.mediaDevices?.getUserMedia) {
       micHint.textContent = "请使用支持麦克风的手机浏览器，并通过 HTTPS 打开网页。";
       return;
     }
     clearResult();
     micHint.textContent = "";
+    setRecordButton("starting", "正在连接麦克风…", true);
+    setStatus("● 正在连接麦克风");
     try {
       const audio = { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true };
       if (micSelect.value) audio.deviceId = { exact: micSelect.value };
@@ -340,18 +354,16 @@
       sourceNode.connect(processorNode);
       processorNode.connect(audioContext.destination);
       recordingStartedAt = Date.now();
-      startButton.disabled = true;
-      stopButton.disabled = false;
-      setStatus("● 正在录音 00:00");
+      setRecordButton("recording", "停止录音", false);
+      setStatus("● 正在录音 00:00 · 再点一次结束");
       timerId = window.setInterval(() => {
         const seconds = Math.floor((Date.now() - recordingStartedAt) / 1000);
-        setStatus(`● 正在录音 00:${String(seconds).padStart(2, "0")}`);
+        setStatus(`● 正在录音 00:${String(seconds).padStart(2, "0")} · 再点一次结束`);
         if (seconds >= 8) stopRecording();
       }, 200);
     } catch (error) {
       await releaseMicrophone();
-      startButton.disabled = false;
-      stopButton.disabled = true;
+      setRecordButton("idle", "开始录音", false);
       setStatus("● 等待录音");
       micHint.textContent = error.name === "NotAllowedError"
         ? "麦克风权限未开放，请允许浏览器使用麦克风。"
@@ -360,23 +372,29 @@
   }
 
   async function stopRecording({ recognize = true } = {}) {
-    if (!audioContext) return;
+    if (!audioContext || isStopping) return;
+    isStopping = true;
+    isRecognizing = recognize;
+    setRecordButton(recognize ? "recognizing" : "processing", recognize ? "正在识别…" : "正在结束…", true);
+    if (recognize) setStatus("● 正在识别 · 提取特征并匹配模板");
     const sampleRate = audioContext.sampleRate;
     await releaseMicrophone();
     recordedSamples = combineChunks();
     drawWave(recordedSamples);
-    startButton.disabled = false;
-    stopButton.disabled = true;
+    isStopping = false;
     if (!recognize) {
+      isRecognizing = false;
+      setRecordButton("idle", "开始录音", false);
       setStatus("● 录音已停止");
       return;
     }
     if (recordedSamples.length < sampleRate * .2) {
+      isRecognizing = false;
+      setRecordButton("idle", "开始录音", false);
       setStatus("● 录音太短");
       micHint.textContent = "请完整说完一个数字再停止录音。";
       return;
     }
-    setStatus("● 正在识别");
     try {
       const response = await fetch("/recognize", {
         method: "POST",
@@ -394,11 +412,16 @@
     } catch (error) {
       setStatus("● 识别失败");
       micHint.textContent = error.message;
+    } finally {
+      isRecognizing = false;
+      setRecordButton("idle", "开始录音", false);
     }
   }
 
-  startButton.addEventListener("click", startRecording);
-  stopButton.addEventListener("click", () => stopRecording());
+  startButton.addEventListener("click", () => {
+    if (audioContext) stopRecording();
+    else startRecording();
+  });
   micRefresh.addEventListener("click", authorizeMicrophones);
   micSelect.addEventListener("change", () => {
     const option = micSelect.selectedOptions[0];

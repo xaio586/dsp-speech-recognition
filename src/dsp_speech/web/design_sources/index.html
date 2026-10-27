@@ -238,8 +238,21 @@
         #page-digits .digit-grid { display: flex; gap: 12px; margin-bottom: 48px; }
         #page-digits .digit-pill { width: 40px; height: 40px; border: var(--line-weight) solid var(--ui-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; opacity: 0.4; }
         #page-digits .digit-pill.active { background: var(--ui-color); color: white; opacity: 1; }
-        #page-digits .controls { display: flex; gap: 16px; align-items: center; margin-bottom: 64px; }
-        #page-digits .status-badge { font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; margin-left: 8px; }
+        #page-digits .controls { display: grid; grid-template-columns: minmax(180px, 220px) minmax(0, 1fr); gap: 14px 20px; align-items: center; margin-bottom: 48px; }
+        #page-digits .record-action-row { display: flex; align-items: center; gap: 16px; grid-column: 1 / -1; min-width: 0; }
+        #page-digits .record-toggle { width: 210px; min-width: 210px; min-height: 48px; padding: 0 18px; display: inline-flex; justify-content: center; align-items: center; white-space: nowrap; font: inherit; font-size: 13px; letter-spacing: .02em; }
+        #page-digits .record-toggle[data-state="recording"] { background: var(--ui-color); color: #fff; }
+        #page-digits .record-toggle:disabled { opacity: .58; cursor: wait; }
+        #page-digits .status-badge { font-size: 12px; letter-spacing: 0.02em; margin: 0; min-width: 0; }
+        #page-digits .recognition-progress { grid-column: 1 / -1; display: none; width: 100%; height: 4px; overflow: hidden; background: rgba(0,0,0,.14); }
+        #page-digits .recognition-progress.is-active { display: block; }
+        #page-digits .recognition-progress span { display: block; width: 34%; height: 100%; background: #17574c; animation: e3-progress 1.2s ease-in-out infinite; }
+        @keyframes e3-progress { 0% { transform: translateX(-110%); } 100% { transform: translateX(330%); } }
+        #page-digits .desktop-mic-controls { grid-column: 1 / 2; display:flex; align-items:center; gap:10px; min-width:0; font-size:12px; white-space:nowrap; }
+        #page-digits .desktop-mic-controls select { flex:1; min-width:0; max-width:100%; min-height:42px; padding:0 10px; border:1px solid rgba(0,0,0,.42); border-radius:2px; background:rgba(255,255,255,.36); color:#111; font:inherit }
+        #page-digits .desktop-mic-refresh { grid-column:2 / 3; justify-self:start; min-height:42px; padding:0 14px; font-size:12px; white-space:nowrap; }
+        #page-digits .desktop-mic-hint { grid-column:1 / -1; font-size:11px; line-height:1.45; opacity:.72; }
+        #page-digits .frame-top .sys-title, #page-digits .frame-top .sys-subtitle { position:relative; z-index:1; opacity:1; text-shadow:none; filter:none; mix-blend-mode:normal; transform:none; animation:none; }
         #page-digits .waveform-panel { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-end; }
         #page-digits .waveform-viz { width: 100%; height: 80px; border-bottom: var(--line-weight) solid var(--ui-color); display: flex; align-items: center; gap: 2px; }
         #page-digits .prediction-card { border: var(--line-weight) solid var(--ui-color); padding: 24px; position: relative; }
@@ -280,6 +293,12 @@
             #page-docs .main-content { flex-direction: column; overflow-y: auto; }
             #page-docs .doc-section { border-right: none; border-bottom: var(--line-weight) solid var(--ui-color); height: auto; }
             #page-docs .page-title { font-size: 32px; }
+        }
+        @media (max-width: 900px) {
+            #page-digits .controls { grid-template-columns: minmax(0, 1fr); }
+            #page-digits .record-toggle { width: 100%; min-width: 0; }
+            #page-digits .desktop-mic-controls, #page-digits .desktop-mic-refresh { grid-column: 1 / -1; }
+            #page-digits .desktop-mic-refresh { justify-self: stretch; }
         }
     </style>
 </head>
@@ -504,13 +523,15 @@
                     </div>
 
                     <div class="controls" vid="154">
-                        <button class="btn" id="digit-start" type="button" vid="155">开始录音</button>
-                        <button class="btn" id="digit-stop" type="button" disabled vid="156">停止并识别</button>
-                        <span class="status-badge" id="mic-status" vid="157">等待录音</span>
+                        <div class="record-action-row">
+                            <button class="btn record-toggle" id="digit-start" type="button" data-state="idle" aria-pressed="false" vid="155">开始录音</button>
+                            <span class="status-badge" id="mic-status" aria-live="polite" vid="157">等待开始</span>
+                        </div>
+                        <div class="recognition-progress" id="recognition-progress" role="progressbar" aria-label="正在识别语音" aria-hidden="true"><span></span></div>
                         <label class="desktop-mic-controls">输入设备
                             <select id="mic-select" aria-label="选择麦克风"><option value="">系统默认麦克风</option></select>
                         </label>
-                        <button class="btn desktop-mic-refresh" id="mic-refresh" type="button">授权 / 刷新</button>
+                        <button class="btn desktop-mic-refresh" id="mic-refresh" type="button">授权 / 刷新设备</button>
                         <span id="mic-hint" class="desktop-mic-hint">设备名称需先授权后显示。</span>
                     </div>
 

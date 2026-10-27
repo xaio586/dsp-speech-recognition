@@ -360,9 +360,10 @@
         .mobile-mic-controls select { min-width:130px; max-width:55vw; padding:7px 8px; border:1px solid rgba(0,0,0,.55); border-radius:0; color:#111; background:rgba(255,255,255,.58); font:inherit; }
         .mobile-mic-controls button { border:1px solid rgba(0,0,0,.55); padding:7px 9px; background:transparent; color:#111; font:inherit; }
         .mic-hint { font-size:12px; line-height:1.45; opacity:.72; }
-        .mobile-record-controls { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-        .mobile-record-controls .btn-outline { width:100%; min-height:48px; color:#111; background:rgba(255,255,255,.28); font:inherit; }
-        .mobile-record-controls .btn-outline:disabled { opacity:.42; cursor:not-allowed; }
+        .mobile-record-controls { display:grid; grid-template-columns:minmax(0, 210px) minmax(0, 1fr); gap:12px; align-items:center; }
+        .mobile-record-controls .record-toggle { width:100%; min-height:48px; padding:0 16px; display:inline-flex; justify-content:center; align-items:center; white-space:nowrap; color:#111; background:rgba(255,255,255,.28); font:inherit; font-size:14px; }
+        .mobile-record-controls .record-toggle[data-state="recording"] { background:#111; color:#fff; }
+        .mobile-record-controls .record-toggle:disabled { opacity:.58; cursor:wait; }
         .results-grid { display:flex; flex-direction:column; gap:14px; margin-top:4px; }
         .result-card, .chart-card { border:var(--line-weight) solid var(--ui-color); padding:14px; background:rgba(255,255,255,.08); }
         .result-row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:8px; }
@@ -376,7 +377,16 @@
         .score-row.is-best .score-label { font-weight:700; }
         .score-row.is-best .score-fill { background:#17574c; }
         .score-row[hidden] { display:none; }
-        .mobile-record-controls .status { grid-column:1 / -1; margin-left:0; text-align:right; }
+        .mobile-record-controls .status { grid-column:2; margin:0; text-align:left; white-space:nowrap; }
+        .recognition-progress { grid-column:1 / -1; display:none; width:100%; height:4px; overflow:hidden; background:rgba(0,0,0,.14); }
+        .recognition-progress.is-active { display:block; }
+        .recognition-progress span { display:block; width:34%; height:100%; background:#17574c; animation:e3-progress 1.2s ease-in-out infinite; }
+        @keyframes e3-progress { 0% { transform:translateX(-110%); } 100% { transform:translateX(330%); } }
+        #screen-digit .page-header, #screen-digit .sys-text { text-shadow:none; filter:none; mix-blend-mode:normal; }
+        @media(max-width:520px) {
+            .mobile-record-controls { grid-template-columns:minmax(0,1fr); }
+            .mobile-record-controls .status { grid-column:1; white-space:normal; text-align:left; }
+        }
         .back-btn { border:0; background:transparent; color:inherit; font:inherit; }
         @media(max-height:740px) { .page-content { gap:20px; padding-top:18px; padding-bottom:18px; } }
         @supports (padding: max(0px)) {
@@ -585,7 +595,7 @@
             <div class="page-content">
                 <div class="digit-intro stagger-el delay-1">
                     <h1 class="large-title">说一个数字</h1>
-                    <p class="hero-desc">对着麦克风说 0 到 9 中的一个数字，停止后查看匹配结果。系统会提取 MFCC 特征，并与数字模板进行 DTW 匹配。</p>
+                <p class="hero-desc">对着麦克风说 0 到 9 中的一个数字，再点一次按钮停止录音，系统会自动提取 MFCC 特征并进行 DTW 匹配。</p>
                 </div>
                 <div class="digits-row stagger-el delay-2" aria-label="识别类别 0 到 9">
                     <div class="digit" data-digit="0">0</div><div class="digit" data-digit="1">1</div>
@@ -595,9 +605,9 @@
                     <div class="digit" data-digit="8">8</div><div class="digit" data-digit="9">9</div>
                 </div>
                 <div class="mobile-record-controls stagger-el delay-4">
-                    <button class="btn-outline" id="digit-start" type="button">开始录音</button>
-                    <button class="btn-outline btn-primary" id="digit-stop" type="button" disabled>停止并识别</button>
-                    <span class="status" id="mic-status">● 等待录音</span>
+                    <button class="btn-outline record-toggle" id="digit-start" type="button" data-state="idle" aria-pressed="false">开始录音</button>
+                    <span class="status" id="mic-status" aria-live="polite">● 等待开始</span>
+                    <div class="recognition-progress" id="recognition-progress" role="progressbar" aria-label="正在识别语音" aria-hidden="true"><span></span></div>
                 </div>
                 <section class="panel-box waveform-panel stagger-el delay-3">
                     <div class="sys-text flex justify-between"><span>实时麦克风波形</span><span id="input-format">等待设备</span></div>
