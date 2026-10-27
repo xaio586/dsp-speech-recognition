@@ -243,19 +243,23 @@
         }
 
         .btn-outline {
-            border: var(--line-weight) solid var(--ui-color);
+            border: var(--line-weight) solid rgba(0,0,0,.42);
             padding: 16px;
+            background: rgba(255,255,255,.18);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            color: #111;
             text-align: center;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: background 0.2s, color 0.2s;
+            transition: background-color 180ms cubic-bezier(.23,1,.32,1), color 180ms cubic-bezier(.23,1,.32,1), border-color 180ms cubic-bezier(.23,1,.32,1);
             text-transform: uppercase;
             letter-spacing: 0.02em;
         }
-        .btn-outline:active {
-            background: var(--ui-color);
-            color: #fff;
+        .btn-outline:active { background:#111; border-color:#111; color:#fff; }
+        @media (hover:hover) and (pointer:fine) {
+            .btn-outline:hover, .mobile-mic-controls button:hover, .back-btn:hover { background:#111; border-color:#111; color:#fff; }
         }
 
         .dtw-bar-container {
@@ -358,10 +362,10 @@
         .module-note { font-size: 14px; line-height: 1.65; }
         .mobile-mic-controls { display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-size:12px; }
         .mobile-mic-controls select { min-width:130px; max-width:55vw; padding:7px 28px 7px 8px; border:1px solid rgba(24,34,30,.28); border-radius:0; appearance:none; color:#111; background-color:rgba(250,226,177,.24); background-image:linear-gradient(45deg,transparent 50%,#1f201b 50%),linear-gradient(135deg,#1f201b 50%,transparent 50%); background-position:calc(100% - 13px) 50%,calc(100% - 8px) 50%; background-size:5px 5px; background-repeat:no-repeat; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); font:inherit; }
-        .mobile-mic-controls button { border:1px solid rgba(0,0,0,.55); padding:7px 9px; background:transparent; color:#111; font:inherit; }
+        .mobile-mic-controls button { border:1px solid rgba(0,0,0,.42); padding:7px 9px; background:rgba(255,255,255,.18); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); color:#111; font:inherit; transition:background-color 180ms cubic-bezier(.23,1,.32,1),color 180ms cubic-bezier(.23,1,.32,1),border-color 180ms cubic-bezier(.23,1,.32,1); }
         .mic-hint { font-size:12px; line-height:1.45; opacity:.72; }
         .mobile-record-controls { display:grid; grid-template-columns:minmax(0, 210px) minmax(0, 1fr); gap:12px; align-items:center; }
-        .mobile-record-controls .record-toggle { width:100%; min-height:48px; padding:0 16px; display:inline-flex; justify-content:center; align-items:center; white-space:nowrap; color:#111; background:rgba(250,226,177,.24); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); font:inherit; font-size:14px; }
+        .mobile-record-controls .record-toggle { width:100%; min-height:48px; padding:0 16px; display:inline-flex; justify-content:center; align-items:center; white-space:nowrap; color:#111; background:rgba(255,255,255,.18); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); border:1px solid rgba(0,0,0,.42); transition:background-color 180ms cubic-bezier(.23,1,.32,1),color 180ms cubic-bezier(.23,1,.32,1),border-color 180ms cubic-bezier(.23,1,.32,1); font:inherit; font-size:14px; }
         .mobile-record-controls .record-toggle[data-state="recording"] { background:#111; color:#fff; }
         .mobile-record-controls .record-toggle:disabled { opacity:.58; cursor:wait; }
         .results-grid { display:flex; flex-direction:column; gap:14px; margin-top:4px; }
@@ -387,7 +391,7 @@
             .mobile-record-controls { grid-template-columns:minmax(0,1fr); }
             .mobile-record-controls .status { grid-column:1; white-space:normal; text-align:left; }
         }
-        .back-btn { border:0; background:transparent; color:inherit; font:inherit; }
+        .back-btn { border:1px solid rgba(0,0,0,.42); padding:8px 10px; background:rgba(255,255,255,.18); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); color:#111; font:inherit; transition:background-color 180ms cubic-bezier(.23,1,.32,1),color 180ms cubic-bezier(.23,1,.32,1),border-color 180ms cubic-bezier(.23,1,.32,1); }
         @media(max-height:740px) { .page-content { gap:20px; padding-top:18px; padding-bottom:18px; } }
         @supports (padding: max(0px)) {
             .page-header { padding-top:max(16px, env(safe-area-inset-top)); }
@@ -502,7 +506,7 @@
                 <div class="list-row" onclick="navigateTo('screen-speaker')" vid="19">
                     <div class="row-index" vid="20">01</div>
                     <div class="row-cta" vid="21">点击进入 →</div>
-                    <div class="row-title" vid="22">说话人识别</div>
+                    <div class="row-title" vid="22">speaker</div>
                     <div class="row-footer sys-text" vid="23">
                         <ul class="spec-list" vid="24">
                             <li vid="25">MFCC · DTW</li>
@@ -519,7 +523,7 @@
                 <div class="list-row" onclick="navigateTo('screen-digit')" vid="30">
                     <div class="row-index" vid="31">02</div>
                     <div class="row-cta" vid="32">点击进入 →</div>
-                    <div class="row-title" vid="33">数字识别</div>
+                    <div class="row-title" vid="33">number</div>
                     <div class="row-footer sys-text" vid="34">
                         <ul class="spec-list" vid="35">
                             <li vid="36">MFCC · DTW · 16 kHz</li>
@@ -536,7 +540,7 @@
                 <div class="list-row" onclick="navigateTo('screen-docs')" vid="41">
                     <div class="row-index" vid="42">03</div>
                     <div class="row-cta" vid="43">点击进入 →</div>
-                    <div class="row-title" vid="44">训练文档</div>
+                    <div class="row-title" vid="44">process</div>
                     <div class="row-footer sys-text" vid="45">
                         <ul class="spec-list" vid="46">
                             <li vid="47">160 TEMPLATES · WAV</li>
