@@ -1,318 +1,402 @@
 (() => {
   "use strict";
 
-  const routes = {
-    "page-home": "/index.html",
-    "page-speaker": "/speaker.html",
-    "page-digits": "/digits.html",
-    "page-docs": "/docs.html",
+  const routeByScreen = {
+    "screen-overview": "/",
+    "screen-speaker": "/speaker.html",
+    "screen-digit": "/digits.html",
+    "screen-docs": "/docs.html",
   };
+  const screenByPath = Object.fromEntries(Object.entries(routeByScreen).map(([screen, path]) => [path, screen]));
+  screenByPath["/index.html"] = "screen-overview";
+  screenByPath["/templates.html"] = "screen-docs";
+  const screens = [...document.querySelectorAll("#app-container .screen")];
+  if (!screens.length) return;
+  window.stopCycle?.();
 
-  let navigating = false;
-  function navigateTo(path) {
-    if (!path || navigating) return;
-    const current = window.location.pathname === "/" ? "/index.html" : window.location.pathname;
-    if (current === path) return;
-    navigating = true;
-    document.body.classList.remove("e3-visible");
-    document.body.classList.add("e3-leaving");
-    window.setTimeout(() => window.location.assign(path), 280);
+  const fadeMs = 240;
+  let activeScreenId = screenByPath[window.location.pathname] || "screen-overview";
+  let isTransitioning = false;
+
+  function setInitialScreen() {
+    screens.forEach((screen) => {
+      const isActive = screen.id === activeScreenId;
+      screen.classList.toggle("active", isActive);
+      screen.classList.remove("is-entering", "is-leaving");
+      screen.classList.toggle("hidden-right", !isActive);
+      if (isActive) screen.classList.remove("hidden-left");
+      screen.setAttribute("aria-hidden", String(!isActive));
+    });
+    document.documentElement.removeAttribute("data-start-view");
+    window.currentScreenId = activeScreenId;
   }
 
-  window.showPage = (pageId) => {
-    if (routes[pageId]) navigateTo(routes[pageId]);
-  };
+  function pathFor(screenId) {
+    return routeByScreen[screenId] || "/";
+  }
 
-  document.addEventListener("click", (event) => {
-    const anchor = event.target.closest("a[href]");
-    if (!anchor) return;
-    const href = anchor.getAttribute("href");
-    const target = href === "/" ? "/index.html" : href === "index.html" ? "/index.html" : null;
-    if (!target) return;
-    event.preventDefault();
-    navigateTo(target);
-  }, true);
+  function navigateTo(screenId, options = {}) {
+    const target = document.getElementById(screenId);
+    const current = document.getElementById(activeScreenId);
+    if (!target || screenId === activeScreenId || isTransitioning) return;
 
-  document.querySelectorAll(".back-btn, .back-link").forEach((link) => {
-    link.addEventListener("click", (event) => {
-      event.preventDefault();
-      navigateTo("/index.html");
+    const { updateHistory = true } = options;
+    isTransitioning = true;
+    if (updateHistory) {
+      const targetPath = pathFor(screenId);
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState({ screenId }, "", targetPath);
+      }
+    }
+
+    current?.classList.remove("active");
+    if (current) {
+      current.classList.remove("is-entering");
+      current.classList.add("is-leaving");
+      current.setAttribute("aria-hidden", "true");
+    }
+
+    target.classList.remove("hidden-left", "hidden-right", "is-leaving");
+    target.classList.add("is-entering");
+    target.setAttribute("aria-hidden", "false");
+    void target.offsetWidth;
+    requestAnimationFrame(() => {
+      target.classList.remove("is-entering");
+      target.classList.add("active");
     });
+
+    const previousId = activeScreenId;
+    activeScreenId = screenId;
+    window.currentScreenId = screenId;
+    window.setTimeout(() => {
+      const previous = document.getElementById(previousId);
+      previous?.classList.remove("is-leaving");
+      previous?.classList.add("hidden-right");
+      isTransitioning = false;
+    }, fadeMs + 30);
+
+    if (screenId === "screen-overview") startCycle();
+    else stopCycle();
+
+    if (window.digitRecorder?.isRecording()) window.digitRecorder.stopWithoutRecognition();
+  }
+
+  window.navigateTo = navigateTo;
+  window.showPage = (pageId) => {
+    const screenId = {
+      "page-home": "screen-overview",
+      "page-speaker": "screen-speaker",
+      "page-digits": "screen-digit",
+      "page-docs": "screen-docs",
+    }[pageId];
+    if (screenId) navigateTo(screenId);
+  };
+  window.addEventListener("popstate", () => {
+    const screenId = screenByPath[window.location.pathname] || "screen-overview";
+    navigateTo(screenId, { updateHistory: false });
   });
+  setInitialScreen();
 
-  if (window.location.pathname !== "/digits.html") return;
+  // The source design has a decorative rotating row showcase; keep it still while a row is touched.
+  const overviewRows = [...document.querySelectorAll("#screen-overview .list-row")];
+  let expandedIdx = 0;
+  let cycleTimer = null;
+  function cycleRows() {
+    if (!overviewRows.length) return;
+    expandedIdx = (expandedIdx + 1) % overviewRows.length;
+    overviewRows.forEach((row, index) => row.classList.toggle("expanded", index === expandedIdx));
+  }
+  function startCycle() {
+    stopCycle();
+    if (!overviewRows.length || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    cycleTimer = window.setInterval(cycleRows, 3200);
+  }
+  function stopCycle() {
+    if (cycleTimer) window.clearInterval(cycleTimer);
+    cycleTimer = null;
+  }
+  overviewRows.forEach((row, index) => {
+    const selectRow = () => {
+      stopCycle();
+      expandedIdx = index;
+      overviewRows.forEach((item, currentIndex) => item.classList.toggle("expanded", currentIndex === index));
+    };
+    row.addEventListener("pointerdown", selectRow, { passive: true });
+  });
+  if (activeScreenId === "screen-overview") startCycle();
 
-  const buttonGroup = document.querySelector(".button-group");
-  const controlSection = document.querySelector(".control-section");
-  const buttons = [...document.querySelectorAll(".button-group .btn")];
-  const startButton = buttons[0];
-  const stopButton = buttons[1];
-  const statusPill = document.querySelector(".status-pill");
-  const resultValue = document.querySelector(".result-val");
-  const resultMeta = document.querySelector(".result-meta");
-  const waveformContainer = document.querySelector(".waveform-viz");
-  const statRows = [...document.querySelectorAll(".stat-row")];
-  const audioLabel = document.querySelector(".viz-section .section-tag");
-  if (!buttonGroup || !controlSection || !startButton || !stopButton) return;
+  const startButton = document.getElementById("digit-start");
+  const stopButton = document.getElementById("digit-stop");
+  const micSelect = document.getElementById("mic-select");
+  const micRefresh = document.getElementById("mic-refresh");
+  const micHint = document.getElementById("mic-hint");
+  const micStatus = document.getElementById("mic-status");
+  const waveformContainer = document.getElementById("wave-digit");
+  const resultDigit = document.getElementById("result-digit");
+  const resultMeta = document.getElementById("result-meta");
+  const scoreList = document.getElementById("score-list");
+  if (!startButton || !stopButton || !waveformContainer) return;
 
-  const style = document.createElement("style");
-  style.textContent = `
-    .viz-section{width:100%;min-width:0}
-    .waveform-viz{display:block!important;position:relative!important;width:100%!important;min-width:0!important;max-width:100%!important;height:120px!important;box-sizing:border-box!important;padding:0!important;overflow:hidden!important;flex:none!important}
-    .waveform-viz canvas{display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
-    .e3-mic-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px;font:12px Inter,"Noto Sans SC",sans-serif;color:#17201a}
-    .e3-mic-row select{max-width:min(360px,55vw);min-width:190px;padding:7px 24px 7px 5px;border:0;border-bottom:1px solid rgba(20,30,25,.5);background:rgba(247,245,235,.28);color:inherit;font:inherit;outline:none}
-    .e3-mic-row button{padding:5px 2px;border:0;background:transparent;color:#17574c;font:inherit;cursor:pointer}
-    .e3-mic-row button:hover{text-decoration:underline}
-    .e3-mic-row .e3-mic-hint{color:rgba(20,30,25,.65);font-size:11px}
-    @media(max-width:650px){.e3-mic-row select{min-width:150px;max-width:68vw}}
-  `;
-  document.head.appendChild(style);
+  const scoreRows = new Map();
+  for (let digit = 0; digit <= 9; digit += 1) {
+    const row = document.createElement("div");
+    row.className = "score-row";
+    row.innerHTML = `<span class="score-label">数字 ${digit}</span><div class="score-track"><div class="score-fill"></div></div><span class="score-value">—</span>`;
+    scoreList.appendChild(row);
+    scoreRows.set(String(digit), row);
+  }
 
-  const micRow = document.createElement("div");
-  micRow.className = "e3-mic-row";
-  micRow.innerHTML = '<span>输入设备</span><select aria-label="选择麦克风"><option value="">系统默认麦克风</option></select><button type="button">授权 / 刷新设备</button><span class="e3-mic-hint"></span>';
-  controlSection.appendChild(micRow);
-  const micSelect = micRow.querySelector("select");
-  const refreshButton = micRow.querySelector("button");
-  const micHint = micRow.querySelector(".e3-mic-hint");
-
-  const waveformCanvas = document.createElement("canvas");
-  waveformCanvas.setAttribute("aria-label", "麦克风实时录音波形");
-  waveformContainer.style.cssText += ";display:block;position:relative;width:100%;min-width:0;max-width:100%;height:120px;box-sizing:border-box;padding:0;overflow:hidden;flex:none";
-  waveformCanvas.style.cssText = "display:block;position:absolute;inset:0;box-sizing:border-box;width:100%;height:100%;min-width:0;max-width:100%";
-  waveformContainer.replaceChildren(waveformCanvas);
-  const waveformContext = waveformCanvas.getContext("2d");
-
+  const canvas = document.createElement("canvas");
+  canvas.setAttribute("aria-label", "麦克风录音波形");
+  canvas.style.cssText = "display:block;width:100%;height:100%;";
+  waveformContainer.replaceChildren(canvas);
   let audioContext = null;
-  let mediaStream = null;
+  let stream = null;
   let sourceNode = null;
   let processorNode = null;
   let chunks = [];
+  let recordingStartedAt = 0;
   let timerId = null;
-  let startedAt = 0;
-  let recorded = new Float32Array(0);
+  let recordedSamples = new Float32Array(0);
 
-  const setStatus = (value) => {
-    if (statusPill) statusPill.textContent = value;
-  };
+  function setStatus(text) {
+    micStatus.textContent = text;
+  }
+
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(1, Math.round(rect.width * ratio));
+    canvas.height = Math.max(1, Math.round(rect.height * ratio));
+    const context = canvas.getContext("2d");
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    drawWave(recordedSamples);
+  }
+
+  function drawWave(samples) {
+    const rect = canvas.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    if (canvas.width !== Math.round(rect.width * ratio) || canvas.height !== Math.round(rect.height * ratio)) {
+      canvas.width = Math.max(1, Math.round(rect.width * ratio));
+      canvas.height = Math.max(1, Math.round(rect.height * ratio));
+    }
+    const context = canvas.getContext("2d");
+    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    context.clearRect(0, 0, rect.width, rect.height);
+    const mid = rect.height / 2;
+    context.strokeStyle = "rgba(23,59,98,.38)";
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(0, mid + .5);
+    context.lineTo(rect.width, mid + .5);
+    context.stroke();
+    if (!samples.length) return;
+    let peak = 0;
+    for (let i = 0; i < samples.length; i += 1) peak = Math.max(peak, Math.abs(samples[i]));
+    const scale = Math.min(rect.height * .38 / Math.max(peak, 1e-6), 900);
+    context.strokeStyle = "#173b62";
+    context.lineWidth = 1;
+    context.beginPath();
+    for (let x = 0; x < Math.ceil(rect.width); x += 1) {
+      const from = Math.floor(x / rect.width * samples.length);
+      const to = Math.max(from + 1, Math.floor((x + 1) / rect.width * samples.length));
+      let min = 0;
+      let max = 0;
+      for (let i = from; i < Math.min(to, samples.length); i += 1) {
+        min = Math.min(min, samples[i]);
+        max = Math.max(max, samples[i]);
+      }
+      context.moveTo(x + .5, mid - max * scale);
+      context.lineTo(x + .5, mid - min * scale);
+    }
+    context.stroke();
+  }
+
+  function combineChunks() {
+    const length = chunks.reduce((total, item) => total + item.length, 0);
+    const output = new Float32Array(length);
+    let offset = 0;
+    chunks.forEach((item) => { output.set(item, offset); offset += item.length; });
+    return output;
+  }
 
   async function refreshMicrophones() {
     if (!navigator.mediaDevices?.enumerateDevices) {
-      micHint.textContent = "浏览器暂不支持麦克风设备列表";
+      micHint.textContent = "当前浏览器不支持麦克风设备列表。";
       return;
     }
     try {
-      const devices = (await navigator.mediaDevices.enumerateDevices()).filter((item) => item.kind === "audioinput");
       const previous = micSelect.value;
-      micSelect.innerHTML = '<option value="">系统默认麦克风</option>';
-      devices.forEach((device, index) => {
-        const option = document.createElement("option");
-        option.value = device.deviceId;
-        option.textContent = device.label || `麦克风 ${index + 1}（授权后显示名称）`;
-        micSelect.appendChild(option);
+      const inputs = (await navigator.mediaDevices.enumerateDevices()).filter((device) => device.kind === "audioinput");
+      micSelect.replaceChildren(new Option("系统默认麦克风", ""));
+      inputs.forEach((device, index) => {
+        micSelect.add(new Option(device.label || `麦克风 ${index + 1}（授权后显示名称）`, device.deviceId));
       });
       if ([...micSelect.options].some((option) => option.value === previous)) micSelect.value = previous;
-      micHint.textContent = devices.some((device) => device.label)
-        ? "选择耳机麦克风后开始录音"
-        : "授权后可显示耳机麦克风名称";
+      if (inputs.some((device) => device.label)) micHint.textContent = "已读取设备；可选择手机或耳机麦克风。";
+      else micHint.textContent = "设备名称需先授权后显示。";
     } catch (error) {
-      micHint.textContent = `读取设备失败：${error.message}`;
+      micHint.textContent = `读取麦克风列表失败：${error.message}`;
     }
   }
 
   async function authorizeMicrophones() {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((track) => track.stop());
+      const permissionStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      permissionStream.getTracks().forEach((track) => track.stop());
       await refreshMicrophones();
     } catch (error) {
       micHint.textContent = error.name === "NotAllowedError"
-        ? "请在浏览器提示中允许麦克风权限"
-        : `无法打开麦克风：${error.message}`;
+        ? "请在浏览器提示中允许麦克风权限。"
+        : `无法访问麦克风：${error.message}`;
     }
-  }
-
-  function joinChunks() {
-    const length = chunks.reduce((total, chunk) => total + chunk.length, 0);
-    const joined = new Float32Array(length);
-    let offset = 0;
-    chunks.forEach((chunk) => { joined.set(chunk, offset); offset += chunk.length; });
-    return joined;
-  }
-
-  function updateWaveform(samples) {
-    const bounds = waveformCanvas.getBoundingClientRect();
-    const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
-    const width = Math.max(1, bounds.width);
-    const height = Math.max(1, bounds.height);
-    waveformCanvas.width = Math.round(width * pixelRatio);
-    waveformCanvas.height = Math.round(height * pixelRatio);
-    waveformContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-    waveformContext.clearRect(0, 0, width, height);
-
-    const center = height / 2;
-    waveformContext.strokeStyle = "rgba(23,59,98,.46)";
-    waveformContext.lineWidth = 1;
-    waveformContext.beginPath();
-    waveformContext.moveTo(0, center + .5);
-    waveformContext.lineTo(width, center + .5);
-    waveformContext.stroke();
-    if (!samples.length) return;
-
-    let peak = 0;
-    for (let i = 0; i < samples.length; i += 1) peak = Math.max(peak, Math.abs(samples[i]));
-    const scale = Math.min((height * .38) / Math.max(peak, 1e-6), 800);
-    waveformContext.strokeStyle = "#173b62";
-    waveformContext.lineWidth = 1;
-    waveformContext.beginPath();
-    let started = false;
-    for (let x = 0; x < Math.ceil(width); x += 1) {
-      const from = Math.floor((x / width) * samples.length);
-      const to = Math.max(from + 1, Math.floor(((x + 1) / width) * samples.length));
-      let minimum = 0;
-      let maximum = 0;
-      for (let i = from; i < Math.min(to, samples.length); i += 1) {
-        minimum = Math.min(minimum, samples[i]);
-        maximum = Math.max(maximum, samples[i]);
-      }
-      const yTop = center - maximum * scale;
-      const yBottom = center - minimum * scale;
-      if (!started) {
-        waveformContext.moveTo(x + .5, yTop);
-        started = true;
-      }
-      waveformContext.lineTo(x + .5, yTop);
-      waveformContext.lineTo(x + .5, yBottom);
-    }
-    waveformContext.stroke();
-  }
-
-  function updateScores(scores) {
-    const ranked = Object.entries(scores).sort((left, right) => left[1] - right[1]).slice(0, 3);
-    const largest = Math.max(...ranked.map((item) => item[1]), 1e-6);
-    ranked.forEach(([digit, distance], index) => {
-      const row = statRows[index];
-      if (!row) return;
-      const labels = row.querySelectorAll(".stat-label span");
-      if (labels[0]) labels[0].textContent = `数字 ${digit}`;
-      if (labels[1]) labels[1].textContent = Number(distance).toFixed(2);
-      const fill = row.querySelector(".stat-bar-fill");
-      if (fill) fill.style.width = `${Math.max(10, (distance / largest) * 100)}%`;
-    });
   }
 
   async function releaseMicrophone() {
-    if (timerId) { clearInterval(timerId); timerId = null; }
-    if (processorNode) { processorNode.onaudioprocess = null; processorNode.disconnect(); processorNode = null; }
-    if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
-    if (mediaStream) { mediaStream.getTracks().forEach((track) => track.stop()); mediaStream = null; }
-    if (audioContext) { const context = audioContext; audioContext = null; await context.close(); }
+    if (timerId) window.clearInterval(timerId);
+    timerId = null;
+    if (processorNode) {
+      processorNode.onaudioprocess = null;
+      processorNode.disconnect();
+    }
+    processorNode = null;
+    if (sourceNode) sourceNode.disconnect();
+    sourceNode = null;
+    if (stream) stream.getTracks().forEach((track) => track.stop());
+    stream = null;
+    if (audioContext) await audioContext.close();
+    audioContext = null;
+  }
+
+  function clearResult() {
+    resultDigit.textContent = "—";
+    resultMeta.textContent = "等待本次录音结果";
+    document.querySelectorAll(".digit-circle").forEach((item) => item.classList.remove("active"));
+    scoreRows.forEach((row) => {
+      row.classList.remove("is-best");
+      row.querySelector(".score-value").textContent = "—";
+      row.querySelector(".score-fill").style.width = "0";
+    });
+  }
+
+  function showScores(scores) {
+    const entries = Object.entries(scores).sort((a, b) => Number(a[1]) - Number(b[1]));
+    const min = Number(entries[0]?.[1] ?? 0);
+    const max = Number(entries.at(-1)?.[1] ?? min);
+    const spread = Math.max(max - min, 1e-9);
+    entries.forEach(([digit, value], index) => {
+      const row = scoreRows.get(digit);
+      if (!row) return;
+      row.querySelector(".score-value").textContent = Number(value).toFixed(2);
+      const distanceScale = 12 + ((Number(value) - min) / spread) * 88;
+      row.querySelector(".score-fill").style.width = `${distanceScale}%`;
+      row.classList.toggle("is-best", index === 0);
+    });
   }
 
   async function startRecording() {
     if (!navigator.mediaDevices?.getUserMedia) {
-      micHint.textContent = "请通过本机程序页面打开，并使用支持麦克风的浏览器";
+      micHint.textContent = "请使用支持麦克风的手机浏览器，并通过 HTTPS 打开网页。";
       return;
     }
+    clearResult();
     micHint.textContent = "";
-    if (resultValue) resultValue.textContent = "—";
-    if (resultMeta) resultMeta.innerHTML = "等待本次录音结果";
-    statRows.forEach((row) => {
-      const labels = row.querySelectorAll(".stat-label span");
-      if (labels[1]) labels[1].textContent = "—";
-      const fill = row.querySelector(".stat-bar-fill");
-      if (fill) fill.style.width = "0%";
-    });
     try {
       const audio = { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true };
       if (micSelect.value) audio.deviceId = { exact: micSelect.value };
-      mediaStream = await navigator.mediaDevices.getUserMedia({ audio });
+      stream = await navigator.mediaDevices.getUserMedia({ audio });
       await refreshMicrophones();
-      micHint.textContent = "";
       audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      sourceNode = audioContext.createMediaStreamSource(mediaStream);
+      await audioContext.resume();
+      sourceNode = audioContext.createMediaStreamSource(stream);
       processorNode = audioContext.createScriptProcessor(4096, 1, 1);
       chunks = [];
-      recorded = new Float32Array(0);
-      updateWaveform(recorded);
+      recordedSamples = new Float32Array(0);
+      drawWave(recordedSamples);
       processorNode.onaudioprocess = (event) => {
-        const input = event.inputBuffer.getChannelData(0);
-        chunks.push(new Float32Array(input));
+        chunks.push(new Float32Array(event.inputBuffer.getChannelData(0)));
         event.outputBuffer.getChannelData(0).fill(0);
-        if (chunks.length % 2 === 0) updateWaveform(joinChunks());
+        if (chunks.length % 2 === 0) {
+          recordedSamples = combineChunks();
+          drawWave(recordedSamples);
+        }
       };
       sourceNode.connect(processorNode);
       processorNode.connect(audioContext.destination);
-      if (audioLabel) audioLabel.textContent = `MIC INPUT / WAVEFORM · ${audioContext.sampleRate} Hz / mono`;
-      startedAt = Date.now();
+      recordingStartedAt = Date.now();
       startButton.disabled = true;
       stopButton.disabled = false;
       setStatus("● 正在录音 00:00");
       timerId = window.setInterval(() => {
-        const seconds = Math.floor((Date.now() - startedAt) / 1000);
+        const seconds = Math.floor((Date.now() - recordingStartedAt) / 1000);
         setStatus(`● 正在录音 00:${String(seconds).padStart(2, "0")}`);
         if (seconds >= 8) stopRecording();
-      }, 150);
+      }, 200);
     } catch (error) {
       await releaseMicrophone();
       startButton.disabled = false;
       stopButton.disabled = true;
       setStatus("● 等待录音");
       micHint.textContent = error.name === "NotAllowedError"
-        ? "麦克风权限未开放；请允许浏览器使用麦克风"
+        ? "麦克风权限未开放，请允许浏览器使用麦克风。"
         : `录音启动失败：${error.message}`;
     }
   }
 
-  async function stopRecording() {
+  async function stopRecording({ recognize = true } = {}) {
     if (!audioContext) return;
     const sampleRate = audioContext.sampleRate;
     await releaseMicrophone();
-    recorded = joinChunks();
+    recordedSamples = combineChunks();
+    drawWave(recordedSamples);
     startButton.disabled = false;
     stopButton.disabled = true;
-    updateWaveform(recorded);
-    if (recorded.length < sampleRate * 0.2) {
-      setStatus("● 录音太短");
-      micHint.textContent = "请完整说完一个数字后再停止录音";
+    if (!recognize) {
+      setStatus("● 录音已停止");
       return;
     }
-    setStatus("● 正在提取特征并匹配");
+    if (recordedSamples.length < sampleRate * .2) {
+      setStatus("● 录音太短");
+      micHint.textContent = "请完整说完一个数字再停止录音。";
+      return;
+    }
+    setStatus("● 正在识别");
     try {
       const response = await fetch("/recognize", {
         method: "POST",
         headers: { "Content-Type": "application/octet-stream", "X-Sample-Rate": String(sampleRate) },
-        body: recorded.buffer,
+        body: recordedSamples.buffer,
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "识别请求失败");
-      if (resultValue) resultValue.textContent = payload.digit;
-      if (resultMeta) resultMeta.innerHTML = `最小 DTW 距离 ${Number(payload.distance).toFixed(3)}<br>有效语音时长 ${Number(payload.audio.speech_seconds).toFixed(2)} s`;
-      updateScores(payload.scores);
-      document.querySelectorAll(".digit-node").forEach((node) => {
-        node.classList.toggle("active", node.textContent.trim() === payload.digit);
-      });
+      if (!response.ok) throw new Error(payload.error || "识别失败，请重新录音。 ");
+      resultDigit.textContent = payload.digit;
+      resultMeta.textContent = `最小 DTW 距离 ${Number(payload.distance).toFixed(3)} · 有效语音 ${Number(payload.audio.speech_seconds).toFixed(2)} 秒`;
+      document.querySelectorAll(".digit-circle").forEach((item) => item.classList.toggle("active", item.dataset.digit === payload.digit));
+      showScores(payload.scores);
       setStatus("● 识别完成");
+      micHint.textContent = "如果数字不对，可换一个麦克风位置或重新说一遍。";
     } catch (error) {
-      setStatus("● 本次识别失败");
+      setStatus("● 识别失败");
       micHint.textContent = error.message;
     }
   }
 
-  startButton.disabled = false;
-  stopButton.disabled = true;
-  if (resultValue) resultValue.textContent = "—";
-  if (resultMeta) resultMeta.innerHTML = "等待一段新的语音";
-  setStatus("● 等待录音");
   startButton.addEventListener("click", startRecording);
-  stopButton.addEventListener("click", stopRecording);
-  refreshButton.addEventListener("click", authorizeMicrophones);
-  window.addEventListener("resize", () => updateWaveform(recorded));
-  if (window.ResizeObserver) new ResizeObserver(() => updateWaveform(recorded)).observe(waveformContainer);
-  updateWaveform(recorded);
+  stopButton.addEventListener("click", () => stopRecording());
+  micRefresh.addEventListener("click", authorizeMicrophones);
+  micSelect.addEventListener("change", () => {
+    const option = micSelect.selectedOptions[0];
+    micHint.textContent = option?.value ? `已选择：${option.textContent}` : "已选择系统默认麦克风。";
+  });
+  window.addEventListener("resize", resizeCanvas, { passive: true });
+  if (window.ResizeObserver) new ResizeObserver(resizeCanvas).observe(waveformContainer);
+  navigator.mediaDevices?.addEventListener?.("devicechange", refreshMicrophones);
+  resizeCanvas();
   refreshMicrophones();
-  if (navigator.mediaDevices?.addEventListener) {
-    navigator.mediaDevices.addEventListener("devicechange", refreshMicrophones);
-  }
+
+  window.digitRecorder = {
+    isRecording: () => Boolean(audioContext),
+    stopWithoutRecognition: () => stopRecording({ recognize: false }),
+  };
 })();

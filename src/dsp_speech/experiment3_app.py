@@ -16,40 +16,35 @@ from .recognize import load_digit_templates, recognize_utterance
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DESIGN_DIR = Path(__file__).resolve().parent / "web" / "design_sources"
 PAGE_ROUTES = {
-    "/": "index.html",
-    "/index.html": "index.html",
-    "/speaker.html": "speaker.html",
-    "/digits.html": "digits.html",
-    "/docs.html": "templates.html",
-    "/templates.html": "templates.html",
+    "/": "mobile.html",
+    "/index.html": "mobile.html",
+    "/speaker.html": "mobile.html",
+    "/digits.html": "mobile.html",
+    "/docs.html": "mobile.html",
+    "/templates.html": "mobile.html",
 }
 MAX_AUDIO_BYTES = 8 * 96_000 * 4
-INTEGRATION_TAG = b'<script src="/integration.js?v=ui-fade-5"></script>'
+INTEGRATION_TAG = b'<script src="/integration.js?v=mobile-spa-1"></script>'
 TRANSITION_STYLE = b"""<style id=\"e3-page-transition\">
-    .ui-layer{animation:e3-ui-enter 1.2s cubic-bezier(.2,.75,.25,1) both}
-    body.e3-leaving .ui-layer{animation:e3-ui-exit .24s ease both}
-    @keyframes e3-ui-enter{from{opacity:0}to{opacity:1}}
-    @keyframes e3-ui-exit{from{opacity:1}to{opacity:0}}
-    @media(prefers-reduced-motion:reduce){.ui-layer{animation:none;opacity:1}}
-    @media(max-width:760px){
-      html,body{width:100%;height:auto;min-height:100%;overflow:auto}
-      .ui-layer{position:relative;height:auto;min-height:100vh}
-      .frame-top,.frame-bottom{padding:16px!important;gap:12px}
-      .main-container{grid-template-columns:minmax(0,1fr)!important;overflow:visible}
-      .primary-pane{padding:24px 18px!important;gap:24px!important;overflow:visible;border-right:0!important}
-      .secondary-pane{padding:20px 18px!important}
-      .hero-title{font-size:clamp(40px,12vw,64px)!important}
-      .digit-grid{display:grid!important;grid-template-columns:repeat(5,minmax(0,44px));gap:8px!important}
-      .digit-node{width:100%!important;height:auto!important;aspect-ratio:1}
-      .button-group,.controls{flex-wrap:wrap}
-      .status-pill,.status-tag{margin-left:0}
-      .waveform-viz,.waveform-container{max-width:100%;}
-      .workspace{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto!important;padding:24px 18px!important;gap:20px!important}
-      .workspace .hero-section{grid-column:auto!important}
-      .speaker-id{font-size:clamp(64px,24vw,120px)!important}
-      .results-container{grid-template-columns:minmax(0,1fr)!important}
-      .main-content{overflow-y:auto}
-    }
+    :root{--e3-enter:cubic-bezier(.23,1,.32,1)}
+    html,body{width:100%;height:100%;height:100dvh;min-height:100%;overflow:hidden}
+    #app-container{height:100%;height:100dvh;min-height:100%;overflow:hidden}
+    #app-container .screen{transform:none!important;transition:opacity 240ms var(--e3-enter)!important;will-change:opacity}
+    #app-container .screen.hidden-left,#app-container .screen.hidden-right{visibility:hidden;opacity:0;transform:none!important}
+    #app-container .screen.active,#app-container .screen.is-entering,#app-container .screen.is-leaving{transform:none!important}
+    #app-container .screen.is-entering,#app-container .screen.is-leaving{visibility:visible;opacity:0;pointer-events:none}
+    #app-container .screen.active{visibility:visible;opacity:1;pointer-events:auto}
+    #app-container .screen.active .stagger-el{transform:none!important;transition-property:opacity!important;transition-duration:220ms!important;transition-delay:0ms!important}
+    html[data-start-view="screen-speaker"] #screen-speaker,
+    html[data-start-view="screen-digit"] #screen-digit,
+    html[data-start-view="screen-docs"] #screen-docs{visibility:visible!important;opacity:1!important;pointer-events:auto!important;transform:none!important}
+    html[data-start-view="screen-speaker"] #screen-overview,
+    html[data-start-view="screen-digit"] #screen-overview,
+    html[data-start-view="screen-docs"] #screen-overview{visibility:hidden!important;opacity:0!important;pointer-events:none!important}
+    .mobile-mic-controls button,.mobile-record-controls button{touch-action:manipulation;min-height:44px}
+    .page-content{overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:max(24px,env(safe-area-inset-bottom))}
+    #glcanvas{z-index:0}
+    @media(prefers-reduced-motion:reduce){#app-container .screen,#app-container .screen.active .stagger-el{transition-duration:1ms!important}}
     </style>"""
 
 
@@ -81,7 +76,14 @@ class RecognitionHandler(BaseHTTPRequestHandler):
                 self._json(500, {"error": f"界面文件读取失败：{error}"})
                 return
             if b"</head>" in body:
-                body = body.replace(b"</head>", TRANSITION_STYLE + b"</head>", 1)
+                initial_view = {
+                    "/speaker.html": "screen-speaker",
+                    "/digits.html": "screen-digit",
+                    "/docs.html": "screen-docs",
+                    "/templates.html": "screen-docs",
+                }.get(path, "screen-overview")
+                boot = f'<script>document.documentElement.dataset.startView="{initial_view}";</script>'.encode("ascii")
+                body = body.replace(b"</head>", TRANSITION_STYLE + boot + b"</head>", 1)
             if b"</body>" in body:
                 body = body.replace(b"</body>", INTEGRATION_TAG + b"</body>", 1)
             self._send(200, body, "text/html; charset=utf-8")

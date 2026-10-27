@@ -1,0 +1,869 @@
+<html lang="zh-CN" vid="0"><head vid="1">
+    <meta charset="UTF-8" vid="2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" vid="3">
+    <title vid="4">Undertone // Voice Experiment - Mobile</title>
+    <style vid="6">
+        :root {
+            --ui-color: #000000;
+            --line-weight: 1px;
+            --transition-timing: 0.7s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
+            background-color: #111;
+            color: var(--ui-color);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        
+        #glcanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        
+        #app-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            overflow: hidden;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background: transparent;
+            transition: transform var(--transition-timing), opacity var(--transition-timing);
+            opacity: 0;
+            pointer-events: none;
+            visibility: hidden;
+        }
+
+        .screen.active {
+            transform: translateX(0);
+            opacity: 1;
+            pointer-events: auto;
+            visibility: visible;
+        }
+
+        .screen.hidden-left {
+            transform: translateX(-30%);
+            opacity: 0;
+        }
+
+        .screen.hidden-right {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        
+        .border-b-thin { border-bottom: var(--line-weight) solid var(--ui-color); }
+        .border-t-thin { border-top: var(--line-weight) solid var(--ui-color); }
+        .border-r-thin { border-right: var(--line-weight) solid var(--ui-color); }
+        .border-l-thin { border-left: var(--line-weight) solid var(--ui-color); }
+        .border-thin { border: var(--line-weight) solid var(--ui-color); }
+
+        .sys-text {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        
+        .frame-top {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .sys-title { font-size: 14px; font-weight: 500; line-height: 1.2; letter-spacing: -0.01em; }
+        .sys-subtitle { font-size: 13px; font-weight: 400; line-height: 1.2; letter-spacing: -0.01em; margin-top: 2px; }
+        .sys-meta-right { text-align: right; }
+
+        .list-container {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .list-row {
+            flex: 1 1 0%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, flex-grow 0.7s cubic-bezier(0.2, 1, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .list-row.expanded { flex-grow: 2.3; }
+        .list-row.expanded .row-title { transform: scale(1.07); transform-origin: left center; }
+        .list-row.expanded .row-footer { opacity: 1; }
+
+        .list-row:active { background-color: rgba(0,0,0,0.05); }
+        
+        .list-row:not(:last-child) {
+            border-bottom: var(--line-weight) solid var(--ui-color);
+        }
+
+        .row-index { font-size: 12px; font-weight: 500; letter-spacing: 0.02em; }
+        .row-title { font-size: clamp(32px, 8vw, 40px); font-weight: 400; letter-spacing: -0.03em; align-self: center; margin: auto 0; transition: transform 0.7s cubic-bezier(0.2, 1, 0.2, 1); }
+        
+        .row-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            opacity: 0.6;
+            transition: opacity 0.5s ease;
+        }
+
+        .row-cta {
+            position: absolute;
+            right: 20px;
+            top: 22px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+
+        .list-row.expanded .row-cta { opacity: 0.9; transform: translateY(0); }
+
+        .spec-list { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+
+        .frame-bottom {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+        .branding { font-size: 13px; letter-spacing: -0.01em; }
+        .dot-signature { font-size: 18px; line-height: 14px; }
+
+        
+        .page-header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .page-content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        
+        .stagger-el {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+
+        .screen.active .stagger-el {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+
+        
+        .large-title {
+            font-size: 36px;
+            font-weight: 400;
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+        }
+
+        .panel-box {
+            border: var(--line-weight) solid var(--ui-color);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: rgba(255,255,255,0.05);
+        }
+
+        .btn-outline {
+            border: var(--line-weight) solid var(--ui-color);
+            padding: 16px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        .btn-outline:active {
+            background: var(--ui-color);
+            color: #fff;
+        }
+
+        .dtw-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+        .dtw-bar-bg {
+            flex-grow: 1;
+            height: 4px;
+            background: rgba(0,0,0,0.1);
+            position: relative;
+        }
+        .dtw-bar-fill {
+            height: 100%;
+            background: var(--ui-color);
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        
+        .wave-container {
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            overflow: hidden;
+        }
+        .wave-bar {
+            width: 2px;
+            background: var(--ui-color);
+            opacity: 0.7;
+        }
+
+        
+        .digit-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+        }
+        .digit-circle {
+            aspect-ratio: 1;
+            border: var(--line-weight) solid var(--ui-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: 500;
+        }
+        .digit-circle.active {
+            background: var(--ui-color);
+            color: transparent; 
+            color: #ddd; 
+        }
+
+        
+        .flow-step {
+            border: var(--line-weight) solid var(--ui-color);
+            padding: 12px 16px;
+            font-size: 13px;
+            position: relative;
+        }
+        .flow-step:not(:last-child)::after {
+            content: '↓';
+            position: absolute;
+            bottom: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 16px;
+            color: var(--ui-color);
+        }
+        
+
+        .module-note { font-size: 14px; line-height: 1.65; }
+        .mobile-mic-controls { display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-size:12px; }
+        .mobile-mic-controls select { min-width:130px; max-width:55vw; padding:7px 8px; border:1px solid rgba(0,0,0,.55); border-radius:0; color:#111; background:rgba(255,255,255,.58); font:inherit; }
+        .mobile-mic-controls button { border:1px solid rgba(0,0,0,.55); padding:7px 9px; background:transparent; color:#111; font:inherit; }
+        .mic-hint { font-size:12px; line-height:1.45; opacity:.72; }
+        .mobile-record-controls { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .mobile-record-controls .btn-outline { width:100%; min-height:48px; color:#111; background:rgba(255,255,255,.28); font:inherit; }
+        .mobile-record-controls .btn-outline:disabled { opacity:.42; cursor:not-allowed; }
+        .match-result { display:grid; grid-template-columns:1fr auto; align-items:center; gap:4px 12px; }
+        .match-result output { grid-column:2; grid-row:1 / span 2; font-size:clamp(76px,23vw,112px); font-weight:300; line-height:.9; }
+        .match-result p { font-size:12px; opacity:.72; }
+        .score-list { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+        .score-row { display:grid; grid-template-columns:50px 1fr 54px; align-items:center; gap:8px; font:12px monospace; }
+        .score-track { height:5px; background:rgba(0,0,0,.12); }
+        .score-fill { height:100%; width:0; background:#111; transition:width 220ms cubic-bezier(.23,1,.32,1); }
+        .score-row.is-best .score-label { font-weight:700; }
+        .score-row.is-best .score-fill { background:#17574c; }
+        .back-btn { border:0; background:transparent; color:inherit; font:inherit; }
+        @media(max-height:740px) { .page-content { gap:20px; padding-top:18px; padding-bottom:18px; } }
+
+        /* Local layout utilities used by the supplied mobile design. */
+        .flex { display:flex; }
+        .flex-col { flex-direction:column; }
+        .grid { display:grid; }
+        .grid-cols-2 { grid-template-columns:repeat(2,minmax(0,1fr)); }
+        .items-center { align-items:center; }
+        .justify-between { justify-content:space-between; }
+        .gap-4 { gap:1rem; }
+        .gap-6 { gap:1.5rem; }
+        .mt-4 { margin-top:1rem; }
+        .mt-8 { margin-top:2rem; }
+        .mb-1 { margin-bottom:.25rem; }
+        .mb-2 { margin-bottom:.5rem; }
+        .font-light { font-weight:300; }
+        .font-medium { font-weight:500; }
+        .text-3xl { font-size:1.875rem; line-height:2.25rem; }
+        .text-sm { font-size:.875rem; line-height:1.25rem; }
+        .text-center { text-align:center; }
+        .text-right { text-align:right; }
+        .opacity-60 { opacity:.6; }
+    </style>
+</head>
+<body vid="7">
+
+    
+    <canvas id="glcanvas" vid="8"></canvas>
+
+    
+    <div id="app-container" vid="9">
+
+        
+        <div id="screen-overview" class="screen active" vid="10">
+            
+            <div class="frame-top border-b-thin" vid="11">
+                <div vid="12">
+                    <div class="sys-title" vid="13">Undertone 01</div>
+                    <div class="sys-subtitle" vid="14">Voice recognition experiment</div>
+                </div>
+                <div class="sys-meta-right sys-text" vid="15">
+                    <div vid="16">SYS.ARCHIVE</div>
+                    <div vid="17">EXP. 01</div>
+                </div>
+            </div>
+
+            
+            <div class="list-container" vid="18">
+                
+                
+                <div class="list-row" onclick="navigateTo('screen-speaker')" vid="19">
+                    <div class="row-index" vid="20">01</div>
+                    <div class="row-cta" vid="21">点击进入 →</div>
+                    <div class="row-title" vid="22">说话人识别</div>
+                    <div class="row-footer sys-text" vid="23">
+                        <ul class="spec-list" vid="24">
+                            <li vid="25">MFCC · DTW</li>
+                            <li vid="26">说话人模块预览</li>
+                        </ul>
+                        <ul class="spec-list text-right" vid="27">
+                            <li vid="28">模块说明</li>
+                            <li vid="29">Real-time</li>
+                        </ul>
+                    </div>
+                </div>
+
+                
+                <div class="list-row" onclick="navigateTo('screen-digit')" vid="30">
+                    <div class="row-index" vid="31">02</div>
+                    <div class="row-cta" vid="32">点击进入 →</div>
+                    <div class="row-title" vid="33">数字识别</div>
+                    <div class="row-footer sys-text" vid="34">
+                        <ul class="spec-list" vid="35">
+                            <li vid="36">MFCC · DTW · 16 kHz</li>
+                            <li vid="37">孤立数字 0–9</li>
+                        </ul>
+                        <ul class="spec-list text-right" vid="38">
+                            <li vid="39">实时识别</li>
+                            <li vid="40">十类数字</li>
+                        </ul>
+                    </div>
+                </div>
+
+                
+                <div class="list-row" onclick="navigateTo('screen-docs')" vid="41">
+                    <div class="row-index" vid="42">03</div>
+                    <div class="row-cta" vid="43">点击进入 →</div>
+                    <div class="row-title" vid="44">训练文档</div>
+                    <div class="row-footer sys-text" vid="45">
+                        <ul class="spec-list" vid="46">
+                            <li vid="47">160 TEMPLATES · WAV</li>
+                            <li vid="48">模板库与流程说明</li>
+                        </ul>
+                        <ul class="spec-list text-right" vid="49">
+                            <li vid="50">MFCC 流程</li>
+                            <li vid="51">实时服务</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+            
+            <div class="frame-bottom border-t-thin" vid="52">
+                <div class="branding" vid="53">DSP LAB Archive</div>
+                <div class="dot-signature" vid="54">•</div>
+            </div>
+        </div>
+
+        
+        <div id="screen-speaker" class="screen hidden-right" vid="55">
+            <div class="page-header border-b-thin" vid="56">
+                <div class="back-btn" onclick="navigateTo('screen-overview')" vid="57">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" vid="58"><path d="M19 12H5M12 19l-7-7 7-7" vid="59"></path></svg>
+                    BACK
+                </div>
+                <div class="sys-text" vid="60">01. SPEAKER</div>
+            </div>
+            
+            <div class="page-content" vid="61">
+                <h1 class="large-title stagger-el delay-1">说话人识别</h1>
+                <section class="panel-box stagger-el delay-2" aria-live="polite">
+                    <div class="sys-text flex justify-between"><span>模块状态</span><span>暂未接入</span></div>
+                    <p class="module-note">当前在线服务已接入 0—9 孤立数字的实时识别。说话人识别页面目前用于展示模块入口，尚未连接对应的识别算法，因此这里不会显示模拟的识别结果。</p>
+                </section>
+                <section class="panel-box stagger-el delay-3">
+                    <div class="sys-text">后续可接入的处理流程</div>
+                    <div class="flow-step flex justify-between items-center"><span>语音采集</span><span class="sys-text opacity-60">麦克风输入</span></div>
+                    <div class="flow-step flex justify-between items-center"><span>特征提取</span><span class="sys-text opacity-60">MFCC</span></div>
+                    <div class="flow-step flex justify-between items-center"><span>模板匹配</span><span class="sys-text opacity-60">DTW</span></div>
+                </section>
+            </div>
+        </div>
+
+        
+        <div id="screen-digit" class="screen hidden-right">
+            <div class="page-header border-b-thin">
+                <button class="back-btn" type="button" onclick="navigateTo('screen-overview')" aria-label="返回总览">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
+                    返回总览
+                </button>
+                <div class="sys-text">02. DIGITS</div>
+            </div>
+            <div class="page-content">
+                <h1 class="large-title stagger-el delay-1">说一个数字</h1>
+                <div class="digit-grid stagger-el delay-2" aria-label="识别类别 0 到 9">
+                    <div class="digit-circle" data-digit="0">0</div><div class="digit-circle" data-digit="1">1</div>
+                    <div class="digit-circle" data-digit="2">2</div><div class="digit-circle" data-digit="3">3</div>
+                    <div class="digit-circle" data-digit="4">4</div><div class="digit-circle" data-digit="5">5</div>
+                    <div class="digit-circle" data-digit="6">6</div><div class="digit-circle" data-digit="7">7</div>
+                    <div class="digit-circle" data-digit="8">8</div><div class="digit-circle" data-digit="9">9</div>
+                </div>
+                <section class="panel-box stagger-el delay-3">
+                    <div class="sys-text flex justify-between"><span>实时麦克风波形</span><span id="mic-status">● 等待录音</span></div>
+                    <div class="wave-container" id="wave-digit" aria-label="实时录音波形"></div>
+                    <div class="mobile-mic-controls">
+                        <label for="mic-select">输入设备</label>
+                        <select id="mic-select" aria-label="选择麦克风"><option value="">系统默认麦克风</option></select>
+                        <button id="mic-refresh" type="button">授权 / 刷新</button>
+                    </div>
+                    <p class="mic-hint" id="mic-hint" aria-live="polite">允许麦克风权限后，可选择手机或耳机麦克风。</p>
+                </section>
+                <div class="mobile-record-controls stagger-el delay-4">
+                    <button class="btn-outline" id="digit-start" type="button">开始录音</button>
+                    <button class="btn-outline" id="digit-stop" type="button" disabled>停止并识别</button>
+                </div>
+                <section class="match-result stagger-el delay-4" aria-live="polite">
+                    <div class="sys-text opacity-60">识别结果</div>
+                    <output id="result-digit">—</output>
+                    <p id="result-meta">等待录音</p>
+                </section>
+                <section class="score-section stagger-el delay-4">
+                    <div class="sys-text opacity-60">各数字 DTW 距离（越小越接近）</div>
+                    <div id="score-list" class="score-list">
+                        <!-- score rows are filled with the real response -->
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <div id="screen-docs" class="screen hidden-right" vid="146">
+            <div class="page-header border-b-thin" vid="147">
+                <div class="back-btn" onclick="navigateTo('screen-overview')" vid="148">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" vid="149"><path d="M19 12H5M12 19l-7-7 7-7" vid="150"></path></svg>
+                    BACK
+                </div>
+                <div class="sys-text" vid="151">03. DOCS</div>
+            </div>
+
+            <div class="page-content" vid="152">
+                <div class="stagger-el delay-1" vid="153">
+                    <h1 class="large-title mb-2" vid="154">训练文档</h1>
+                    <div class="sys-text" vid="155">160 TEMPLATES · WAV</div>
+                </div>
+                
+                <div class="flex flex-col gap-6 stagger-el delay-2 mt-4" vid="156">
+                    <div class="sys-text opacity-60" vid="157">RECOGNITION PIPELINE</div>
+                    
+                    <div class="flex flex-col gap-6" vid="158">
+                        <div class="flow-step flex justify-between items-center" vid="159">
+                            <span class="font-medium" vid="160">01. AUDIO INPUT</span>
+                            <span class="sys-text opacity-60" vid="161">16kHz Mono</span>
+                        </div>
+                        <div class="flow-step flex justify-between items-center" vid="162">
+                            <span class="font-medium" vid="163">02. 端点检测与预处理</span>
+                            <span class="sys-text opacity-60" vid="164">去直流、归一化</span>
+                        </div>
+                        <div class="flow-step flex justify-between items-center" vid="165">
+                            <span class="font-medium" vid="166">03. MFCC EXTRACTION</span>
+                            <span class="sys-text opacity-60" vid="167">13 Features / Frame</span>
+                        </div>
+                        <div class="flow-step flex justify-between items-center" style="border-bottom: var(--line-weight) solid var(--ui-color);" vid="168">
+                            <span class="font-medium" vid="169">04. DTW MATCHING</span>
+                            <span class="sys-text opacity-60" vid="170">Dynamic Time Warping</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mt-8 stagger-el delay-3" vid="171">
+                    <div class="panel-box items-center text-center" vid="172">
+                        <div class="text-3xl font-light mb-1" vid="173">160</div>
+                        <div class="sys-text opacity-60" vid="174">TOTAL TEMPLATES</div>
+                    </div>
+                    <div class="panel-box items-center text-center" vid="175">
+                        <div class="text-3xl font-light mb-1" vid="176">13</div>
+                        <div class="sys-text opacity-60" vid="177">MFCC DIMS</div>
+                    </div>
+                    <div class="panel-box items-center text-center" vid="178">
+                        <div class="text-3xl font-light mb-1" vid="179">25<span class="text-sm" vid="180">ms</span></div>
+                        <div class="sys-text opacity-60" vid="181">FRAME SIZE</div>
+                    </div>
+                    <div class="panel-box items-center text-center" vid="182">
+                        <div class="text-3xl font-light mb-1" vid="183">10<span class="text-sm" vid="184">ms</span></div>
+                        <div class="sys-text opacity-60" vid="185">FRAME SHIFT</div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    
+    <script vid="186">
+        
+        let currentScreenId = 'screen-overview';
+
+        function navigateTo(targetId) {
+            if (currentScreenId === targetId) return;
+
+            const currentEl = document.getElementById(currentScreenId);
+            const targetEl = document.getElementById(targetId);
+
+            
+            const isGoingDeep = targetId !== 'screen-overview';
+
+            
+            currentEl.classList.remove('active');
+            
+            if (isGoingDeep) {
+                
+                currentEl.classList.add('hidden-left');
+                
+                targetEl.classList.remove('hidden-left', 'hidden-right');
+                
+                void targetEl.offsetWidth;
+                targetEl.classList.add('active');
+            } else {
+                
+                currentEl.classList.add('hidden-right');
+                
+                targetEl.classList.remove('hidden-left', 'hidden-right');
+                
+                void targetEl.offsetWidth;
+                targetEl.classList.add('active');
+            }
+
+            currentScreenId = targetId;
+            if (targetId === 'screen-overview') { startCycle(); } else { stopCycle(); }
+        }
+
+        
+        function generateWave(containerId, count) {
+            const container = document.getElementById(containerId);
+            if(!container) return;
+            container.innerHTML = '';
+            for(let i=0; i<count; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'wave-bar';
+                
+                const height = 10 + Math.random() * (Math.sin(i/count * Math.PI) * 80 + 10);
+                bar.style.height = `${height}%`;
+                
+                
+                bar.style.animation = `pulse ${0.5 + Math.random()*1}s infinite alternate ease-in-out`;
+                container.appendChild(bar);
+            }
+        }
+
+        
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes pulse {
+                0% { transform: scaleY(0.8); opacity: 0.5; }
+                100% { transform: scaleY(1.1); opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        
+        generateWave('wave-speaker', 40);
+        generateWave('wave-digit', 30);
+
+        
+        // Desktop-style dynamics: auto-cycling row showcase + press-to-expand
+        const overviewRows = Array.from(document.querySelectorAll('#screen-overview .list-row'));
+        let expandedIdx = 0;
+        let cycleTimer = null;
+
+        function cycleRows() {
+            expandedIdx = (expandedIdx + 1) % overviewRows.length;
+            overviewRows.forEach((r, i) => r.classList.toggle('expanded', i === expandedIdx));
+        }
+
+        function startCycle() {
+            stopCycle();
+            cycleTimer = setInterval(cycleRows, 2600);
+        }
+
+        function stopCycle() {
+            if (cycleTimer) { clearInterval(cycleTimer); cycleTimer = null; }
+        }
+
+        overviewRows[0].classList.add('expanded');
+        startCycle();
+
+        overviewRows.forEach((r, i) => {
+            const press = () => {
+                stopCycle();
+                expandedIdx = i;
+                overviewRows.forEach((o, j) => o.classList.toggle('expanded', j === i));
+            };
+            r.addEventListener('touchstart', press, { passive: true });
+            r.addEventListener('mousedown', press);
+        });
+
+        
+        const canvas = document.getElementById('glcanvas');
+        const gl = canvas.getContext('webgl');
+
+        if (!gl) { console.error('WebGL not supported'); }
+
+        const vsSource = `
+            attribute vec4 aVertexPosition;
+            varying vec2 vUv;
+            void main() {
+                gl_Position = aVertexPosition;
+                vUv = aVertexPosition.xy * 0.5 + 0.5;
+            }
+        `;
+
+        const fsSource = `
+            precision highp float;
+            varying vec2 vUv;
+            uniform float uTime;
+            uniform vec2 uResolution;
+            uniform vec2 uMouse;
+
+            vec3 colorA = vec3(0.91, 0.36, 0.02); // Deep Orange
+            vec3 colorB = vec3(0.91, 0.77, 0.42); // Golden Yellow
+            vec3 colorC = vec3(0.66, 0.85, 0.86); // Soft Cyan
+            vec3 colorD = vec3(0.16, 0.62, 0.56); // Teal/Green
+            vec3 colorE = vec3(0.11, 0.21, 0.34); // Dark Navy
+
+            float random(vec2 st) {
+                return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+            }
+
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+            float snoise(vec2 v) {
+                const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                vec2 i  = floor(v + dot(v, C.yy) );
+                vec2 x0 = v -   i + dot(i, C.xx);
+                vec2 i1;
+                i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                vec4 x12 = x0.xyxy + C.xxzz;
+                x12.xy -= i1;
+                i = mod289(i);
+                vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+                vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                m = m*m ;
+                m = m*m ;
+                vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                vec3 h = abs(x) - 0.5;
+                vec3 ox = floor(x + 0.5);
+                vec3 a0 = x - ox;
+                m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+                vec3 g;
+                g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                return 130.0 * dot(m, g);
+            }
+
+            void main() {
+                vec2 st = gl_FragCoord.xy / uResolution.xy;
+                st.x *= uResolution.x / uResolution.y;
+
+                vec2 mouseOffset = (uMouse / uResolution) * 0.2;
+                st += mouseOffset * 0.5;
+
+                float n1 = snoise(st * 1.5 + uTime * 0.1);
+                float n2 = snoise(st * 2.0 - uTime * 0.15 + n1);
+                
+                vec2 warpedSt = st + vec2(n1, n2) * 0.4;
+
+                float d1 = length(warpedSt - vec2(0.2, 0.8));
+                float d2 = length(warpedSt - vec2(0.8, 0.2));
+                float d3 = length(warpedSt - vec2(0.5, 0.5));
+                float d4 = warpedSt.y;
+
+                vec3 finalColor = mix(colorA, colorB, smoothstep(0.0, 1.2, d1));
+                finalColor = mix(finalColor, colorC, smoothstep(0.2, 1.5, d3));
+                finalColor = mix(finalColor, colorE, smoothstep(0.4, 2.0, d2));
+                
+                float cyanPop = snoise(st * 3.0 + uTime * 0.05);
+                finalColor = mix(finalColor, colorD, smoothstep(0.5, 1.0, cyanPop) * 0.5);
+                
+                float grain = random(vUv * (uTime * 0.001 + 100.0));
+                float grainStrength = 0.18;
+                
+                vec3 grainyColor = finalColor + (grain - 0.5) * grainStrength;
+                
+                gl_FragColor = vec4(grainyColor, 1.0);
+            }
+        `;
+
+        function initShaderProgram(gl, vsSource, fsSource) {
+            const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+            const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+            const shaderProgram = gl.createProgram();
+            gl.attachShader(shaderProgram, vertexShader);
+            gl.attachShader(shaderProgram, fragmentShader);
+            gl.linkProgram(shaderProgram);
+            return shaderProgram;
+        }
+
+        function loadShader(gl, type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            return shader;
+        }
+
+        const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+
+        const programInfo = {
+            program: shaderProgram,
+            attribLocations: { vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition') },
+            uniformLocations: {
+                uTime: gl.getUniformLocation(shaderProgram, 'uTime'),
+                uResolution: gl.getUniformLocation(shaderProgram, 'uResolution'),
+                uMouse: gl.getUniformLocation(shaderProgram, 'uMouse'),
+            },
+        };
+
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        const positions = [ 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0 ];
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+
+        let mouseX = 0; let mouseY = 0;
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = window.innerHeight - e.clientY; 
+        });
+        
+        
+        document.addEventListener('touchmove', (e) => {
+            if(e.touches.length > 0) {
+                mouseX = e.touches[0].clientX;
+                mouseY = window.innerHeight - e.touches[0].clientY;
+            }
+        }, {passive: true});
+
+        function resizeCanvasToDisplaySize(canvas) {
+            const displayWidth  = canvas.clientWidth;
+            const displayHeight = canvas.clientHeight;
+            if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+                canvas.width  = displayWidth;
+                canvas.height = displayHeight;
+                return true;
+            }
+            return false;
+        }
+
+        function render(now) {
+            now *= 0.001; 
+            resizeCanvasToDisplaySize(canvas);
+            gl.viewport(0, 0, canvas.width, canvas.height);
+            gl.useProgram(programInfo.program);
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+
+            gl.uniform1f(programInfo.uniformLocations.uTime, now);
+            gl.uniform2f(programInfo.uniformLocations.uResolution, canvas.width, canvas.height);
+            gl.uniform2f(programInfo.uniformLocations.uMouse, mouseX, mouseY);
+
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            requestAnimationFrame(render);
+        }
+
+        requestAnimationFrame(render);
+    </script>
+
+</body></html>
