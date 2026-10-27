@@ -44,6 +44,13 @@
             display: block;
         }
 
+        .page.is-entering, .page.is-leaving { display: block; pointer-events: none; }
+        .page .ui-layer { opacity: 1; transition: opacity 260ms cubic-bezier(.23,1,.32,1); }
+        .page.is-entering .ui-layer, .page.is-leaving .ui-layer { opacity: 0; }
+        @media (prefers-reduced-motion: reduce) {
+            .page .ui-layer { transition-duration: 1ms; }
+        }
+
         .bg-canvas {
             position: absolute;
             top: 0;
@@ -128,8 +135,14 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            padding: 8px 10px;
+            border: 1px solid rgba(0,0,0,.42);
+            background: rgba(255,255,255,.18);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             pointer-events: auto;
             cursor: pointer;
+            transition: background-color 180ms cubic-bezier(.23,1,.32,1), color 180ms cubic-bezier(.23,1,.32,1), border-color 180ms cubic-bezier(.23,1,.32,1);
         }
 
         .back-link {
@@ -150,18 +163,29 @@
         
         .btn {
             padding: 12px 24px;
-            border: var(--line-weight) solid var(--ui-color);
-            background: transparent;
+            border: var(--line-weight) solid rgba(0,0,0,.42);
+            background: rgba(255,255,255,.18);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            color: #111;
             font-family: inherit;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background-color 180ms cubic-bezier(.23,1,.32,1), color 180ms cubic-bezier(.23,1,.32,1), border-color 180ms cubic-bezier(.23,1,.32,1);
             pointer-events: auto;
         }
-        
-        .btn:hover {
-            background: var(--ui-color);
-            color: white;
+
+        @media (hover: hover) and (pointer: fine) {
+            .btn:not(:disabled):hover, .back-btn:hover {
+                background: #111;
+                border-color: #111;
+                color: #fff;
+            }
+        }
+        .btn:not(:disabled):active, .back-btn:active {
+            background: #111;
+            border-color: #111;
+            color: #fff;
         }
 
         .wave-bar {
@@ -182,7 +206,7 @@
         #page-home .col-index { font-size: 12px; font-weight: 500; letter-spacing: 0.02em; }
         #page-home .col-content-main { flex-grow: 1; display: flex; align-items: center; justify-content: center; opacity: 0; transform: translateX(-10px); transition: opacity 0.4s ease, transform 0.6s cubic-bezier(0.2, 1, 0.2, 1); transition-delay: 0s; }
         #page-home .column:hover .col-content-main { opacity: 1; transform: translateX(0); transition-delay: 0.2s; }
-        #page-home .col-title { font-size: clamp(32px, 4vw, 64px); font-weight: 400; letter-spacing: -0.03em; text-transform: capitalize; white-space: nowrap; cursor: pointer; }
+        #page-home .col-title { font-size: clamp(32px, 4vw, 64px); font-weight: 400; letter-spacing: -0.03em; text-transform: none; white-space: nowrap; cursor: pointer; }
         #page-home .col-footer { display: flex; justify-content: space-between; align-items: flex-end; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.4; transition: opacity 0.4s ease; white-space: nowrap; }
         #page-home .column:hover .col-footer { opacity: 1; }
         #page-home .spec-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
@@ -326,7 +350,7 @@
                 <div class="column" onclick="showPage('page-speaker')" vid="18">
                     <div class="col-index" vid="19">01</div>
                     <div class="col-content-main" vid="20">
-                        <a href="#" onclick="showPage('page-speaker'); return false;" class="col-title" style="text-decoration:none; color:inherit;" vid="21">说话人识别</a>
+                        <a href="#" onclick="showPage('page-speaker'); return false;" class="col-title" style="text-decoration:none; color:inherit;" vid="21">speaker</a>
                     </div>
                     <div class="col-footer" vid="22">
                         <ul class="spec-list" vid="23">
@@ -343,7 +367,7 @@
                 <div class="column" onclick="showPage('page-digits')" vid="29">
                     <div class="col-index" vid="30">02</div>
                     <div class="col-content-main" vid="31">
-                        <a href="#" onclick="showPage('page-digits'); return false;" class="col-title" style="text-decoration:none; color:inherit;" vid="32">数字识别</a>
+                        <a href="#" onclick="showPage('page-digits'); return false;" class="col-title" style="text-decoration:none; color:inherit;" vid="32">number</a>
                     </div>
                     <div class="col-footer" vid="33">
                         <ul class="spec-list" vid="34">
@@ -360,7 +384,7 @@
                 <div class="column" onclick="showPage('page-docs')" vid="40">
                     <div class="col-index" vid="41">03</div>
                     <div class="col-content-main" vid="42">
-                        <a href="#" onclick="showPage('page-docs'); return false;" class="col-title" style="text-decoration:none; color:inherit;" vid="43">训练文档</a>
+                        <a href="#" onclick="showPage('page-docs'); return false;" class="col-title" style="text-decoration:none; color:inherit;" vid="43">process</a>
                     </div>
                     <div class="col-footer" vid="44">
                         <ul class="spec-list" vid="45">
@@ -918,12 +942,32 @@
 
     
     <script vid="287">
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            document.getElementById(pageId).classList.add('active');
+        let activePageId = document.querySelector('.page.active')?.id || 'page-home';
+        let pageTransitioning = false;
+        function showPage(pageId, options = {}) {
+            const target = document.getElementById(pageId);
+            const current = document.querySelector('.page.active');
+            if (!target || target === current || pageTransitioning) return;
+            const paths = { 'page-home': '/', 'page-speaker': '/speaker.html', 'page-digits': '/digits.html', 'page-docs': '/docs.html' };
+            if (options.updateHistory !== false && paths[pageId] && location.pathname !== paths[pageId]) history.pushState({ pageId }, '', paths[pageId]);
+            pageTransitioning = true;
+            current?.classList.remove('active', 'is-entering');
+            current?.classList.add('is-leaving');
+            current?.setAttribute('aria-hidden', 'true');
+            target.classList.remove('is-leaving');
+            target.classList.add('active', 'is-entering');
+            target.setAttribute('aria-hidden', 'false');
+            activePageId = pageId;
+            requestAnimationFrame(() => target.classList.remove('is-entering'));
+            window.setTimeout(() => {
+                current?.classList.remove('is-leaving');
+                pageTransitioning = false;
+            }, 290);
         }
+        window.addEventListener('popstate', () => {
+            const pageId = { '/': 'page-home', '/index.html': 'page-home', '/speaker.html': 'page-speaker', '/digits.html': 'page-digits', '/docs.html': 'page-docs', '/templates.html': 'page-docs' }[location.pathname] || 'page-home';
+            showPage(pageId, { updateHistory: false });
+        });
     </script>
 
 
