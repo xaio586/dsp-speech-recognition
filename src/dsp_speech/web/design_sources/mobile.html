@@ -1,6 +1,10 @@
 <html lang="zh-CN" vid="0"><head vid="1">
     <meta charset="UTF-8" vid="2">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" vid="3">
+    <meta name="theme-color" content="#dca161">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="DSP语音识别">
     <title vid="4">Undertone // Voice Experiment - Mobile</title>
     <style vid="6">
         :root {
@@ -20,9 +24,10 @@
         body, html {
             width: 100%;
             height: 100%;
+            min-height: 100dvh;
             overflow: hidden;
             font-family: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif;
-            background-color: #111;
+            background-color: #dca161;
             color: var(--ui-color);
             -webkit-font-smoothing: antialiased;
         }
@@ -295,6 +300,27 @@
             grid-template-columns: repeat(5, 1fr);
             gap: 12px;
         }
+        .digits-row {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:clamp(4px, 1.4vw, 10px);
+            margin:2px 0 4px;
+        }
+        .digit {
+            width:clamp(28px, 7vw, 42px);
+            height:clamp(28px, 7vw, 42px);
+            flex:0 0 auto;
+            border:var(--line-weight) solid var(--ui-color);
+            border-radius:50%;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:clamp(12px, 3vw, 18px);
+            opacity:.55;
+            transition:background-color .2s ease, color .2s ease, opacity .2s ease, transform .2s ease;
+        }
+        .digit.active { background:var(--ui-color); color:#fff; opacity:1; transform:scale(1.08); }
         .digit-circle {
             aspect-ratio: 1;
             border: var(--line-weight) solid var(--ui-color);
@@ -337,17 +363,27 @@
         .mobile-record-controls { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
         .mobile-record-controls .btn-outline { width:100%; min-height:48px; color:#111; background:rgba(255,255,255,.28); font:inherit; }
         .mobile-record-controls .btn-outline:disabled { opacity:.42; cursor:not-allowed; }
-        .match-result { display:grid; grid-template-columns:1fr auto; align-items:center; gap:4px 12px; }
-        .match-result output { grid-column:2; grid-row:1 / span 2; font-size:clamp(76px,23vw,112px); font-weight:300; line-height:.9; }
-        .match-result p { font-size:12px; opacity:.72; }
-        .score-list { display:flex; flex-direction:column; gap:8px; margin-top:10px; }
-        .score-row { display:grid; grid-template-columns:50px 1fr 54px; align-items:center; gap:8px; font:12px monospace; }
-        .score-track { height:5px; background:rgba(0,0,0,.12); }
-        .score-fill { height:100%; width:0; background:#111; transition:width 220ms cubic-bezier(.23,1,.32,1); }
+        .results-grid { display:flex; flex-direction:column; gap:14px; margin-top:4px; }
+        .result-card, .chart-card { border:var(--line-weight) solid var(--ui-color); padding:14px; background:rgba(255,255,255,.08); }
+        .result-row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:8px; }
+        .result-card output { font-size:clamp(54px,15vw,76px); font-weight:300; line-height:1; }
+        .result-card p { max-width:70%; font-size:11px; line-height:1.5; opacity:.72; text-align:right; }
+        .chart-list { display:flex; flex-direction:column; gap:12px; margin-top:12px; }
+        .chart-item { display:flex; flex-direction:column; gap:4px; }
+        .chart-labels { display:flex; justify-content:space-between; gap:12px; font-size:11px; }
+        .chart-bar-bg { width:100%; height:4px; background:rgba(0,0,0,.12); }
+        .chart-bar-fill { width:0; height:100%; background:var(--ui-color); transition:width 220ms cubic-bezier(.23,1,.32,1); }
         .score-row.is-best .score-label { font-weight:700; }
         .score-row.is-best .score-fill { background:#17574c; }
+        .score-row[hidden] { display:none; }
+        .mobile-record-controls .status { grid-column:1 / -1; margin-left:0; text-align:right; }
         .back-btn { border:0; background:transparent; color:inherit; font:inherit; }
         @media(max-height:740px) { .page-content { gap:20px; padding-top:18px; padding-bottom:18px; } }
+        @supports (padding: max(0px)) {
+            .page-header { padding-top:max(16px, env(safe-area-inset-top)); }
+            .frame-top { padding-top:max(16px, env(safe-area-inset-top)); }
+            .frame-bottom { padding-bottom:max(16px, env(safe-area-inset-bottom)); }
+        }
 
         /* Wide screens use the same archive design as three side-by-side panels;
            narrow screens keep the stacked layout for touch and portrait viewing. */
@@ -383,27 +419,26 @@
                 align-content: start;
                 gap: 22px 28px;
             }
-            #screen-digit .page-content > h1,
-            #screen-digit .digit-grid { grid-column: 1 / -1; }
-            #screen-digit .digit-grid {
-                grid-template-columns: repeat(10, minmax(0, 58px));
-                justify-content: start;
-                gap: 12px;
-            }
-            #screen-digit .page-content > .panel-box,
-            #screen-digit .mobile-record-controls { grid-column: 1; }
-            #screen-digit .match-result { grid-column: 2; grid-row: 3; }
-            #screen-digit .score-section { grid-column: 2; grid-row: 4 / span 2; align-self: start; }
+            #screen-digit .digit-intro,
+            #screen-digit .digits-row { grid-column: 1 / -1; }
+            #screen-digit .mobile-record-controls,
+            #screen-digit .page-content > .panel-box { grid-column: 1; }
+            #screen-digit .results-grid { grid-column: 2; grid-row: 3 / span 2; align-self: start; }
+            #screen-digit .result-card, #screen-digit .chart-card { min-width:0; }
             #screen-docs .page-content > div:first-child { grid-column: 1; grid-row: 1; }
             #screen-docs .page-content > div:nth-child(2) { grid-column: 1; grid-row: 2; }
             #screen-docs .page-content > .grid { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
         }
         @media (min-width: 1100px) {
             #screen-digit .page-content { width: min(100%, 1400px); }
-            #screen-digit .page-content > .panel-box { grid-row: 3 / span 2; align-self: start; }
-            #screen-digit .mobile-record-controls { grid-row: 5; }
-            #screen-digit .match-result { grid-row: 3; }
-            #screen-digit .score-section { grid-row: 4 / span 2; }
+            #screen-digit .page-content { grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+            #screen-digit .digits-row { gap:14px; }
+            #screen-digit .digit { width:42px; height:42px; }
+        }
+        @media (max-width: 390px) {
+            .page-header { padding-left:14px; padding-right:14px; }
+            #screen-digit .page-content { padding-left:14px; padding-right:14px; gap:20px; }
+            #screen-digit .digits-row { gap:4px; }
         }
 
         /* Local layout utilities used by the supplied mobile design. */
@@ -548,16 +583,24 @@
                 <div class="sys-text">02. DIGITS</div>
             </div>
             <div class="page-content">
-                <h1 class="large-title stagger-el delay-1">说一个数字</h1>
-                <div class="digit-grid stagger-el delay-2" aria-label="识别类别 0 到 9">
-                    <div class="digit-circle" data-digit="0">0</div><div class="digit-circle" data-digit="1">1</div>
-                    <div class="digit-circle" data-digit="2">2</div><div class="digit-circle" data-digit="3">3</div>
-                    <div class="digit-circle" data-digit="4">4</div><div class="digit-circle" data-digit="5">5</div>
-                    <div class="digit-circle" data-digit="6">6</div><div class="digit-circle" data-digit="7">7</div>
-                    <div class="digit-circle" data-digit="8">8</div><div class="digit-circle" data-digit="9">9</div>
+                <div class="digit-intro stagger-el delay-1">
+                    <h1 class="large-title">说一个数字</h1>
+                    <p class="hero-desc">对着麦克风说 0 到 9 中的一个数字，停止后查看匹配结果。系统会提取 MFCC 特征，并与数字模板进行 DTW 匹配。</p>
                 </div>
-                <section class="panel-box stagger-el delay-3">
-                    <div class="sys-text flex justify-between"><span>实时麦克风波形</span><span id="mic-status">● 等待录音</span></div>
+                <div class="digits-row stagger-el delay-2" aria-label="识别类别 0 到 9">
+                    <div class="digit" data-digit="0">0</div><div class="digit" data-digit="1">1</div>
+                    <div class="digit" data-digit="2">2</div><div class="digit" data-digit="3">3</div>
+                    <div class="digit" data-digit="4">4</div><div class="digit" data-digit="5">5</div>
+                    <div class="digit" data-digit="6">6</div><div class="digit" data-digit="7">7</div>
+                    <div class="digit" data-digit="8">8</div><div class="digit" data-digit="9">9</div>
+                </div>
+                <div class="mobile-record-controls stagger-el delay-4">
+                    <button class="btn-outline" id="digit-start" type="button">开始录音</button>
+                    <button class="btn-outline btn-primary" id="digit-stop" type="button" disabled>停止并识别</button>
+                    <span class="status" id="mic-status">● 等待录音</span>
+                </div>
+                <section class="panel-box waveform-panel stagger-el delay-3">
+                    <div class="sys-text flex justify-between"><span>实时麦克风波形</span><span id="input-format">等待设备</span></div>
                     <div class="wave-container" id="wave-digit" aria-label="实时录音波形"></div>
                     <div class="mobile-mic-controls">
                         <label for="mic-select">输入设备</label>
@@ -566,21 +609,19 @@
                     </div>
                     <p class="mic-hint" id="mic-hint" aria-live="polite">允许麦克风权限后，可选择手机或耳机麦克风。</p>
                 </section>
-                <div class="mobile-record-controls stagger-el delay-4">
-                    <button class="btn-outline" id="digit-start" type="button">开始录音</button>
-                    <button class="btn-outline" id="digit-stop" type="button" disabled>停止并识别</button>
+                <div class="results-grid stagger-el delay-4">
+                    <section class="result-card" aria-live="polite">
+                        <div class="panel-header">识别结果 / PREDICTION</div>
+                        <div class="result-row">
+                            <output id="result-digit">—</output>
+                            <p id="result-meta">等待录音</p>
+                        </div>
+                    </section>
+                    <section class="chart-card">
+                        <div class="panel-header">各数字的最小 DTW 距离 / 越小越接近</div>
+                        <div id="score-list" class="chart-list"></div>
+                    </section>
                 </div>
-                <section class="match-result stagger-el delay-4" aria-live="polite">
-                    <div class="sys-text opacity-60">识别结果</div>
-                    <output id="result-digit">—</output>
-                    <p id="result-meta">等待录音</p>
-                </section>
-                <section class="score-section stagger-el delay-4">
-                    <div class="sys-text opacity-60">各数字 DTW 距离（越小越接近）</div>
-                    <div id="score-list" class="score-list">
-                        <!-- score rows are filled with the real response -->
-                    </div>
-                </section>
             </div>
         </div>
 
