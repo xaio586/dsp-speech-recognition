@@ -24,7 +24,7 @@ PAGE_ROUTES = {
     "/templates.html": "docs",
 }
 MAX_AUDIO_BYTES = 8 * 96_000 * 4
-INTEGRATION_TAG = b'<script src="/integration.js?v=record-toggle-1"></script>'
+INTEGRATION_TAG = b'<script src="/integration.js?v=waveform-live-2"></script>'
 DESKTOP_STYLE = b"""<style id=\"e3-desktop-mic-style\">
     #page-digits .desktop-mic-row{display:flex;align-items:center;gap:10px;min-width:0}
     #page-digits .desktop-mic-controls{display:flex;align-items:center;gap:10px;min-width:0;font-size:12px;white-space:nowrap}
