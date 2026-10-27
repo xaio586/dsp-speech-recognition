@@ -349,6 +349,63 @@
         .back-btn { border:0; background:transparent; color:inherit; font:inherit; }
         @media(max-height:740px) { .page-content { gap:20px; padding-top:18px; padding-bottom:18px; } }
 
+        /* Wide screens use the same archive design as three side-by-side panels;
+           narrow screens keep the stacked layout for touch and portrait viewing. */
+        @media (min-width: 761px) {
+            .frame-top, .frame-bottom { padding-left: 28px; padding-right: 28px; }
+            .list-container { flex-direction: row; }
+            .list-row { min-width: 0; padding: clamp(22px, 2.2vw, 40px); }
+            .list-row:not(:last-child) {
+                border-bottom: 0;
+                border-right: var(--line-weight) solid var(--ui-color);
+            }
+            .row-title { font-size: clamp(38px, 4vw, 72px); text-align: center; }
+            .row-footer { align-items: flex-start; gap: 12px; }
+            .row-footer .spec-list { overflow-wrap: anywhere; }
+            .page-header { padding-left: 28px; padding-right: 28px; }
+            .page-content {
+                width: min(100%, 1200px);
+                align-self: center;
+                padding: 32px clamp(28px, 5vw, 64px);
+            }
+            #screen-speaker .page-content,
+            #screen-docs .page-content {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                align-content: start;
+                gap: 24px;
+            }
+            #screen-speaker .page-content > h1 { grid-column: 1 / -1; }
+            #screen-speaker .page-content > section { min-width: 0; }
+            #screen-digit .page-content {
+                display: grid;
+                grid-template-columns: minmax(0, 1.15fr) minmax(300px, .85fr);
+                align-content: start;
+                gap: 22px 28px;
+            }
+            #screen-digit .page-content > h1,
+            #screen-digit .digit-grid { grid-column: 1 / -1; }
+            #screen-digit .digit-grid {
+                grid-template-columns: repeat(10, minmax(0, 58px));
+                justify-content: start;
+                gap: 12px;
+            }
+            #screen-digit .page-content > .panel-box,
+            #screen-digit .mobile-record-controls { grid-column: 1; }
+            #screen-digit .match-result { grid-column: 2; grid-row: 3; }
+            #screen-digit .score-section { grid-column: 2; grid-row: 4 / span 2; align-self: start; }
+            #screen-docs .page-content > div:first-child { grid-column: 1; grid-row: 1; }
+            #screen-docs .page-content > div:nth-child(2) { grid-column: 1; grid-row: 2; }
+            #screen-docs .page-content > .grid { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
+        }
+        @media (min-width: 1100px) {
+            #screen-digit .page-content { width: min(100%, 1400px); }
+            #screen-digit .page-content > .panel-box { grid-row: 3 / span 2; align-self: start; }
+            #screen-digit .mobile-record-controls { grid-row: 5; }
+            #screen-digit .match-result { grid-row: 3; }
+            #screen-digit .score-section { grid-row: 4 / span 2; }
+        }
+
         /* Local layout utilities used by the supplied mobile design. */
         .flex { display:flex; }
         .flex-col { flex-direction:column; }
@@ -867,3 +924,4 @@
     </script>
 
 </body></html>
+
