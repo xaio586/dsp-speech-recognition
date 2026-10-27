@@ -248,9 +248,10 @@
         #page-digits .recognition-progress.is-active { display: block; }
         #page-digits .recognition-progress span { display: block; width: 34%; height: 100%; background: #17574c; animation: e3-progress 1.2s ease-in-out infinite; }
         @keyframes e3-progress { 0% { transform: translateX(-110%); } 100% { transform: translateX(330%); } }
-        #page-digits .desktop-mic-controls { grid-column: 1 / 2; display:flex; align-items:center; gap:10px; min-width:0; font-size:12px; white-space:nowrap; }
+        #page-digits .desktop-mic-row { grid-column:1 / -1; display:flex; align-items:center; gap:10px; min-width:0; }
+        #page-digits .desktop-mic-controls { display:flex; align-items:center; gap:10px; min-width:0; font-size:12px; white-space:nowrap; }
         #page-digits .desktop-mic-controls select { flex:1; min-width:0; max-width:100%; min-height:42px; padding:0 10px; border:1px solid rgba(0,0,0,.42); border-radius:2px; background:rgba(255,255,255,.36); color:#111; font:inherit }
-        #page-digits .desktop-mic-refresh { grid-column:2 / 3; justify-self:start; min-height:42px; padding:0 14px; font-size:12px; white-space:nowrap; }
+        #page-digits .desktop-mic-refresh { justify-self:start; min-height:42px; padding:0 14px; font-size:12px; white-space:nowrap; flex:0 0 auto; }
         #page-digits .desktop-mic-hint { grid-column:1 / -1; font-size:11px; line-height:1.45; opacity:.72; }
         #page-digits .frame-top .sys-title, #page-digits .frame-top .sys-subtitle { position:relative; z-index:1; opacity:1; text-shadow:none; filter:none; mix-blend-mode:normal; transform:none; animation:none; }
         #page-digits .waveform-panel { flex-grow: 1; display: flex; flex-direction: column; justify-content: flex-end; }
@@ -297,8 +298,9 @@
         @media (max-width: 900px) {
             #page-digits .controls { grid-template-columns: minmax(0, 1fr); }
             #page-digits .record-toggle { width: 100%; min-width: 0; }
-            #page-digits .desktop-mic-controls, #page-digits .desktop-mic-refresh { grid-column: 1 / -1; }
-            #page-digits .desktop-mic-refresh { justify-self: stretch; }
+            #page-digits .desktop-mic-row { flex-wrap:wrap; }
+            #page-digits .desktop-mic-controls { flex:1 1 100%; }
+            #page-digits .desktop-mic-refresh { justify-self:stretch; flex:1 1 100%; }
         }
     </style>
 </head>
@@ -528,29 +530,18 @@
                             <span class="status-badge" id="mic-status" aria-live="polite" vid="157">等待开始</span>
                         </div>
                         <div class="recognition-progress" id="recognition-progress" role="progressbar" aria-label="正在识别语音" aria-hidden="true"><span></span></div>
-                        <label class="desktop-mic-controls">输入设备
-                            <select id="mic-select" aria-label="选择麦克风"><option value="">系统默认麦克风</option></select>
-                        </label>
-                        <button class="btn desktop-mic-refresh" id="mic-refresh" type="button">授权 / 刷新设备</button>
+                        <div class="desktop-mic-row">
+                            <label class="desktop-mic-controls" for="mic-select">输入设备
+                                <select id="mic-select" aria-label="选择麦克风"><option value="">系统默认麦克风</option></select>
+                            </label>
+                            <button class="btn desktop-mic-refresh" id="mic-refresh" type="button">授权 / 刷新设备</button>
+                        </div>
                         <span id="mic-hint" class="desktop-mic-hint">设备名称需先授权后显示。</span>
                     </div>
 
                     <div class="waveform-panel" vid="158">
                         <div class="section-tag" vid="159">MIC INPUT / WAVEFORM · <span id="input-format">等待录音</span></div>
-                        <div class="waveform-viz" id="wave-digit" vid="160">
-                            <div class="wave-bar" style="height: 20%;" vid="161"></div>
-                            <div class="wave-bar" style="height: 40%;" vid="162"></div>
-                            <div class="wave-bar" style="height: 30%;" vid="163"></div>
-                            <div class="wave-bar" style="height: 60%;" vid="164"></div>
-                            <div class="wave-bar" style="height: 80%;" vid="165"></div>
-                            <div class="wave-bar" style="height: 45%;" vid="166"></div>
-                            <div class="wave-bar" style="height: 20%;" vid="167"></div>
-                            <div class="wave-bar" style="height: 35%;" vid="168"></div>
-                            <div class="wave-bar" style="height: 10%;" vid="169"></div>
-                            <div class="wave-bar" style="height: 55%;" vid="170"></div>
-                            <div class="wave-bar" style="height: 70%;" vid="171"></div>
-                            <div class="wave-bar" style="height: 30%;" vid="172"></div>
-                        </div>
+                        <div class="waveform-viz" id="wave-digit" aria-label="实时录音波形" vid="160"></div>
                     </div>
                 </div>
 

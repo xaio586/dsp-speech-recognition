@@ -26,9 +26,10 @@ PAGE_ROUTES = {
 MAX_AUDIO_BYTES = 8 * 96_000 * 4
 INTEGRATION_TAG = b'<script src="/integration.js?v=record-toggle-1"></script>'
 DESKTOP_STYLE = b"""<style id=\"e3-desktop-mic-style\">
+    #page-digits .desktop-mic-row{display:flex;align-items:center;gap:10px;min-width:0}
     #page-digits .desktop-mic-controls{display:flex;align-items:center;gap:10px;min-width:0;font-size:12px;white-space:nowrap}
     #page-digits .desktop-mic-controls select{flex:1;min-width:0;max-width:100%;min-height:42px;padding:0 10px;border:1px solid rgba(0,0,0,.42);border-radius:2px;background:rgba(255,255,255,.36);color:#111;font:inherit}
-    #page-digits .desktop-mic-refresh{min-height:42px;padding:0 14px;font-size:12px;white-space:nowrap}
+    #page-digits .desktop-mic-refresh{min-height:42px;padding:0 14px;font-size:12px;white-space:nowrap;flex:0 0 auto}
     #page-digits .desktop-mic-hint{font-size:11px;line-height:1.45;opacity:.72}
     #page-digits .frame-top .sys-title,#page-digits .frame-top .sys-subtitle{text-shadow:none;filter:none;mix-blend-mode:normal}
     #page-digits .recognition-progress{display:none;width:100%;height:4px;overflow:hidden;background:rgba(0,0,0,.14)}
@@ -38,7 +39,7 @@ DESKTOP_STYLE = b"""<style id=\"e3-desktop-mic-style\">
     #page-digits #wave-digit canvas{display:block;width:100%;height:100%}
     #page-digits .dtw-row[hidden]{display:none!important}
     #page-digits .dtw-row.is-best .dtw-label,#page-digits .dtw-row.is-best .dtw-value{font-weight:700}
-    @media(max-width:900px){#page-digits .desktop-mic-controls{white-space:normal}}
+    @media(max-width:900px){#page-digits .desktop-mic-row{flex-wrap:wrap}#page-digits .desktop-mic-controls{flex:1 1 100%;white-space:normal}#page-digits .desktop-mic-refresh{flex:1 1 100%}}
     </style>"""
 TRANSITION_STYLE = b"""<style id=\"e3-page-transition\">
     :root{--e3-enter:cubic-bezier(.23,1,.32,1)}
