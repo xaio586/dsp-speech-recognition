@@ -45,7 +45,7 @@ TRANSITION_STYLE = b"""<style id=\"e3-page-transition\">
     :root{--e3-enter:cubic-bezier(.23,1,.32,1)}
     html,body{width:100%;height:100%;height:100dvh;min-height:100%;overflow:hidden}
     #app-container{height:100%;height:100dvh;min-height:100%;overflow:hidden}
-    #app-container .screen{transform:none!important;transition:opacity 240ms var(--e3-enter)!important;will-change:opacity}
+    #app-container .screen{transform:none!important;transition:opacity 260ms var(--e3-enter)!important;will-change:opacity}
     #app-container .screen.hidden-left,#app-container .screen.hidden-right{visibility:hidden;opacity:0;transform:none!important}
     #app-container .screen.active,#app-container .screen.is-entering,#app-container .screen.is-leaving{transform:none!important}
     #app-container .screen.is-entering,#app-container .screen.is-leaving{visibility:visible;opacity:0;pointer-events:none}
