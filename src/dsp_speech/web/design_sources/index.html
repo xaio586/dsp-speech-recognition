@@ -736,8 +736,9 @@
                     vec3 finalColor = mix(colorA, colorB, smoothstep(0.0, 1.2, d1));
                     finalColor = mix(finalColor, colorC, smoothstep(0.2, 1.5, d3)); finalColor = mix(finalColor, colorE, smoothstep(0.4, 2.0, d2));
                     float cyanPop = snoise(st * 3.0 + uTime * 0.05); finalColor = mix(finalColor, colorD, smoothstep(0.5, 1.0, cyanPop) * 0.5);
+                    finalColor = mix(finalColor, vec3(1.0), 0.08);
                     float grain = random(vUv * (uTime * 0.001 + 100.0));
-                    gl_FragColor = vec4(finalColor + (grain - 0.5) * 0.18, 1.0);
+                    gl_FragColor = vec4(finalColor + (grain - 0.5) * 0.075, 1.0);
                 }
             `;
             function loadShader(gl, type, source) { const s = gl.createShader(type); gl.shaderSource(s, source); gl.compileShader(s); return s; }
@@ -748,7 +749,7 @@
             function render(now) {
                 canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; gl.viewport(0, 0, canvas.width, canvas.height); gl.useProgram(prog);
                 gl.bindBuffer(gl.ARRAY_BUFFER, posBuf); gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0); gl.enableVertexAttribArray(aPos);
-                gl.uniform1f(uTime, now * 0.001); gl.uniform2f(uRes, canvas.width, canvas.height); gl.uniform2f(uMouse, mX, mY);
+                gl.uniform1f(uTime, now * 0.00055); gl.uniform2f(uRes, canvas.width, canvas.height); gl.uniform2f(uMouse, mX, mY);
                 gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); requestAnimationFrame(render);
             }
             requestAnimationFrame(render);
@@ -785,8 +786,9 @@
                     vec3 finalColor = mix(colorA, colorB, smoothstep(0.0, 1.5, length(warpedSt - vec2(0.2, 0.8))));
                     finalColor = mix(finalColor, colorC, smoothstep(0.2, 1.8, length(warpedSt - vec2(0.5))));
                     finalColor = mix(finalColor, colorE, smoothstep(0.4, 2.0, length(warpedSt - vec2(0.8, 0.2))));
+                    finalColor = mix(finalColor, vec3(1.0), 0.08);
                     float grain = random(vUv * (uTime * 0.001 + 100.0));
-                    gl_FragColor = vec4(finalColor + (grain - 0.5) * 0.18, 1.0);
+                    gl_FragColor = vec4(finalColor + (grain - 0.5) * 0.075, 1.0);
                 }
             `;
             function loadShader(gl, type, source) { const s = gl.createShader(type); gl.shaderSource(s, source); gl.compileShader(s); return s; }
@@ -796,7 +798,7 @@
             function render(now) {
                 canvas.width = window.innerWidth; canvas.height = window.innerHeight; gl.viewport(0, 0, canvas.width, canvas.height); gl.useProgram(prog);
                 gl.bindBuffer(gl.ARRAY_BUFFER, posBuf); gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0); gl.enableVertexAttribArray(aPos);
-                gl.uniform1f(uTime, now * 0.001); gl.uniform2f(uRes, canvas.width, canvas.height);
+                gl.uniform1f(uTime, now * 0.00055); gl.uniform2f(uRes, canvas.width, canvas.height);
                 gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); requestAnimationFrame(render);
             }
             requestAnimationFrame(render);
@@ -833,8 +835,9 @@
                     vec3 finalColor = mix(colorA, colorB, smoothstep(0.0, 1.2, length(warpedSt - vec2(0.2, 0.8))));
                     finalColor = mix(finalColor, colorC, smoothstep(0.2, 1.5, length(warpedSt - vec2(0.5, 0.5))));
                     finalColor = mix(finalColor, colorE, smoothstep(0.4, 2.0, length(warpedSt - vec2(0.8, 0.2))));
+                    finalColor = mix(finalColor, vec3(1.0), 0.08);
                     float grain = random(vUv * (uTime * 0.001 + 100.0));
-                    gl_FragColor = vec4(finalColor + (grain - 0.5) * 0.18, 1.0);
+                    gl_FragColor = vec4(finalColor + (grain - 0.5) * 0.075, 1.0);
                 }
             `;
             function loadShader(gl, type, source) { const s = gl.createShader(type); gl.shaderSource(s, source); gl.compileShader(s); return s; }
@@ -844,7 +847,7 @@
             function render(now) {
                 canvas.width = window.innerWidth; canvas.height = window.innerHeight; gl.viewport(0, 0, canvas.width, canvas.height); gl.useProgram(prog);
                 gl.bindBuffer(gl.ARRAY_BUFFER, posBuf); gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0); gl.enableVertexAttribArray(aPos);
-                gl.uniform1f(uTime, now * 0.001); gl.uniform2f(uRes, canvas.width, canvas.height);
+                gl.uniform1f(uTime, now * 0.00055); gl.uniform2f(uRes, canvas.width, canvas.height);
                 gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); requestAnimationFrame(render);
             }
             requestAnimationFrame(render);
@@ -882,8 +885,9 @@
                     float d1 = length(warpedSt - vec2(0.2, 0.8)); float d2 = length(warpedSt - vec2(0.8, 0.2)); float d3 = length(warpedSt - vec2(0.5, 0.5));
                     vec3 finalColor = mix(colorA, colorB, smoothstep(0.0, 1.2, d1));
                     finalColor = mix(finalColor, colorC, smoothstep(0.2, 1.5, d3)); finalColor = mix(finalColor, colorE, smoothstep(0.4, 2.0, d2));
+                    finalColor = mix(finalColor, vec3(1.0), 0.08);
                     float grain = random(vUv * (uTime * 0.001 + 100.0));
-                    gl_FragColor = vec4(finalColor + (grain - 0.5) * 0.18, 1.0);
+                    gl_FragColor = vec4(finalColor + (grain - 0.5) * 0.075, 1.0);
                 }
             `;
             function loadShader(gl, type, source) { const s = gl.createShader(type); gl.shaderSource(s, source); gl.compileShader(s); return s; }
@@ -894,7 +898,7 @@
             function render(now) {
                 canvas.width = window.innerWidth; canvas.height = window.innerHeight; gl.viewport(0, 0, canvas.width, canvas.height); gl.useProgram(prog);
                 gl.bindBuffer(gl.ARRAY_BUFFER, posBuf); gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0); gl.enableVertexAttribArray(aPos);
-                gl.uniform1f(uTime, now * 0.001); gl.uniform2f(uRes, canvas.width, canvas.height); gl.uniform2f(uMouse, mX, mY);
+                gl.uniform1f(uTime, now * 0.00055); gl.uniform2f(uRes, canvas.width, canvas.height); gl.uniform2f(uMouse, mX, mY);
                 gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4); requestAnimationFrame(render);
             }
             requestAnimationFrame(render);

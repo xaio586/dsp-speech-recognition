@@ -876,9 +876,9 @@
                 finalColor = mix(finalColor, colorD, smoothstep(0.5, 1.0, cyanPop) * 0.5);
                 
                 float grain = random(vUv * (uTime * 0.001 + 100.0));
-                float grainStrength = 0.18;
+                float grainStrength = 0.075;
                 
-                vec3 grainyColor = finalColor + (grain - 0.5) * grainStrength;
+                vec3 grainyColor = mix(finalColor, vec3(1.0), 0.08) + (grain - 0.5) * grainStrength;
                 
                 gl_FragColor = vec4(grainyColor, 1.0);
             }
@@ -944,7 +944,7 @@
         }
 
         function render(now) {
-            now *= 0.001; 
+            now *= 0.00055; 
             resizeCanvasToDisplaySize(canvas);
             gl.viewport(0, 0, canvas.width, canvas.height);
             gl.useProgram(programInfo.program);

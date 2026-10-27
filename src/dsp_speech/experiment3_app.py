@@ -24,7 +24,7 @@ PAGE_ROUTES = {
     "/templates.html": "docs",
 }
 MAX_AUDIO_BYTES = 8 * 96_000 * 4
-INTEGRATION_TAG = b'<script src="/integration.js?v=split-layout-2"></script>'
+INTEGRATION_TAG = b'<script src="/integration.js?v=split-layout-3"></script>'
 DESKTOP_STYLE = b"""<style id=\"e3-desktop-mic-style\">
     #page-digits .desktop-mic-controls{display:flex;align-items:center;gap:8px;font-size:12px;white-space:nowrap}
     #page-digits #mic-select{max-width:min(28vw,260px);min-height:36px;padding:0 10px;border:1px solid rgba(0,0,0,.42);border-radius:2px;background:rgba(255,255,255,.36);color:#111;font:inherit}
@@ -69,6 +69,7 @@ class RecognitionHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        self.send_header("Vary", "User-Agent, Sec-CH-UA-Mobile")
         self.end_headers()
         self.wfile.write(body)
 
