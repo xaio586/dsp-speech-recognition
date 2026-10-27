@@ -1,0 +1,469 @@
+<html lang="en" vid="0"><head vid="1">
+    <meta charset="UTF-8" vid="2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" vid="3">
+    <title vid="4">Undertone // Speaker ID</title>
+    <style vid="5">
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&display=swap');
+
+        :root {
+            --ui-color: #000000;
+            --line-weight: 1px;
+            --transition-timing: 0.85s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body, html {
+            width: 1440px;
+            height: 900px;
+            overflow: hidden;
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, sans-serif;
+            background-color: #111;
+            color: var(--ui-color);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #glcanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+        }
+
+        
+        .frame-top {
+            width: 100%;
+            padding: 24px 32px;
+            border-bottom: var(--line-weight) solid var(--ui-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .sys-title-group {
+            display: flex;
+            gap: 8px;
+            align-items: baseline;
+        }
+
+        .sys-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .sys-divider {
+            opacity: 0.4;
+        }
+
+        .sys-subtitle {
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .sys-meta-right {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            text-align: right;
+        }
+
+        
+        .workspace {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto 1fr auto;
+            padding: 48px 32px;
+            gap: 48px;
+        }
+
+        .hero-section {
+            grid-column: 1 / 3;
+        }
+
+        .hero-title {
+            font-size: 64px;
+            font-weight: 400;
+            letter-spacing: -0.04em;
+            margin-bottom: 12px;
+        }
+
+        .hero-desc {
+            font-size: 14px;
+            opacity: 0.8;
+            max-width: 400px;
+            line-height: 1.6;
+        }
+
+        
+        .panel {
+            border: var(--line-weight) solid var(--ui-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .panel-header {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: flex;
+            justify-content: space-between;
+            opacity: 0.6;
+        }
+
+        .waveform-container {
+            height: 160px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            border-bottom: 0.5px solid rgba(0,0,0,0.1);
+        }
+
+        .wave-bar {
+            flex: 1;
+            background: var(--ui-color);
+            min-height: 2px;
+            opacity: 0.3;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: var(--line-weight) solid var(--ui-color);
+            background: transparent;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn:hover {
+            background: var(--ui-color);
+            color: white;
+        }
+
+        .status-tag {
+            font-size: 11px;
+            align-self: center;
+            margin-left: auto;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 24px;
+        }
+
+        .result-card {
+            border: var(--line-weight) solid var(--ui-color);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .speaker-id {
+            font-size: 120px;
+            font-weight: 400;
+            line-height: 1;
+            margin: 20px 0;
+            letter-spacing: -0.05em;
+        }
+
+        .card-meta {
+            font-size: 11px;
+            opacity: 0.6;
+            margin-top: auto;
+            line-height: 1.8;
+        }
+
+        .comparison-list {
+            list-style: none;
+            margin-top: 24px;
+        }
+
+        .comparison-item {
+            margin-bottom: 20px;
+        }
+
+        .comp-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 6px;
+        }
+
+        .comp-bar-bg {
+            height: 4px;
+            width: 100%;
+            background: rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .comp-bar-fill {
+            height: 100%;
+            background: var(--ui-color);
+        }
+
+        
+        .frame-bottom {
+            width: 100%;
+            padding: 16px 32px 24px 32px;
+            border-top: var(--line-weight) solid var(--ui-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .back-btn {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+    </style>
+</head>
+<body vid="6">
+
+    <canvas id="glcanvas" vid="7"></canvas>
+
+    <div class="ui-layer" vid="8">
+        
+        <div class="frame-top" vid="9">
+            <div class="sys-title-group" vid="10">
+                <div class="sys-title" vid="11">DSP LAB</div>
+                <div class="sys-divider" vid="12">/</div>
+                <div class="sys-subtitle" vid="13">VOICE · 数字语音识别实验</div>
+            </div>
+            <div class="sys-meta-right" vid="14">
+                <div vid="15">MFCC + DTW · LOCAL</div>
+                <div vid="16">16 KHZ</div>
+            </div>
+        </div>
+
+        <div class="workspace" vid="17">
+            <div class="hero-section" vid="18">
+                <h1 class="hero-title" vid="19">说话人是谁？</h1>
+                <p class="hero-desc" vid="20">对着麦克风说任意词语，停止后判断说话人身份。系统将提取 MFCC 特征并与模板库进行动态时间规整（DTW）计算。</p>
+            </div>
+
+            <div class="panel" vid="21">
+                <div class="panel-header" vid="22">
+                    <span vid="23">MIC INPUT / WAVEFORM</span>
+                    <span vid="24">16000 Hz / mono</span>
+                </div>
+                <div class="waveform-container" vid="25">
+                    
+                    <div class="wave-bar" style="height: 20%;" vid="26"></div>
+                    <div class="wave-bar" style="height: 45%;" vid="27"></div>
+                    <div class="wave-bar" style="height: 60%;" vid="28"></div>
+                    <div class="wave-bar" style="height: 30%;" vid="29"></div>
+                    <div class="wave-bar" style="height: 80%;" vid="30"></div>
+                    <div class="wave-bar" style="height: 95%;" vid="31"></div>
+                    <div class="wave-bar" style="height: 70%;" vid="32"></div>
+                    <div class="wave-bar" style="height: 40%;" vid="33"></div>
+                    <div class="wave-bar" style="height: 20%;" vid="34"></div>
+                    <div class="wave-bar" style="height: 50%;" vid="35"></div>
+                    <div class="wave-bar" style="height: 85%;" vid="36"></div>
+                    <div class="wave-bar" style="height: 60%;" vid="37"></div>
+                    <div class="wave-bar" style="height: 30%;" vid="38"></div>
+                    <div class="wave-bar" style="height: 10%;" vid="39"></div>
+                    <div class="wave-bar" style="height: 40%;" vid="40"></div>
+                    <div class="wave-bar" style="height: 75%;" vid="41"></div>
+                    <div class="wave-bar" style="height: 50%;" vid="42"></div>
+                    <div class="wave-bar" style="height: 20%;" vid="43"></div>
+                </div>
+                <div class="controls" vid="44">
+                    <button class="btn" vid="45">开始录音</button>
+                    <button class="btn" vid="46">停止并识别</button>
+                    <div class="status-tag" vid="47">识别完成 00:04</div>
+                </div>
+            </div>
+
+            <div class="results-container" vid="48">
+                <div class="result-card" vid="49">
+                    <div class="panel-header" vid="50">识别结果 / SPEAKER</div>
+                    <div class="speaker-id" vid="51">S3</div>
+                    <div class="card-meta" vid="52">
+                        最小 DTW 距离 18.42<br vid="53">
+                        有效语音 2.10 s
+                    </div>
+                </div>
+                <div class="result-card" vid="54">
+                    <div class="panel-header" vid="55">各说话人的最小 DTW 距离 / 越小越接近</div>
+                    <div class="comparison-list" vid="56">
+                        <div class="comparison-item" vid="57">
+                            <div class="comp-header" vid="58">
+                                <span vid="59">S3 (Current)</span>
+                                <span vid="60">18.42</span>
+                            </div>
+                            <div class="comp-bar-bg" vid="61"><div class="comp-bar-fill" style="width: 40%;" vid="62"></div></div>
+                        </div>
+                        <div class="comparison-item" vid="63">
+                            <div class="comp-header" vid="64">
+                                <span vid="65">S1</span>
+                                <span vid="66">19.87</span>
+                            </div>
+                            <div class="comp-bar-bg" vid="67"><div class="comp-bar-fill" style="width: 55%; opacity: 0.5;" vid="68"></div></div>
+                        </div>
+                        <div class="comparison-item" vid="69">
+                            <div class="comp-header" vid="70">
+                                <span vid="71">S2</span>
+                                <span vid="72">21.15</span>
+                            </div>
+                            <div class="comp-bar-bg" vid="73"><div class="comp-bar-fill" style="width: 70%; opacity: 0.5;" vid="74"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="frame-bottom" vid="75">
+            <a href="#" class="back-btn" vid="76">← 返回索引</a>
+            <div vid="77">安静环境下更容易得到稳定结果。</div>
+            <div vid="78">•</div>
+        </div>
+
+    </div>
+
+    <script vid="79">
+        const canvas = document.getElementById('glcanvas');
+        const gl = canvas.getContext('webgl');
+
+        const vsSource = `
+            attribute vec4 aVertexPosition;
+            varying vec2 vUv;
+            void main() {
+                gl_Position = aVertexPosition;
+                vUv = aVertexPosition.xy * 0.5 + 0.5;
+            }
+        `;
+
+        const fsSource = `
+            precision highp float;
+            varying vec2 vUv;
+            uniform float uTime;
+            uniform vec2 uResolution;
+
+            vec3 colorA = vec3(0.91, 0.36, 0.02); 
+            vec3 colorB = vec3(0.91, 0.77, 0.42); 
+            vec3 colorC = vec3(0.66, 0.85, 0.86); 
+            vec3 colorD = vec3(0.16, 0.62, 0.56); 
+            vec3 colorE = vec3(0.11, 0.21, 0.34); 
+
+            float random(vec2 st) {
+                return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+            }
+
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+            float snoise(vec2 v) {
+                const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                vec2 i  = floor(v + dot(v, C.yy) );
+                vec2 x0 = v -   i + dot(i, C.xx);
+                vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                vec4 x12 = x0.xyxy + C.xxzz;
+                x12.xy -= i1;
+                i = mod289(i);
+                vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+                vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                m = m*m*m*m ;
+                vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                vec3 h = abs(x) - 0.5;
+                vec3 ox = floor(x + 0.5);
+                vec3 a0 = x - ox;
+                m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+                vec3 g;
+                g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                return 130.0 * dot(m, g);
+            }
+
+            void main() {
+                vec2 st = gl_FragCoord.xy / uResolution.xy;
+                st.x *= uResolution.x / uResolution.y;
+                float n1 = snoise(st * 1.2 + uTime * 0.05);
+                float n2 = snoise(st * 1.8 - uTime * 0.08 + n1);
+                vec2 warpedSt = st + vec2(n1, n2) * 0.4;
+                vec3 finalColor = mix(colorA, colorB, smoothstep(0.0, 1.5, length(warpedSt - vec2(0.2, 0.8))));
+                finalColor = mix(finalColor, colorC, smoothstep(0.2, 1.8, length(warpedSt - vec2(0.5))));
+                finalColor = mix(finalColor, colorE, smoothstep(0.4, 2.0, length(warpedSt - vec2(0.8, 0.2))));
+                float grain = random(vUv * (uTime * 0.001 + 100.0));
+                gl_FragColor = vec4(finalColor + (grain - 0.5) * 0.18, 1.0);
+            }
+        `;
+
+        function loadShader(gl, type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            return shader;
+        }
+
+        const shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, loadShader(gl, gl.VERTEX_SHADER, vsSource));
+        gl.attachShader(shaderProgram, loadShader(gl, gl.FRAGMENT_SHADER, fsSource));
+        gl.linkProgram(shaderProgram);
+
+        const posBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([1,1,-1,1,1,-1,-1,-1]), gl.STATIC_DRAW);
+
+        const posLoc = gl.getAttribLocation(shaderProgram, 'aVertexPosition');
+        const timeLoc = gl.getUniformLocation(shaderProgram, 'uTime');
+        const resLoc = gl.getUniformLocation(shaderProgram, 'uResolution');
+
+        function render(now) {
+            canvas.width = 1440; canvas.height = 900;
+            gl.viewport(0, 0, 1440, 900);
+            gl.useProgram(shaderProgram);
+            gl.enableVertexAttribArray(posLoc);
+            gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+            gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+            gl.uniform1f(timeLoc, now * 0.001);
+            gl.uniform2f(resLoc, 1440, 900);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            requestAnimationFrame(render);
+        }
+        requestAnimationFrame(render);
+    </script>
+
+</body></html>

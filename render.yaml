@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: dsp-speech-recognition
+    runtime: python
+    plan: free
+    region: singapore
+    buildCommand: pip install -r requirements-hosted.txt
+    startCommand: python scripts/run_experiment3.py
+    healthCheckPath: /health

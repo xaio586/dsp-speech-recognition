@@ -1,0 +1,446 @@
+<html lang="en" vid="0"><head vid="1">
+    <meta charset="UTF-8" vid="2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" vid="3">
+    <title vid="4">Undertone // 数字识别 Experiment</title>
+    <style vid="5">
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&display=swap');
+
+        :root {
+            --ui-color: #000000;
+            --line-weight: 1px;
+            --transition-timing: 0.85s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body, html {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, sans-serif;
+            background-color: #111;
+            color: var(--ui-color);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #glcanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none; 
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+
+        
+        .frame-top {
+            width: 100%;
+            padding: 24px 32px 16px 32px;
+            border-bottom: var(--line-weight) solid var(--ui-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+        }
+
+        .frame-bottom {
+            width: 100%;
+            padding: 16px 32px 24px 32px;
+            border-top: var(--line-weight) solid var(--ui-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: auto;
+        }
+
+        .sys-title { font-size: 14px; font-weight: 500; letter-spacing: -0.01em; }
+        .sys-subtitle { font-size: 14px; font-weight: 400; margin-top: 2px; opacity: 0.8; }
+        .sys-meta-right { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; text-align: right; }
+
+        
+        .main-container {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            pointer-events: auto;
+            overflow: hidden;
+        }
+
+        .primary-pane {
+            border-right: var(--line-weight) solid var(--ui-color);
+            padding: 40px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .primary-pane::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+
+        .secondary-pane {
+            padding: 40px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            background: rgba(0,0,0,0.02);
+        }
+
+        
+        .section-tag { font-size: 12px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; display: block; }
+        .hero-title { font-size: 64px; font-weight: 400; letter-spacing: -0.04em; margin-bottom: 12px; }
+        .description { font-size: 14px; line-height: 1.6; max-width: 500px; opacity: 0.8; }
+
+        
+        .digit-grid {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        .digit-node {
+            width: 44px;
+            height: 44px;
+            border: var(--line-weight) solid var(--ui-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            opacity: 0.4;
+        }
+        .digit-node.active {
+            background: var(--ui-color);
+            color: white;
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        
+        .button-group { display: flex; gap: 16px; align-items: center; }
+        .btn {
+            padding: 12px 24px;
+            border: var(--line-weight) solid var(--ui-color);
+            background: transparent;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn:hover { background: var(--ui-color); color: white; }
+        .btn-primary { background: var(--ui-color); color: white; }
+        .status-pill { font-size: 12px; font-variant-numeric: tabular-nums; letter-spacing: 0.05em; }
+
+        
+        .waveform-viz {
+            height: 120px;
+            border: var(--line-weight) solid var(--ui-color);
+            position: relative;
+            background: rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            gap: 3px;
+        }
+        .wave-bar { width: 2px; background: var(--ui-color); opacity: 0.6; }
+
+        
+        .card {
+            border: var(--line-weight) solid var(--ui-color);
+            padding: 24px;
+        }
+        .result-display {
+            display: flex;
+            align-items: baseline;
+            gap: 20px;
+        }
+        .result-val { font-size: 84px; font-weight: 400; line-height: 1; }
+        .result-meta { font-size: 11px; text-transform: uppercase; line-height: 1.8; opacity: 0.7; }
+
+        
+        .stat-row { margin-bottom: 16px; }
+        .stat-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px; }
+        .stat-bar-bg { height: 4px; background: rgba(0,0,0,0.1); width: 100%; position: relative; }
+        .stat-bar-fill { height: 100%; background: var(--ui-color); }
+
+        .back-link {
+            text-decoration: none;
+            color: inherit;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .back-link:hover { opacity: 1; }
+    </style>
+</head>
+<body vid="6">
+
+    <canvas id="glcanvas" vid="7"></canvas>
+
+    <div class="ui-layer" vid="8">
+        <div class="frame-top" vid="9">
+            <div vid="10">
+                <div class="sys-title" vid="11">DSP LAB / VOICE · 数字语音识别实验</div>
+                <div class="sys-subtitle" vid="12">实验三：实时孤立词识别系统</div>
+            </div>
+            <div class="sys-meta-right" vid="13">
+                <div vid="14">MFCC + DTW · LOCAL</div>
+                <div vid="15">SAMPLE RATE 16 kHz</div>
+            </div>
+        </div>
+
+        <div class="main-container" vid="16">
+            <div class="primary-pane" vid="17">
+                <div vid="18">
+                    <a href="index.html" class="back-link" vid="19">← 返回系统目录</a>
+                    <span class="section-tag" vid="20">实时孤立数字识别 · 10 CLASSES / 0—9</span>
+                    <h1 class="hero-title" vid="21">说一个数字</h1>
+                    <p class="description" vid="22">
+                        对着麦克风说 0 到 9 中的一个数字，停止后查看匹配结果。系统将提取梅尔倒谱系数并与本地模板进行动态时间规整匹配。
+                    </p>
+                </div>
+
+                <div class="digit-grid" vid="23">
+                    <div class="digit-node" vid="24">0</div>
+                    <div class="digit-node" vid="25">1</div>
+                    <div class="digit-node active" vid="26">2</div>
+                    <div class="digit-node" vid="27">3</div>
+                    <div class="digit-node" vid="28">4</div>
+                    <div class="digit-node" vid="29">5</div>
+                    <div class="digit-node" vid="30">6</div>
+                    <div class="digit-node" vid="31">7</div>
+                    <div class="digit-node" vid="32">8</div>
+                    <div class="digit-node" vid="33">9</div>
+                </div>
+
+                <div class="control-section" vid="34">
+                    <div class="button-group" vid="35">
+                        <button class="btn" vid="36">开始录音</button>
+                        <button class="btn btn-primary" vid="37">停止并识别</button>
+                        <span class="status-pill" vid="38">● 识别完成 00:03</span>
+                    </div>
+                </div>
+
+                <div class="viz-section" vid="39">
+                    <span class="section-tag" vid="40">MIC INPUT / WAVEFORM · 48000 Hz / mono</span>
+                    <div class="waveform-viz" vid="41">
+                        
+                        <div class="wave-bar" style="height:20%" vid="42"></div>
+                        <div class="wave-bar" style="height:35%" vid="43"></div>
+                        <div class="wave-bar" style="height:60%" vid="44"></div>
+                        <div class="wave-bar" style="height:45%" vid="45"></div>
+                        <div class="wave-bar" style="height:80%" vid="46"></div>
+                        <div class="wave-bar" style="height:30%" vid="47"></div>
+                        <div class="wave-bar" style="height:15%" vid="48"></div>
+                        <div class="wave-bar" style="height:40%" vid="49"></div>
+                        <div class="wave-bar" style="height:70%" vid="50"></div>
+                        <div class="wave-bar" style="height:55%" vid="51"></div>
+                        <div class="wave-bar" style="height:25%" vid="52"></div>
+                        <div class="wave-bar" style="height:10%" vid="53"></div>
+                        <div class="wave-bar" style="height:40%" vid="54"></div>
+                        <div class="wave-bar" style="height:90%" vid="55"></div>
+                        <div class="wave-bar" style="height:60%" vid="56"></div>
+                        <div class="wave-bar" style="height:30%" vid="57"></div>
+                        <div class="wave-bar" style="height:20%" vid="58"></div>
+                        <div class="wave-bar" style="height:45%" vid="59"></div>
+                        <div class="wave-bar" style="height:75%" vid="60"></div>
+                        <div class="wave-bar" style="height:40%" vid="61"></div>
+                        <div class="wave-bar" style="height:20%" vid="62"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="secondary-pane" vid="63">
+                <div class="card" vid="64">
+                    <span class="section-tag" vid="65">识别结果 / PREDICTION</span>
+                    <div class="result-display" vid="66">
+                        <div class="result-val" vid="67">2</div>
+                        <div class="result-meta" vid="68">
+                            最小 DTW 距离 22.698<br vid="69">
+                            有效语音时长 2.33 s
+                        </div>
+                    </div>
+                </div>
+
+                <div vid="70">
+                    <span class="section-tag" vid="71">各数字的最小 DTW 距离 / 越小越接近</span>
+                    
+                    <div class="stat-row" vid="72">
+                        <div class="stat-label" vid="73"><span vid="74">数字 2</span><span vid="75">22.70</span></div>
+                        <div class="stat-bar-bg" vid="76"><div class="stat-bar-fill" style="width: 40%" vid="77"></div></div>
+                    </div>
+
+                    <div class="stat-row" vid="78">
+                        <div class="stat-label" vid="79"><span vid="80">数字 8</span><span vid="81">23.22</span></div>
+                        <div class="stat-bar-bg" vid="82"><div class="stat-bar-fill" style="width: 45%" vid="83"></div></div>
+                    </div>
+
+                    <div class="stat-row" vid="84">
+                        <div class="stat-label" vid="85"><span vid="86">数字 9</span><span vid="87">24.36</span></div>
+                        <div class="stat-bar-bg" vid="88"><div class="stat-bar-fill" style="width: 55%" vid="89"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="frame-bottom" vid="90">
+            <div class="branding" vid="91">
+                结果是模板距离最小的数字；安静环境下说一个数字更容易得到稳定结果。
+            </div>
+            <div class="dot-signature" vid="92">•</div>
+        </div>
+    </div>
+
+    <script vid="93">
+        const canvas = document.getElementById('glcanvas');
+        const gl = canvas.getContext('webgl');
+
+        const vsSource = `
+            attribute vec4 aVertexPosition;
+            varying vec2 vUv;
+            void main() {
+                gl_Position = aVertexPosition;
+                vUv = aVertexPosition.xy * 0.5 + 0.5;
+            }
+        `;
+
+        const fsSource = `
+            precision highp float;
+            varying vec2 vUv;
+            uniform float uTime;
+            uniform vec2 uResolution;
+
+            vec3 colorA = vec3(0.91, 0.36, 0.02); 
+            vec3 colorB = vec3(0.91, 0.77, 0.42); 
+            vec3 colorC = vec3(0.66, 0.85, 0.86); 
+            vec3 colorD = vec3(0.16, 0.62, 0.56); 
+            vec3 colorE = vec3(0.11, 0.21, 0.34); 
+
+            float random(vec2 st) {
+                return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+            }
+
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+            float snoise(vec2 v) {
+                const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                vec2 i  = floor(v + dot(v, C.yy) );
+                vec2 x0 = v -   i + dot(i, C.xx);
+                vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                vec4 x12 = x0.xyxy + C.xxzz;
+                x12.xy -= i1;
+                i = mod289(i);
+                vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+                vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                m = m*m*m*m;
+                vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                vec3 h = abs(x) - 0.5;
+                vec3 ox = floor(x + 0.5);
+                vec3 a0 = x - ox;
+                m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+                vec3 g;
+                g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                return 130.0 * dot(m, g);
+            }
+
+            void main() {
+                vec2 st = gl_FragCoord.xy / uResolution.xy;
+                st.x *= uResolution.x / uResolution.y;
+
+                float n1 = snoise(st * 1.5 + uTime * 0.1);
+                float n2 = snoise(st * 2.0 - uTime * 0.15 + n1);
+                vec2 warpedSt = st + vec2(n1, n2) * 0.4;
+
+                float d1 = length(warpedSt - vec2(0.2, 0.8));
+                float d2 = length(warpedSt - vec2(0.8, 0.2));
+                float d3 = length(warpedSt - vec2(0.5, 0.5));
+
+                vec3 finalColor = mix(colorA, colorB, smoothstep(0.0, 1.2, d1));
+                finalColor = mix(finalColor, colorC, smoothstep(0.2, 1.5, d3));
+                finalColor = mix(finalColor, colorE, smoothstep(0.4, 2.0, d2));
+                
+                float grain = random(vUv * (uTime * 0.001 + 100.0));
+                vec3 grainyColor = finalColor + (grain - 0.5) * 0.18;
+                gl_FragColor = vec4(grainyColor, 1.0);
+            }
+        `;
+
+        function initShaderProgram(gl, vsSource, fsSource) {
+            const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+            const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+            const shaderProgram = gl.createProgram();
+            gl.attachShader(shaderProgram, vertexShader);
+            gl.attachShader(shaderProgram, fragmentShader);
+            gl.linkProgram(shaderProgram);
+            return shaderProgram;
+        }
+
+        function loadShader(gl, type, source) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            return shader;
+        }
+
+        const shaderProgram = initShaderProgram(gl, vsSource, fsSource);
+        const programInfo = {
+            program: shaderProgram,
+            attribLocations: { vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition') },
+            uniformLocations: {
+                uTime: gl.getUniformLocation(shaderProgram, 'uTime'),
+                uResolution: gl.getUniformLocation(shaderProgram, 'uResolution')
+            },
+        };
+
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([1,1, -1,1, 1,-1, -1,-1]), gl.STATIC_DRAW);
+
+        function render(now) {
+            now *= 0.001;
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+            gl.useProgram(programInfo.program);
+            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+            gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+            gl.uniform1f(programInfo.uniformLocations.uTime, now);
+            gl.uniform2f(programInfo.uniformLocations.uResolution, canvas.width, canvas.height);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            requestAnimationFrame(render);
+        }
+        requestAnimationFrame(render);
+    </script>
+</body></html>

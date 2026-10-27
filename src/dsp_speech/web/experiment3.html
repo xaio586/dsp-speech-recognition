@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eee9d7">
+  <title>语音实验 / 实时数字识别</title>
+  <style>
+    :root {
+      --ink: #111711;
+      --rule: rgba(20, 30, 25, .72);
+      --muted: rgba(20, 30, 25, .62);
+      --paper: rgba(247, 245, 235, .82);
+      --orange: #ef5a08;
+      --gold: #e3a51c;
+      --cyan: #64c2cf;
+      --teal: #178d7b;
+      --navy: #173b62;
+      --ease: cubic-bezier(.2, 1, .2, 1);
+    }
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; }
+    body {
+      overflow: hidden;
+      color: var(--ink);
+      font-family: Inter, "Noto Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+      background: #eee9d7;
+      -webkit-font-smoothing: antialiased;
+    }
+    #ambient {
+      position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0;
+      pointer-events: none;
+    }
+    .grain {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: .10;
+      background-image: radial-gradient(rgba(20, 24, 20, .72) .55px, transparent .75px);
+      background-size: 4px 4px; mix-blend-mode: multiply;
+    }
+    .ui-layer {
+      position: relative; z-index: 2; height: 100%; display: flex; flex-direction: column;
+      padding: 0 28px;
+    }
+    .frame-top, .frame-bottom {
+      min-height: 72px; display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--rule); letter-spacing: -.02em;
+    }
+    .frame-bottom { min-height: 54px; border-top: 1px solid var(--rule); border-bottom: 0; }
+    .brand-title { font-size: 14px; font-weight: 600; }
+    .brand-subtitle { margin-top: 3px; font-size: 12px; color: var(--muted); }
+    .meta { font: 11px/1.5 ui-monospace, SFMono-Regular, Consolas, monospace; text-align: right; }
+    .main-layout { flex: 1; min-height: 0; display: flex; }
+    .sidebar {
+      width: 27%; max-width: 360px; min-width: 245px; display: flex; flex-direction: column;
+      border-right: 1px solid var(--rule);
+    }
+    .side-label { padding: 23px 22px 14px; font-size: 10px; color: var(--muted); letter-spacing: .12em; }
+    .nav-item {
+      appearance: none; flex: 0 0 72px; display: flex; align-items: center; width: 100%;
+      padding: 0 22px; border: 0; border-top: 1px solid var(--rule); color: var(--ink);
+      background: transparent; text-align: left; font: inherit; cursor: pointer;
+      transition: background .25s ease, padding .4s var(--ease);
+    }
+    .nav-item:last-of-type { border-bottom: 1px solid var(--rule); }
+    .nav-item:hover, .nav-item.active { background: rgba(247, 245, 235, .38); padding-left: 30px; }
+    .index { width: 38px; flex: 0 0 38px; color: var(--muted); font: 11px ui-monospace, monospace; }
+    .nav-name { font-size: 14px; }
+    .side-note { margin-top: auto; padding: 18px 22px 20px; font-size: 11px; line-height: 1.7; color: var(--muted); }
+    .side-note strong { color: var(--ink); font-weight: 500; }
+    .detail-panel { position: relative; flex: 1; min-width: 0; overflow: auto; padding: 28px clamp(24px, 5vw, 72px); }
+    .page { display: none; min-height: 100%; animation: arrive .45s var(--ease) both; }
+    .page.active { display: flex; flex-direction: column; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+    .page-kicker { display: flex; justify-content: space-between; gap: 16px; font: 11px ui-monospace, monospace; color: var(--muted); text-transform: uppercase; }
+    h1 { margin: 20px 0 8px; font-size: clamp(36px, 5vw, 68px); font-weight: 400; line-height: .98; letter-spacing: -.065em; }
+    .lead { margin: 0; font-size: 14px; color: var(--muted); }
+    .digits { display: flex; flex-wrap: wrap; gap: 8px; margin: 23px 0 22px; }
+    .digit-chip { display: grid; place-items: center; width: 34px; height: 34px; border: 1px solid rgba(20,30,25,.32); border-radius: 50%; font: 12px ui-monospace, monospace; }
+    .control-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .button {
+      border: 1px solid rgba(20,30,25,.38); border-radius: 999px; padding: 11px 18px; color: var(--ink);
+      background: rgba(247,245,235,.32); font: inherit; font-size: 13px; font-weight: 500; cursor: pointer;
+      box-shadow: 0 4px 18px rgba(24,40,32,.06); backdrop-filter: blur(8px);
+      transition: color .2s, background .2s, border-color .2s, transform .2s, box-shadow .2s;
+    }
+    .button:hover:not(:disabled) { border-color: rgba(20,30,25,.72); background: rgba(247,245,235,.68); transform: translateY(-1px); box-shadow: 0 7px 22px rgba(24,40,32,.10); }
+    .button.primary { color: #f8f5e9; background: #183f39; border-color: #183f39; }
+    .button.primary:hover:not(:disabled) { color: #fff; background: #245d50; border-color: #245d50; }
+    #stop-btn:not(:disabled) { color: #7d321b; border-color: rgba(199,83,35,.42); background: rgba(255,238,220,.56); }
+    .button:disabled { opacity: .4; cursor: not-allowed; }
+    .mic-select-row { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-top: 13px; }
+    .mic-label { font-size: 11px; color: var(--muted); }
+    #mic-select { max-width: min(390px, 55vw); min-width: 190px; padding: 7px 26px 7px 4px; border: 0; border-bottom: 1px solid rgba(20,30,25,.45); border-radius: 0; color: var(--ink); background: rgba(247,245,235,.18); font: inherit; font-size: 12px; outline: none; }
+    #mic-select:focus { border-bottom-color: var(--teal); }
+    .button.quiet { padding: 6px 3px; border: 0; border-radius: 0; background: transparent; box-shadow: none; color: #174b43; font-size: 11px; }
+    .button.quiet:hover:not(:disabled) { background: transparent; box-shadow: none; transform: none; text-decoration: underline; }
+    .status { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #7b847b; }
+    .status-dot.live { background: var(--orange); box-shadow: 0 0 0 5px rgba(239,90,8,.15); animation: pulse 1s infinite; }
+    .status-dot.ready { background: var(--teal); }
+    @keyframes pulse { 50% { box-shadow: 0 0 0 9px rgba(239,90,8,0); } }
+    .wave-wrap { margin-top: 20px; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); background: rgba(247,245,235,.25); }
+    #waveform { display: block; width: 100%; height: 118px; }
+    .wave-caption { display: flex; justify-content: space-between; padding: 0 0 9px; font: 10px ui-monospace, monospace; color: var(--muted); }
+    .result-row { display: grid; grid-template-columns: minmax(150px, .8fr) minmax(220px, 1.2fr); gap: 14px; margin-top: 16px; }
+    .result-card, .scores-card { min-height: 145px; padding: 17px 19px; background: var(--paper); border: 1px solid rgba(20,30,25,.22); }
+    .card-label { font: 10px ui-monospace, monospace; color: var(--muted); letter-spacing: .08em; }
+    .result-digit { margin-top: 4px; font-size: 76px; font-weight: 300; line-height: 1; letter-spacing: -.08em; }
+    .result-caption { margin-top: 3px; font-size: 11px; color: var(--muted); }
+    .score-list { display: grid; gap: 7px; margin-top: 12px; }
+    .score-line { display: grid; grid-template-columns: 16px 1fr 50px; gap: 8px; align-items: center; font: 10px ui-monospace, monospace; }
+    .score-track { height: 4px; background: rgba(20,30,25,.12); }
+    .score-fill { height: 100%; width: 0; background: var(--teal); transition: width .35s var(--ease); }
+    .hint { min-height: 19px; margin: 8px 0 0; color: #8c3519; font-size: 11px; }
+    .info-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1px; margin-top: 28px; background: var(--rule); border: 1px solid var(--rule); }
+    .info-cell { min-height: 128px; padding: 19px; background: rgba(247,245,235,.68); }
+    .info-number { font: 11px ui-monospace, monospace; color: var(--muted); }
+    .info-title { margin-top: 20px; font-size: 17px; }
+    .info-desc { margin-top: 6px; font-size: 12px; line-height: 1.65; color: var(--muted); }
+    .dataset-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 8px; margin-top: 28px; }
+    .dataset-cell { padding: 13px 10px; border: 1px solid rgba(20,30,25,.28); background: rgba(247,245,235,.62); }
+    .dataset-digit { font-size: 25px; font-weight: 300; }
+    .dataset-count { margin-top: 8px; font: 10px ui-monospace, monospace; color: var(--muted); }
+    .footer-left { font-size: 11px; }
+    .footer-right { font: 10px ui-monospace, monospace; color: var(--muted); }
+    @media (max-width: 800px) {
+      .ui-layer { padding: 0 14px; }
+      .sidebar { width: 34%; min-width: 150px; }
+      .nav-item { padding: 0 12px; }
+      .nav-item:hover, .nav-item.active { padding-left: 17px; }
+      .index { width: 27px; flex-basis: 27px; }
+      .detail-panel { padding: 22px 18px; }
+      .result-row { grid-template-columns: 1fr; }
+      .result-card { min-height: 115px; }
+      .result-digit { font-size: 58px; }
+      #mic-select { max-width: 62vw; min-width: 145px; }
+    }
+    @media (max-width: 560px) {
+      .frame-top { min-height: 62px; }
+      .sidebar { width: 42%; min-width: 126px; }
+      .side-label { padding: 18px 10px 12px; font-size: 9px; }
+      .nav-item { flex-basis: 62px; padding: 0 9px; }
+      .nav-name { font-size: 12px; }
+      .detail-panel { padding: 20px 13px; }
+      .page-kicker { font-size: 9px; }
+      .dataset-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .info-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="ambient" aria-hidden="true"></canvas>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="ui-layer">
+    <header class="frame-top">
+      <div><div class="brand-title">DSP LAB / VOICE</div><div class="brand-subtitle">数字语音识别实验 · 实验三</div></div>
+      <div class="meta"><div>MFCC + DTW</div><div>LOCAL · 16 kHz</div></div>
+    </header>
+    <main class="main-layout">
+      <nav class="sidebar" aria-label="实验页面">
+        <div class="side-label">VOICE RECOGNITION / 03</div>
+        <button class="nav-item active" data-page="live"><span class="index">01</span><span class="nav-name">实时识别</span></button>
+        <button class="nav-item" data-page="flow"><span class="index">02</span><span class="nav-name">识别流程</span></button>
+        <button class="nav-item" data-page="data"><span class="index">03</span><span class="nav-name">模板数据</span></button>
+        <div class="side-note">输入方式<br><strong>电脑麦克风 · 单个数字</strong><br>说完后点击停止，程序自动给出识别结果。</div>
+      </nav>
+      <section class="detail-panel">
+        <div class="page active" id="page-live">
+          <div class="page-kicker"><span>实时孤立数字识别</span><span>10 CLASSES / 0—9</span></div>
+          <h1>说一个数字</h1>
+          <p class="lead">对着麦克风说 0 到 9 中的一个数字，停止后查看匹配结果。</p>
+          <div class="digits" aria-label="可识别数字"><span class="digit-chip">0</span><span class="digit-chip">1</span><span class="digit-chip">2</span><span class="digit-chip">3</span><span class="digit-chip">4</span><span class="digit-chip">5</span><span class="digit-chip">6</span><span class="digit-chip">7</span><span class="digit-chip">8</span><span class="digit-chip">9</span></div>
+          <div class="control-row">
+            <button class="button primary" id="start-btn">●&nbsp; 开始录音</button>
+            <button class="button" id="stop-btn" disabled>停止并识别</button>
+            <span class="status"><i class="status-dot" id="status-dot"></i><span id="status-text">等待开始</span></span>
+            <span class="status" id="timer">00:00</span>
+          </div>
+          <div class="mic-select-row">
+            <span class="mic-label">输入设备</span>
+            <select id="mic-select" aria-label="选择麦克风"><option value="">系统默认麦克风</option></select>
+            <button class="button quiet" id="refresh-mics">授权 / 刷新设备</button>
+          </div>
+          <div class="wave-wrap"><canvas id="waveform" aria-label="录音波形"></canvas><div class="wave-caption"><span>MIC INPUT / WAVEFORM</span><span id="wave-sample-rate">等待麦克风</span></div></div>
+          <p class="hint" id="hint" role="status"></p>
+          <div class="result-row">
+            <div class="result-card"><div class="card-label">识别结果 / PREDICTION</div><div class="result-digit" id="result-digit">—</div><div class="result-caption" id="result-caption">等待一段新的语音</div></div>
+            <div class="scores-card"><div class="card-label">各数字的最小 DTW 距离 / 越小越接近</div><div class="score-list" id="score-list"><div class="result-caption">完成一次录音后显示前三个匹配结果</div></div></div>
+          </div>
+        </div>
+        <div class="page" id="page-flow">
+          <div class="page-kicker"><span>METHOD / PIPELINE</span><span>MFCC + DTW</span></div>
+          <h1>从声音到数字</h1>
+          <p class="lead">网页只负责采集现场语音，识别计算由本机 Python 程序完成。</p>
+          <div class="info-grid">
+            <div class="info-cell"><div class="info-number">01 / INPUT</div><div class="info-title">麦克风录音</div><div class="info-desc">说话时采集单声道音频；停止后将录音交给本机识别服务。</div></div>
+            <div class="info-cell"><div class="info-number">02 / PREPROCESS</div><div class="info-title">统一采样与端点</div><div class="info-desc">重采样到16 kHz，去除直流分量并检测语音区间，减少前后静音影响。</div></div>
+            <div class="info-cell"><div class="info-number">03 / FEATURE</div><div class="info-title">提取 MFCC</div><div class="info-desc">分帧、加窗、频谱变换和 Mel 滤波后，得到每帧13维 MFCC 特征。</div></div>
+            <div class="info-cell"><div class="info-number">04 / CLASSIFY</div><div class="info-title">DTW 模板匹配</div><div class="info-desc">把输入特征与0—9模板逐类比较，取最小归一化 DTW 距离对应的数字。</div></div>
+          </div>
+        </div>
+        <div class="page" id="page-data">
+          <div class="page-kicker"><span>DATA / TEMPLATE BANK</span><span>PROCESSED WAV</span></div>
+          <h1>数字模板</h1>
+          <p class="lead">页面启动时从仓库的 data/processed 读取模板；姓名录音不参与数字分类。</p>
+          <div class="dataset-grid" id="dataset-grid"></div>
+          <div class="info-grid">
+            <div class="info-cell"><div class="info-number">SOURCE</div><div class="info-title">组内数字录音</div><div class="info-desc">以 metadata.csv 中标记为0—9的 WAV 记录建立模板。当前程序以小组采集者声音作为模板范围。</div></div>
+            <div class="info-cell"><div class="info-number">LIMITATION</div><div class="info-title">识别范围</div><div class="info-desc">识别采用孤立数字模板匹配。距离较大时仍会给出最接近类别，实际效果需要结合麦克风和课堂环境验证。</div></div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="frame-bottom"><div class="footer-left">语音信号处理 / 课程实验</div><div class="footer-right" id="server-state">LOCAL SERVICE · CONNECTING</div></footer>
+  </div>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const navItems = [...document.querySelectorAll('.nav-item')];
+    const pages = [...document.querySelectorAll('.page')];
+    navItems.forEach((button) => button.addEventListener('click', () => {
+      navItems.forEach((item) => item.classList.toggle('active', item === button));
+      pages.forEach((page) => page.classList.toggle('active', page.id === `page-${button.dataset.page}`));
+    }));
+
+    const ambient = $('ambient');
+    const ambientCtx = ambient.getContext('2d');
+    let ambientFrame = 0;
+    function paintAmbient() {
+      const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
+      const width = window.innerWidth, height = window.innerHeight;
+      if (ambient.width !== Math.round(width * ratio) || ambient.height !== Math.round(height * ratio)) {
+        ambient.width = Math.round(width * ratio); ambient.height = Math.round(height * ratio);
+      }
+      ambientCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      ambientCtx.clearRect(0, 0, width, height);
+      const t = ambientFrame++ * .010;
+      const blobs = [
+        [width * (.12 + .10 * Math.sin(t)), height * (.30 + .10 * Math.cos(t * .75)), Math.max(width, height) * .72, '239,90,8'],
+        [width * (.43 + .10 * Math.sin(t * .68 + 2)), height * (.70 + .09 * Math.cos(t * .82)), Math.max(width, height) * .72, '227,165,28'],
+        [width * (.70 + .09 * Math.cos(t * .83 + 1)), height * (.38 + .11 * Math.sin(t * .61)), Math.max(width, height) * .70, '72,194,207'],
+        [width * (.94 + .06 * Math.sin(t * .57 + 4)), height * (.52 + .12 * Math.cos(t * .67)), Math.max(width, height) * .68, '23,59,98']
+      ];
+      const gradient = ambientCtx.createLinearGradient(0, 0, width, height);
+      gradient.addColorStop(0, '#ef5a08'); gradient.addColorStop(.47, '#e8d58b'); gradient.addColorStop(.72, '#94c9bd'); gradient.addColorStop(1, '#173b62');
+      ambientCtx.fillStyle = gradient; ambientCtx.fillRect(0, 0, width, height);
+      ambientCtx.globalCompositeOperation = 'screen';
+      blobs.forEach(([x, y, radius, color]) => {
+        const blob = ambientCtx.createRadialGradient(x, y, radius * .05, x, y, radius);
+        blob.addColorStop(0, `rgba(${color},.46)`); blob.addColorStop(.38, `rgba(${color},.22)`); blob.addColorStop(1, 'rgba(255,255,255,0)');
+        ambientCtx.fillStyle = blob; ambientCtx.fillRect(0, 0, width, height);
+      });
+      ambientCtx.globalCompositeOperation = 'source-over';
+      requestAnimationFrame(paintAmbient);
+    }
+    paintAmbient();
+
+    const waveform = $('waveform'), waveCtx = waveform.getContext('2d');
+    let recorded = new Float32Array(0);
+    function joinChunks(blocks) {
+      const length = blocks.reduce((sum, block) => sum + block.length, 0);
+      const joined = new Float32Array(length);
+      let offset = 0;
+      blocks.forEach((block) => { joined.set(block, offset); offset += block.length; });
+      return joined;
+    }
+    function drawWave(data, live = false) {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2);
+      const rect = waveform.getBoundingClientRect();
+      waveform.width = Math.max(1, Math.round(rect.width * ratio));
+      waveform.height = Math.max(1, Math.round(rect.height * ratio));
+      waveCtx.setTransform(ratio, 0, 0, ratio, 0, 0);
+      const width = rect.width, height = rect.height;
+      waveCtx.clearRect(0, 0, width, height);
+      waveCtx.strokeStyle = 'rgba(20,30,25,.14)'; waveCtx.lineWidth = 1;
+      waveCtx.beginPath(); waveCtx.moveTo(0, height / 2); waveCtx.lineTo(width, height / 2); waveCtx.stroke();
+      if (!data || !data.length) return;
+      const step = Math.max(1, Math.floor(data.length / width));
+      waveCtx.strokeStyle = live ? '#ef5a08' : '#173b62'; waveCtx.lineWidth = 1.2; waveCtx.beginPath();
+      for (let x = 0; x < width; x++) {
+        const index = Math.min(data.length - 1, x * step);
+        const y = height / 2 - data[index] * height * .42;
+        if (x === 0) waveCtx.moveTo(x, y); else waveCtx.lineTo(x, y);
+      }
+      waveCtx.stroke();
+    }
+    window.addEventListener('resize', () => drawWave(recorded));
+    drawWave(recorded);
+
+    let audioContext = null, mediaStream = null, sourceNode = null, processorNode = null;
+    let chunks = [], recordingStartedAt = 0, timerId = null;
+    const MAX_SECONDS = 8;
+    function status(text, mode = '') {
+      $('status-text').textContent = text;
+      $('status-dot').className = `status-dot ${mode}`;
+    }
+    function setTimer(seconds) {
+      const value = Math.max(0, Math.floor(seconds));
+      $('timer').textContent = `00:${String(value).padStart(2, '0')}`;
+    }
+    function setHint(text) { $('hint').textContent = text || ''; }
+    async function refreshMicrophones() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+        setHint('当前浏览器不支持麦克风设备选择。'); return;
+      }
+      try {
+        const devices = (await navigator.mediaDevices.enumerateDevices()).filter((device) => device.kind === 'audioinput');
+        const select = $('mic-select'), previous = select.value;
+        select.innerHTML = '<option value="">系统默认麦克风</option>';
+        devices.forEach((device, index) => {
+          const option = document.createElement('option');
+          option.value = device.deviceId;
+          option.textContent = device.label || `麦克风 ${index + 1}（允许权限后显示名称）`;
+          select.appendChild(option);
+        });
+        if ([...select.options].some((option) => option.value === previous)) select.value = previous;
+        if (devices.length) setHint(devices.some((device) => device.label) ? '已读取输入设备，可选择耳机麦克风后开始录音。' : '设备已列出；若名称未显示，点“授权 / 刷新设备”后再选耳机麦克风。');
+      } catch (error) {
+        setHint(`读取麦克风设备失败：${error.message}`);
+      }
+    }
+    async function authorizeAndRefreshMicrophones() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setHint('当前浏览器无法调用麦克风，请使用 Edge 或 Chrome 打开本机页面。'); return;
+      }
+      try {
+        const temporaryStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        temporaryStream.getTracks().forEach((track) => track.stop());
+        await refreshMicrophones();
+      } catch (error) {
+        setHint(error.name === 'NotAllowedError' ? '麦克风权限未开放。请在浏览器地址栏的权限设置中允许麦克风。' : `读取麦克风失败：${error.message}`);
+      }
+    }
+    async function startRecording() {
+      setHint(''); $('result-digit').textContent = '—'; $('result-caption').textContent = '录音完成后进行匹配';
+      $('score-list').innerHTML = '<div class="result-caption">正在等待识别结果</div>';
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setHint('当前浏览器无法调用麦克风，请使用较新的 Edge 或 Chrome 打开本机页面。'); return;
+      }
+      try {
+        const selectedDevice = $('mic-select').value;
+        const audioConstraints = { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true };
+        if (selectedDevice) audioConstraints.deviceId = { exact: selectedDevice };
+        mediaStream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
+        await refreshMicrophones();
+        setHint('');
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        sourceNode = audioContext.createMediaStreamSource(mediaStream);
+        processorNode = audioContext.createScriptProcessor(4096, 1, 1);
+        chunks = []; recorded = new Float32Array(0);
+        processorNode.onaudioprocess = (event) => {
+          const input = event.inputBuffer.getChannelData(0);
+          chunks.push(new Float32Array(input));
+          event.outputBuffer.getChannelData(0).fill(0);
+          if (chunks.length % 4 === 0) {
+            const previewChunks = chunks.slice(-20);
+            drawWave(joinChunks(previewChunks), true);
+          }
+        };
+        sourceNode.connect(processorNode); processorNode.connect(audioContext.destination);
+        recordingStartedAt = Date.now();
+        $('start-btn').disabled = true; $('stop-btn').disabled = false;
+        $('wave-sample-rate').textContent = `${audioContext.sampleRate} Hz / mono`;
+        status('正在录音，说一个数字', 'live');
+        timerId = window.setInterval(() => {
+          const seconds = (Date.now() - recordingStartedAt) / 1000;
+          setTimer(seconds);
+          if (seconds >= MAX_SECONDS) stopRecording();
+        }, 100);
+      } catch (error) {
+        await releaseMicrophone();
+        $('start-btn').disabled = false; $('stop-btn').disabled = true;
+        status('等待开始');
+        setHint(error.name === 'NotAllowedError' ? '麦克风权限未开放。请在浏览器地址栏的权限设置中允许麦克风，再点击开始录音。' : `无法打开麦克风：${error.message}`);
+      }
+    }
+    async function releaseMicrophone() {
+      if (timerId) { clearInterval(timerId); timerId = null; }
+      if (processorNode) { processorNode.onaudioprocess = null; processorNode.disconnect(); processorNode = null; }
+      if (sourceNode) { sourceNode.disconnect(); sourceNode = null; }
+      if (mediaStream) { mediaStream.getTracks().forEach((track) => track.stop()); mediaStream = null; }
+      if (audioContext) { const context = audioContext; audioContext = null; await context.close(); }
+    }
+    async function stopRecording() {
+      if (!audioContext) return;
+      const sampleRate = audioContext.sampleRate;
+      const seconds = (Date.now() - recordingStartedAt) / 1000;
+      await releaseMicrophone();
+      recorded = joinChunks(chunks);
+      $('start-btn').disabled = false; $('stop-btn').disabled = true;
+      drawWave(recorded); setTimer(seconds); status('正在计算 MFCC 和 DTW');
+      if (recorded.length < sampleRate * .2) {
+        status('等待开始'); setHint('录音时间太短，请说完数字后再停止。'); return;
+      }
+      try {
+        const response = await fetch('/recognize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/octet-stream', 'X-Sample-Rate': String(sampleRate) },
+          body: recorded.buffer
+        });
+        const payload = await response.json();
+        if (!response.ok) throw new Error(payload.error || '识别请求失败');
+        $('result-digit').textContent = payload.digit;
+        $('result-caption').textContent = `最小 DTW 距离 ${Number(payload.distance).toFixed(3)} · 有效语音 ${Number(payload.audio.speech_seconds).toFixed(2)} s`;
+        const ranked = Object.entries(payload.scores).sort((a, b) => a[1] - b[1]).slice(0, 3);
+        const maxDistance = Math.max(...ranked.map((item) => item[1]), 1e-6);
+        $('score-list').innerHTML = ranked.map(([digit, distance], index) => `<div class="score-line"><span>${digit}</span><span class="score-track"><span class="score-fill" style="display:block;width:${Math.max(5, 100 * (1 - distance / maxDistance))}%;background:${index === 0 ? 'var(--teal)' : 'var(--navy)'}"></span></span><span>${Number(distance).toFixed(2)}</span></div>`).join('');
+        status('识别完成', 'ready'); setHint('结果是模板距离最小的数字；安静环境下说一个数字更容易得到稳定结果。');
+      } catch (error) {
+        status('本次没有识别成功'); setHint(error.message);
+      }
+    }
+    $('start-btn').addEventListener('click', startRecording);
+    $('stop-btn').addEventListener('click', stopRecording);
+    $('refresh-mics').addEventListener('click', authorizeAndRefreshMicrophones);
+    if (navigator.mediaDevices && navigator.mediaDevices.addEventListener) navigator.mediaDevices.addEventListener('devicechange', refreshMicrophones);
+    refreshMicrophones();
+
+    async function loadHealth() {
+      try {
+        const response = await fetch('/health', { cache: 'no-store' });
+        const health = await response.json();
+        if (!response.ok || !health.ready) throw new Error('数字模板未准备好');
+        $('server-state').textContent = `LOCAL SERVICE · ${health.template_count} TEMPLATES`;
+        $('dataset-grid').innerHTML = Object.entries(health.digits).map(([digit, count]) => `<div class="dataset-cell"><div class="dataset-digit">${digit}</div><div class="dataset-count">${count} 条模板</div></div>`).join('');
+      } catch (error) {
+        $('server-state').textContent = 'LOCAL SERVICE · OFFLINE';
+        $('start-btn').disabled = true;
+        setHint('本机识别服务未就绪。请先运行 scripts/run_experiment3.py，再刷新页面。');
+      }
+    }
+    loadHealth();
+  </script>
+</body>
+</html>

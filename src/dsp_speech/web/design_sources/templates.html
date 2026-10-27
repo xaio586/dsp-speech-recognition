@@ -1,0 +1,507 @@
+<html lang="en" vid="0"><head vid="1">
+    <meta charset="UTF-8" vid="2">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" vid="3">
+    <title vid="4">Undertone // Documentation</title>
+    <style vid="5">
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Noto+Sans+SC:wght@400;500&display=swap');
+
+        :root {
+            --ui-color: #000000;
+            --line-weight: 1px;
+            --transition-timing: 0.85s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+        }
+
+        body, html {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Inter', 'Noto Sans SC', -apple-system, sans-serif;
+            background-color: #111;
+            color: var(--ui-color);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        #glcanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none; 
+        }
+
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none; 
+        }
+
+        .frame-top {
+            width: 100%;
+            padding: 24px 32px 16px 32px;
+            border-bottom: var(--line-weight) solid var(--ui-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: auto;
+        }
+
+        .sys-title {
+            font-size: 14px;
+            font-weight: 500;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .sys-subtitle {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+            margin-top: 2px;
+        }
+
+        .sys-meta-right {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: right;
+        }
+
+        .frame-bottom {
+            width: 100%;
+            padding: 16px 32px 24px 32px;
+            border-top: var(--line-weight) solid var(--ui-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: auto;
+        }
+
+        .branding {
+            font-size: 14px;
+            letter-spacing: -0.01em;
+        }
+
+        .dot-signature {
+            font-size: 18px;
+            line-height: 14px;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            width: 100%;
+            pointer-events: auto;
+            overflow: hidden;
+        }
+
+        .doc-section {
+            height: 100%;
+            border-right: var(--line-weight) solid var(--ui-color);
+            display: flex;
+            flex-direction: column;
+            padding: 32px;
+        }
+
+        .doc-section:last-child {
+            border-right: none;
+        }
+
+        .section-left {
+            flex: 1.5;
+        }
+
+        .section-right {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .page-header {
+            margin-bottom: 48px;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 400;
+            letter-spacing: -0.03em;
+            display: flex;
+            align-items: baseline;
+            gap: 16px;
+        }
+
+        .page-title span {
+            font-size: 24px;
+            opacity: 0.5;
+            letter-spacing: 0.05em;
+        }
+
+        .list-container {
+            width: 100%;
+        }
+
+        .data-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 2fr;
+            padding: 12px 0;
+            border-bottom: 0.5px solid rgba(0,0,0,0.15);
+            font-size: 13px;
+            letter-spacing: 0.02em;
+        }
+
+        .data-row:hover {
+            background: rgba(0,0,0,0.03);
+        }
+
+        .row-dim {
+            opacity: 0.5;
+        }
+
+        .summary-footer {
+            margin-top: auto;
+            padding-top: 24px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 500;
+        }
+
+        .pipeline-container {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .pipeline-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 32px;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .step {
+            margin-bottom: 24px;
+            display: flex;
+            gap: 20px;
+        }
+
+        .step-num {
+            font-size: 12px;
+            opacity: 0.4;
+            min-width: 20px;
+        }
+
+        .step-content {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .step-label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .stats-block {
+            margin-top: auto;
+            border: var(--line-weight) solid var(--ui-color);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .stat-item {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content { flex-direction: column; overflow-y: auto; }
+            .doc-section { border-right: none; border-bottom: var(--line-weight) solid var(--ui-color); height: auto; }
+            .page-title { font-size: 32px; }
+        }
+    </style>
+</head>
+<body vid="6">
+
+    <canvas id="glcanvas" vid="7"></canvas>
+
+    <div class="ui-layer" vid="8">
+        <div class="frame-top" vid="9">
+            <div vid="10">
+                <a href="/" class="sys-title" vid="11">Undertone 01</a>
+                <div class="sys-subtitle" vid="12">Voice recognition experiment</div>
+            </div>
+            <div class="sys-meta-right" vid="13">
+                <div vid="14">SYS.ARCHIVE</div>
+                <div vid="15">EXP. 01</div>
+            </div>
+        </div>
+
+        <div class="main-content" vid="16">
+            <div class="doc-section section-left" vid="17">
+                <div class="page-header" vid="18">
+                    <h1 class="page-title" vid="19">训练文档 <span vid="20">/ TEMPLATES</span></h1>
+                </div>
+
+                <div class="list-container" vid="21">
+                    <div class="data-row" vid="22">
+                        <div vid="23">speaker_a_01.wav</div>
+                        <div class="row-dim" vid="24">0:03</div>
+                        <div vid="25">说话人 A</div>
+                    </div>
+                    <div class="data-row" vid="26">
+                        <div vid="27">speaker_b_take2.wav</div>
+                        <div class="row-dim" vid="28">0:07</div>
+                        <div vid="29">说话人 B</div>
+                    </div>
+                    <div class="data-row" vid="30">
+                        <div vid="31">digits_full_09.wav</div>
+                        <div class="row-dim" vid="32">0:12</div>
+                        <div vid="33">数字 0–9</div>
+                    </div>
+                    <div class="data-row" vid="34">
+                        <div vid="35">noise_floor_ref.wav</div>
+                        <div class="row-dim" vid="36">0:05</div>
+                        <div vid="37">环境底噪参考</div>
+                    </div>
+                    <div class="data-row" vid="38">
+                        <div vid="39">vocal_range_01.wav</div>
+                        <div class="row-dim" vid="40">0:15</div>
+                        <div vid="41">元音共振峰模板</div>
+                    </div>
+                    <div class="data-row" vid="42">
+                        <div vid="43">command_start.wav</div>
+                        <div class="row-dim" vid="44">0:02</div>
+                        <div vid="45">激活指令库</div>
+                    </div>
+                    <div class="data-row" vid="46">
+                        <div vid="47">speaker_c_base.wav</div>
+                        <div class="row-dim" vid="48">0:06</div>
+                        <div vid="49">说话人 C</div>
+                    </div>
+                    <div class="data-row" vid="50">
+                        <div vid="51">isolated_digit_5.wav</div>
+                        <div class="row-dim" vid="52">0:01</div>
+                        <div vid="53">数字 5 单项</div>
+                    </div>
+                </div>
+
+                <div class="summary-footer" vid="54">
+                    100 TEMPLATES · 16 kHz · WAV mono
+                </div>
+            </div>
+
+            <div class="doc-section section-right" vid="55">
+                <div class="pipeline-container" vid="56">
+                    <h2 class="pipeline-title" vid="57">识别流程 / PIPELINE</h2>
+                    
+                    <div class="step" vid="58">
+                        <div class="step-num" vid="59">01</div>
+                        <div class="step-content" vid="60">
+                            <span class="step-label" vid="61">预处理</span>
+                            对原始信号进行预加重、分帧及加窗处理，增强高频信号并确保信号准平稳性。
+                        </div>
+                    </div>
+
+                    <div class="step" vid="62">
+                        <div class="step-num" vid="63">02</div>
+                        <div class="step-content" vid="64">
+                            <span class="step-label" vid="65">端点检测 (VAD)</span>
+                            基于能量阈值和过零率自动识别语音起始与结束位置，剔除无声片段。
+                        </div>
+                    </div>
+
+                    <div class="step" vid="66">
+                        <div class="step-num" vid="67">03</div>
+                        <div class="step-content" vid="68">
+                            <span class="step-label" vid="69">MFCC 特征提取</span>
+                            通过倒谱分析模拟人类听觉感知，提取反映语音本质特征的倒谱系数矢量。
+                        </div>
+                    </div>
+
+                    <div class="step" vid="70">
+                        <div class="step-num" vid="71">04</div>
+                        <div class="step-content" vid="72">
+                            <span class="step-label" vid="73">DTW 模板匹配</span>
+                            采用动态时间规整算法计算测试语音与模板库之间的最小累计距离进行分类。
+                        </div>
+                    </div>
+
+                    <div class="stats-block" vid="74">
+                        <div class="stat-item" vid="75">
+                            <span vid="76">Capacity</span>
+                            <span vid="77">10 CLASSES</span>
+                        </div>
+                        <div class="stat-item" vid="78">
+                            <span vid="79">Database</span>
+                            <span vid="80">100 TEMPLATES</span>
+                        </div>
+                        <div class="stat-item" vid="81">
+                            <span vid="82">Environment</span>
+                            <span vid="83">LOCAL SERVICE</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="frame-bottom" vid="84">
+            <div class="branding" vid="85">DSP LAB Archive</div>
+            <div class="dot-signature" vid="86">•</div>
+        </div>
+    </div>
+
+    <script vid="87">
+        const canvas = document.getElementById('glcanvas');
+        const gl = canvas.getContext('webgl');
+        if (!gl) console.error('WebGL not supported');
+
+        const vsSource = `
+            attribute vec4 aVertexPosition;
+            varying vec2 vUv;
+            void main() {
+                gl_Position = aVertexPosition;
+                vUv = aVertexPosition.xy * 0.5 + 0.5;
+            }
+        `;
+
+        const fsSource = `
+            precision highp float;
+            varying vec2 vUv;
+            uniform float uTime;
+            uniform vec2 uResolution;
+            uniform vec2 uMouse;
+
+            vec3 colorA = vec3(0.91, 0.36, 0.02);
+            vec3 colorB = vec3(0.91, 0.77, 0.42);
+            vec3 colorC = vec3(0.66, 0.85, 0.86);
+            vec3 colorD = vec3(0.16, 0.62, 0.56);
+            vec3 colorE = vec3(0.11, 0.21, 0.34);
+
+            float random(vec2 st) {
+                return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);
+            }
+
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+
+            float snoise(vec2 v) {
+                const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                vec2 i  = floor(v + dot(v, C.yy) );
+                vec2 x0 = v -   i + dot(i, C.xx);
+                vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                vec4 x12 = x0.xyxy + C.xxzz;
+                x12.xy -= i1;
+                i = mod289(i);
+                vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+                vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                m = m*m; m = m*m;
+                vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                vec3 h = abs(x) - 0.5;
+                vec3 ox = floor(x + 0.5);
+                vec3 a0 = x - ox;
+                m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+                vec3 g;
+                g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                return 130.0 * dot(m, g);
+            }
+
+            void main() {
+                vec2 st = gl_FragCoord.xy / uResolution.xy;
+                st.x *= uResolution.x / uResolution.y;
+                vec2 mouseOffset = (uMouse / uResolution) * 0.1;
+                st += mouseOffset;
+                float n1 = snoise(st * 1.5 + uTime * 0.1);
+                float n2 = snoise(st * 2.0 - uTime * 0.15 + n1);
+                vec2 warpedSt = st + vec2(n1, n2) * 0.4;
+                float d1 = length(warpedSt - vec2(0.2, 0.8));
+                float d2 = length(warpedSt - vec2(0.8, 0.2));
+                float d3 = length(warpedSt - vec2(0.5, 0.5));
+                vec3 finalColor = mix(colorA, colorB, smoothstep(0.0, 1.2, d1));
+                finalColor = mix(finalColor, colorC, smoothstep(0.2, 1.5, d3));
+                finalColor = mix(finalColor, colorE, smoothstep(0.4, 2.0, d2));
+                float grain = random(vUv * (uTime * 0.001 + 100.0));
+                vec3 grainyColor = finalColor + (grain - 0.5) * 0.18;
+                gl_FragColor = vec4(grainyColor, 1.0);
+            }
+        `;
+
+        function initShaderProgram(gl, vsSource, fsSource) {
+            const vs = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+            const fs = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+            const prog = gl.createProgram();
+            gl.attachShader(prog, vs);
+            gl.attachShader(prog, fs);
+            gl.linkProgram(prog);
+            return prog;
+        }
+
+        function loadShader(gl, type, source) {
+            const s = gl.createShader(type);
+            gl.shaderSource(s, source);
+            gl.compileShader(s);
+            return s;
+        }
+
+        const prog = initShaderProgram(gl, vsSource, fsSource);
+        const programInfo = {
+            prog,
+            attr: { pos: gl.getAttribLocation(prog, 'aVertexPosition') },
+            unif: {
+                time: gl.getUniformLocation(prog, 'uTime'),
+                res: gl.getUniformLocation(prog, 'uResolution'),
+                mouse: gl.getUniformLocation(prog, 'uMouse')
+            }
+        };
+
+        const posBuf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([1,1,-1,1,1,-1,-1,-1]), gl.STATIC_DRAW);
+
+        let mX = 0, mY = 0;
+        document.addEventListener('mousemove', (e) => { mX = e.clientX; mY = window.innerHeight - e.clientY; });
+
+        function render(now) {
+            now *= 0.001;
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+            gl.viewport(0, 0, canvas.width, canvas.height);
+            gl.useProgram(programInfo.prog);
+            gl.bindBuffer(gl.ARRAY_BUFFER, posBuf);
+            gl.vertexAttribPointer(programInfo.attr.pos, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(programInfo.attr.pos);
+            gl.uniform1f(programInfo.unif.time, now);
+            gl.uniform2f(programInfo.unif.res, canvas.width, canvas.height);
+            gl.uniform2f(programInfo.unif.mouse, mX, mY);
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+            requestAnimationFrame(render);
+        }
+        requestAnimationFrame(render);
+    </script>
+
+</body></html>
