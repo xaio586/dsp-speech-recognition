@@ -13,7 +13,7 @@
   const screens = [...document.querySelectorAll("#app-container .screen")];
   if (screens.length) window.stopCycle?.();
 
-  const fadeMs = 240;
+  const fadeMs = 260;
   let activeScreenId = screenByPath[window.location.pathname] || "screen-overview";
   let isTransitioning = false;
   if (screens.length) {
@@ -129,8 +129,47 @@
       "/": "page-home", "/index.html": "page-home", "/speaker.html": "page-speaker",
       "/digits.html": "page-digits", "/docs.html": "page-docs", "/templates.html": "page-docs",
     };
-    const initialPage = document.documentElement.dataset.startPage || desktopPageByPath[window.location.pathname] || "page-home";
-    if (initialPage !== "page-home") window.showPage?.(initialPage);
+    const desktopPathByPage = Object.fromEntries(Object.entries(desktopPageByPath).map(([path, page]) => [page, path]));
+    const desktopPages = [...document.querySelectorAll(".page")];
+    let activeDesktopPage = document.documentElement.dataset.startPage || desktopPageByPath[window.location.pathname] || "page-home";
+    let desktopTransitioning = false;
+    desktopPages.forEach((page) => {
+      const isActive = page.id === activeDesktopPage;
+      page.classList.toggle("active", isActive);
+      page.classList.remove("is-entering", "is-leaving");
+      page.setAttribute("aria-hidden", String(!isActive));
+    });
+    document.documentElement.removeAttribute("data-start-page");
+    window.currentPageId = activeDesktopPage;
+    function showDesktopPage(pageId, options = {}) {
+      const target = document.getElementById(pageId);
+      const current = document.getElementById(activeDesktopPage);
+      if (!target || pageId === activeDesktopPage || desktopTransitioning) return;
+      desktopTransitioning = true;
+      if (options.updateHistory !== false) {
+        const targetPath = desktopPathByPage[pageId] || "/";
+        if (window.location.pathname !== targetPath) window.history.pushState({ pageId }, "", targetPath);
+      }
+      current?.classList.remove("active", "is-entering");
+      current?.classList.add("is-leaving");
+      current?.setAttribute("aria-hidden", "true");
+      target.classList.remove("is-leaving");
+      target.classList.add("active", "is-entering");
+      target.setAttribute("aria-hidden", "false");
+      activeDesktopPage = pageId;
+      window.currentPageId = pageId;
+      requestAnimationFrame(() => target.classList.remove("is-entering"));
+      window.setTimeout(() => {
+        current?.classList.remove("is-leaving");
+        desktopTransitioning = false;
+      }, fadeMs + 30);
+      if (window.digitRecorder?.isRecording()) window.digitRecorder.stopWithoutRecognition();
+    }
+    window.showPage = (pageId) => showDesktopPage(pageId);
+    window.addEventListener("popstate", () => {
+      const pageId = desktopPageByPath[window.location.pathname] || "page-home";
+      showDesktopPage(pageId, { updateHistory: false });
+    });
   }
 
   const startButton = document.getElementById("digit-start");
