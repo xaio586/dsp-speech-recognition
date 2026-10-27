@@ -132,6 +132,7 @@
   const micHint = document.getElementById("mic-hint");
   const micStatus = document.getElementById("mic-status");
   const waveformContainer = document.getElementById("wave-digit");
+  const inputFormat = document.getElementById("input-format");
   const resultDigit = document.getElementById("result-digit");
   const resultMeta = document.getElementById("result-meta");
   const scoreList = document.getElementById("score-list");
@@ -140,8 +141,9 @@
   const scoreRows = new Map();
   for (let digit = 0; digit <= 9; digit += 1) {
     const row = document.createElement("div");
-    row.className = "score-row";
-    row.innerHTML = `<span class="score-label">数字 ${digit}</span><div class="score-track"><div class="score-fill"></div></div><span class="score-value">—</span>`;
+    row.className = "chart-item score-row";
+    row.hidden = true;
+    row.innerHTML = `<div class="chart-labels"><span class="score-label">数字 ${digit}</span><span class="score-value">—</span></div><div class="chart-bar-bg"><div class="chart-bar-fill score-fill"></div></div>`;
     scoreList.appendChild(row);
     scoreRows.set(String(digit), row);
   }
@@ -272,7 +274,7 @@
   function clearResult() {
     resultDigit.textContent = "—";
     resultMeta.textContent = "等待本次录音结果";
-    document.querySelectorAll(".digit-circle").forEach((item) => item.classList.remove("active"));
+    document.querySelectorAll(".digit[data-digit]").forEach((item) => item.classList.remove("active"));
     scoreRows.forEach((row) => {
       row.classList.remove("is-best");
       row.querySelector(".score-value").textContent = "—";
@@ -288,6 +290,7 @@
     entries.forEach(([digit, value], index) => {
       const row = scoreRows.get(digit);
       if (!row) return;
+      row.hidden = index >= 3;
       row.querySelector(".score-value").textContent = Number(value).toFixed(2);
       const distanceScale = 12 + ((Number(value) - min) / spread) * 88;
       row.querySelector(".score-fill").style.width = `${distanceScale}%`;
@@ -309,6 +312,7 @@
       await refreshMicrophones();
       audioContext = new (window.AudioContext || window.webkitAudioContext)();
       await audioContext.resume();
+      if (inputFormat) inputFormat.textContent = `${audioContext.sampleRate} Hz / mono`;
       sourceNode = audioContext.createMediaStreamSource(stream);
       processorNode = audioContext.createScriptProcessor(4096, 1, 1);
       chunks = [];
@@ -372,7 +376,7 @@
       if (!response.ok) throw new Error(payload.error || "识别失败，请重新录音。 ");
       resultDigit.textContent = payload.digit;
       resultMeta.textContent = `最小 DTW 距离 ${Number(payload.distance).toFixed(3)} · 有效语音 ${Number(payload.audio.speech_seconds).toFixed(2)} 秒`;
-      document.querySelectorAll(".digit-circle").forEach((item) => item.classList.toggle("active", item.dataset.digit === payload.digit));
+      document.querySelectorAll(".digit[data-digit]").forEach((item) => item.classList.toggle("active", item.dataset.digit === payload.digit));
       showScores(payload.scores);
       setStatus("● 识别完成");
       micHint.textContent = "如果数字不对，可换一个麦克风位置或重新说一遍。";
@@ -400,3 +404,4 @@
     stopWithoutRecognition: () => stopRecording({ recognize: false }),
   };
 })();
+
