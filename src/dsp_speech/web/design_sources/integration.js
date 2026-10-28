@@ -109,7 +109,7 @@
   function startCycle() {
     stopCycle();
     if (!overviewRows.length || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    cycleTimer = window.setInterval(cycleRows, 4800);
+    cycleTimer = window.setInterval(cycleRows, 3300);
   }
   function stopCycle() {
     if (cycleTimer) window.clearInterval(cycleTimer);
