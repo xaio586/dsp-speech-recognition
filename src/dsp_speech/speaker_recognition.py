@@ -25,9 +25,9 @@ from .io_audio import load_wav
 from .preprocess import apply_window, detect_endpoint, frame_signal, normalize_amplitude, pre_emphasis, remove_dc
 from .recognize import _fallback_endpoint, prepare_utterance
 
-# Hyperparameters selected by leave-one-sentence-out grouped cross-validation
-# on the 40 training utterances (see scripts/evaluate_speaker_svm.py).
-SVM_C = 1.0
+# Hyperparameters selected by per-utterance grouped cross-validation on the
+# channel-augmented training set (see scripts/evaluate_speaker_svm.py).
+SVM_C = 10.0
 SVM_GAMMA = "scale"
 
 # Below this top-class probability the closed-set answer is flagged as unsure.
@@ -237,7 +237,41 @@ def train_speaker_svm(
     )
 
 
-def build_training_vectors(root: str | Path) -> tuple[dict[str, list[np.ndarray]], dict[str, str]]:
+def channel_augmentations(samples: np.ndarray, sample_rate: int) -> list[np.ndarray]:
+    """Channel/mic variations of one utterance for robust SVM training.
+
+    Live browsers recordings come from headset/Bluetooth/laptop mics whose
+    frequency response differs from the phone recordings in the training set.
+    Augmenting with a telephone-style bandpass + 8 kHz codec round-trip, a
+    mild 6 kHz low-pass, and 20 dB SNR white noise keeps the closed-set model
+    from collapsing onto one speaker when the input channel shifts.
+    """
+    from scipy.signal import butter, sosfiltfilt
+
+    values = np.asarray(samples, dtype=np.float32)
+    variants: list[np.ndarray] = []
+
+    sos_bt = butter(4, [300, 3400], btype="band", fs=sample_rate, output="sos")
+    bt = sosfiltfilt(sos_bt, values)
+    bt = resample_poly(bt, 1, 2)
+    bt = resample_poly(bt, 2, 1)
+    variants.append(np.ascontiguousarray(bt, dtype=np.float32))
+
+    sos_lp = butter(4, 6000, btype="low", fs=sample_rate, output="sos")
+    lp = sosfiltfilt(sos_lp, values)
+    variants.append(np.ascontiguousarray(lp, dtype=np.float32))
+
+    rng = np.random.default_rng(20261105)
+    rms = float(np.sqrt(np.mean(values.astype(np.float64) ** 2))) or 1e-6
+    noise = rng.normal(0.0, rms / 10.0, size=values.shape)  # ~20 dB SNR
+    noisy = values.astype(np.float64) + noise
+    variants.append(np.ascontiguousarray(noisy, dtype=np.float32))
+    return variants
+
+
+def build_training_vectors(
+    root: str | Path, augment: bool = False
+) -> tuple[dict[str, list[np.ndarray]], dict[str, str]]:
     """Utterance-level vectors for every training recording (WAV-based)."""
     root = Path(root).resolve()
     manifest = root / "data" / "speaker_recognition" / "metadata.csv"
@@ -249,8 +283,12 @@ def build_training_vectors(root: str | Path) -> tuple[dict[str, list[np.ndarray]
             if row.get("split") != "train":
                 continue
             audio = load_wav(root / "data" / "speaker_recognition" / row["file_name"], target_sample_rate=16000)
-            mfcc, lpc, _ = prepare_speaker_utterance(audio.samples, audio.sample_rate)
-            vectors.setdefault(row["speaker_id"], []).append(utterance_feature_vector(mfcc, lpc))
+            signals = [audio.samples]
+            if augment:
+                signals = signals + channel_augmentations(audio.samples, audio.sample_rate)
+            for signal in signals:
+                mfcc, lpc, _ = prepare_speaker_utterance(signal, audio.sample_rate)
+                vectors.setdefault(row["speaker_id"], []).append(utterance_feature_vector(mfcc, lpc))
     return vectors, names
 
 

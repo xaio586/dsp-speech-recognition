@@ -18,7 +18,7 @@ from dsp_speech.speaker_recognition import build_training_vectors  # noqa: E402
 
 
 def main() -> None:
-    vectors, names = build_training_vectors(ROOT)
+    vectors, names = build_training_vectors(ROOT, augment=True)
     payload: dict[str, np.ndarray] = {}
     for sid, items in sorted(vectors.items()):
         for index, vector in enumerate(items):
