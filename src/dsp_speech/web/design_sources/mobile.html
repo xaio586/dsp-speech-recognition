@@ -10,7 +10,7 @@
         :root {
             --ui-color: #000000;
             --line-weight: 1px;
-            --transition-timing: 0.55s cubic-bezier(0.2, 1, 0.2, 1);
+            --transition-timing: 0.7s cubic-bezier(0.2, 1, 0.2, 1);
         }
 
         * {
@@ -125,7 +125,7 @@
             justify-content: space-between;
             padding: 20px;
             cursor: pointer;
-            transition: background-color 0.25s ease, flex-grow 0.52s cubic-bezier(0.2, 1, 0.2, 1);
+            transition: background-color 0.3s ease, flex-grow 0.7s cubic-bezier(0.2, 1, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
@@ -243,23 +243,19 @@
         }
 
         .btn-outline {
-            border: var(--line-weight) solid rgba(0,0,0,.42);
+            border: var(--line-weight) solid var(--ui-color);
             padding: 16px;
-            background: rgba(255,255,255,.18);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
-            color: #111;
             text-align: center;
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 180ms cubic-bezier(.23,1,.32,1), color 180ms cubic-bezier(.23,1,.32,1), border-color 180ms cubic-bezier(.23,1,.32,1);
+            transition: background 0.2s, color 0.2s;
             text-transform: uppercase;
             letter-spacing: 0.02em;
         }
-        .btn-outline:active { background:#111; border-color:#111; color:#fff; }
-        @media (hover:hover) and (pointer:fine) {
-            .btn-outline:hover, .mobile-mic-controls button:hover, .back-btn:hover { background:#111; border-color:#111; color:#fff; }
+        .btn-outline:active {
+            background: var(--ui-color);
+            color: #fff;
         }
 
         .dtw-bar-container {
@@ -361,13 +357,12 @@
 
         .module-note { font-size: 14px; line-height: 1.65; }
         .mobile-mic-controls { display:flex; align-items:center; flex-wrap:wrap; gap:8px; font-size:12px; }
-        .mobile-mic-controls select { min-width:130px; max-width:55vw; padding:7px 28px 7px 8px; border:1px solid rgba(24,34,30,.28); border-radius:0; appearance:none; color:#111; background-color:rgba(250,226,177,.24); background-image:linear-gradient(45deg,transparent 50%,#1f201b 50%),linear-gradient(135deg,#1f201b 50%,transparent 50%); background-position:calc(100% - 13px) 50%,calc(100% - 8px) 50%; background-size:5px 5px; background-repeat:no-repeat; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); font:inherit; }
-        .mobile-mic-controls button { border:1px solid rgba(0,0,0,.42); padding:7px 9px; background:rgba(255,255,255,.18); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); color:#111; font:inherit; transition:background-color 180ms cubic-bezier(.23,1,.32,1),color 180ms cubic-bezier(.23,1,.32,1),border-color 180ms cubic-bezier(.23,1,.32,1); }
+        .mobile-mic-controls select { min-width:130px; max-width:55vw; padding:7px 8px; border:1px solid rgba(0,0,0,.55); border-radius:0; color:#111; background:rgba(255,255,255,.58); font:inherit; }
+        .mobile-mic-controls button { border:1px solid rgba(0,0,0,.55); padding:7px 9px; background:transparent; color:#111; font:inherit; }
         .mic-hint { font-size:12px; line-height:1.45; opacity:.72; }
-        .mobile-record-controls { display:grid; grid-template-columns:minmax(0, 210px) minmax(0, 1fr); gap:12px; align-items:center; }
-        .mobile-record-controls .record-toggle { width:100%; min-height:48px; padding:0 16px; display:inline-flex; justify-content:center; align-items:center; white-space:nowrap; color:#111; background:rgba(255,255,255,.18); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); border:1px solid rgba(0,0,0,.42); transition:background-color 180ms cubic-bezier(.23,1,.32,1),color 180ms cubic-bezier(.23,1,.32,1),border-color 180ms cubic-bezier(.23,1,.32,1); font:inherit; font-size:14px; }
-        .mobile-record-controls .record-toggle[data-state="recording"] { background:#111; color:#fff; }
-        .mobile-record-controls .record-toggle:disabled { opacity:.58; cursor:wait; }
+        .mobile-record-controls { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+        .mobile-record-controls .btn-outline { width:100%; min-height:48px; color:#111; background:rgba(255,255,255,.28); font:inherit; }
+        .mobile-record-controls .btn-outline:disabled { opacity:.42; cursor:not-allowed; }
         .results-grid { display:flex; flex-direction:column; gap:14px; margin-top:4px; }
         .result-card, .chart-card { border:var(--line-weight) solid var(--ui-color); padding:14px; background:rgba(255,255,255,.08); }
         .result-row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:8px; }
@@ -381,17 +376,8 @@
         .score-row.is-best .score-label { font-weight:700; }
         .score-row.is-best .score-fill { background:#17574c; }
         .score-row[hidden] { display:none; }
-        .mobile-record-controls .status { grid-column:2; margin:0; text-align:left; white-space:nowrap; }
-        .recognition-progress { grid-column:1 / -1; display:none; width:100%; height:4px; overflow:hidden; background:rgba(0,0,0,.14); }
-        .recognition-progress.is-active { display:block; }
-        .recognition-progress span { display:block; width:34%; height:100%; background:#17574c; animation:e3-progress 1.2s ease-in-out infinite; }
-        @keyframes e3-progress { 0% { transform:translateX(-110%); } 100% { transform:translateX(330%); } }
-        #screen-digit .page-header, #screen-digit .sys-text { text-shadow:none; filter:none; mix-blend-mode:normal; }
-        @media(max-width:520px) {
-            .mobile-record-controls { grid-template-columns:minmax(0,1fr); }
-            .mobile-record-controls .status { grid-column:1; white-space:normal; text-align:left; }
-        }
-        .back-btn { border:1px solid rgba(0,0,0,.42); padding:8px 10px; background:rgba(255,255,255,.18); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); color:#111; font:inherit; transition:background-color 180ms cubic-bezier(.23,1,.32,1),color 180ms cubic-bezier(.23,1,.32,1),border-color 180ms cubic-bezier(.23,1,.32,1); }
+        .mobile-record-controls .status { grid-column:1 / -1; margin-left:0; text-align:right; }
+        .back-btn { border:0; background:transparent; color:inherit; font:inherit; }
         @media(max-height:740px) { .page-content { gap:20px; padding-top:18px; padding-bottom:18px; } }
         @supports (padding: max(0px)) {
             .page-header { padding-top:max(16px, env(safe-area-inset-top)); }
@@ -506,7 +492,7 @@
                 <div class="list-row" onclick="navigateTo('screen-speaker')" vid="19">
                     <div class="row-index" vid="20">01</div>
                     <div class="row-cta" vid="21">点击进入 →</div>
-                    <div class="row-title" vid="22">speaker</div>
+                    <div class="row-title" vid="22">说话人识别</div>
                     <div class="row-footer sys-text" vid="23">
                         <ul class="spec-list" vid="24">
                             <li vid="25">MFCC · DTW</li>
@@ -523,7 +509,7 @@
                 <div class="list-row" onclick="navigateTo('screen-digit')" vid="30">
                     <div class="row-index" vid="31">02</div>
                     <div class="row-cta" vid="32">点击进入 →</div>
-                    <div class="row-title" vid="33">number</div>
+                    <div class="row-title" vid="33">数字识别</div>
                     <div class="row-footer sys-text" vid="34">
                         <ul class="spec-list" vid="35">
                             <li vid="36">MFCC · DTW · 16 kHz</li>
@@ -540,7 +526,7 @@
                 <div class="list-row" onclick="navigateTo('screen-docs')" vid="41">
                     <div class="row-index" vid="42">03</div>
                     <div class="row-cta" vid="43">点击进入 →</div>
-                    <div class="row-title" vid="44">process</div>
+                    <div class="row-title" vid="44">训练文档</div>
                     <div class="row-footer sys-text" vid="45">
                         <ul class="spec-list" vid="46">
                             <li vid="47">160 TEMPLATES · WAV</li>
@@ -590,16 +576,16 @@
         
         <div id="screen-digit" class="screen hidden-right">
             <div class="page-header border-b-thin">
-                <button class="back-btn" type="button" onclick="navigateTo('screen-overview')" aria-label="Back">
+                <button class="back-btn" type="button" onclick="navigateTo('screen-overview')" aria-label="返回总览">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"></path></svg>
-                    ← BACK
+                    返回总览
                 </button>
                 <div class="sys-text">02. DIGITS</div>
             </div>
             <div class="page-content">
                 <div class="digit-intro stagger-el delay-1">
                     <h1 class="large-title">说一个数字</h1>
-                    <p class="hero-desc">对着麦克风说 0 到 9 中的一个数字，再点一次按钮停止录音，系统会自动提取 MFCC 特征并进行 DTW 匹配。</p>
+                    <p class="hero-desc">对着麦克风说 0 到 9 中的一个数字，停止后查看匹配结果。系统会提取 MFCC 特征，并与数字模板进行 DTW 匹配。</p>
                 </div>
                 <div class="digits-row stagger-el delay-2" aria-label="识别类别 0 到 9">
                     <div class="digit" data-digit="0">0</div><div class="digit" data-digit="1">1</div>
@@ -609,9 +595,9 @@
                     <div class="digit" data-digit="8">8</div><div class="digit" data-digit="9">9</div>
                 </div>
                 <div class="mobile-record-controls stagger-el delay-4">
-                    <button class="btn-outline record-toggle" id="digit-start" type="button" data-state="idle" aria-pressed="false">开始录音</button>
-                    <span class="status" id="mic-status" aria-live="polite">● 等待开始</span>
-                    <div class="recognition-progress" id="recognition-progress" role="progressbar" aria-label="正在识别语音" aria-hidden="true"><span></span></div>
+                    <button class="btn-outline" id="digit-start" type="button">开始录音</button>
+                    <button class="btn-outline btn-primary" id="digit-stop" type="button" disabled>停止并识别</button>
+                    <span class="status" id="mic-status">● 等待录音</span>
                 </div>
                 <section class="panel-box waveform-panel stagger-el delay-3">
                     <div class="sys-text flex justify-between"><span>实时麦克风波形</span><span id="input-format">等待设备</span></div>
@@ -770,6 +756,7 @@
 
         
         generateWave('wave-speaker', 40);
+        generateWave('wave-digit', 30);
 
         
         // Desktop-style dynamics: auto-cycling row showcase + press-to-expand
@@ -826,11 +813,11 @@
             uniform vec2 uResolution;
             uniform vec2 uMouse;
 
-            vec3 colorA = vec3(0.96, 0.29, 0.01); // Saturated Orange
-            vec3 colorB = vec3(0.98, 0.68, 0.24); // Warm Gold
-            vec3 colorC = vec3(0.50, 0.80, 0.84); // Clear Cyan
-            vec3 colorD = vec3(0.08, 0.58, 0.52); // Teal/Green
-            vec3 colorE = vec3(0.08, 0.18, 0.32); // Dark Navy
+            vec3 colorA = vec3(0.91, 0.36, 0.02); // Deep Orange
+            vec3 colorB = vec3(0.91, 0.77, 0.42); // Golden Yellow
+            vec3 colorC = vec3(0.66, 0.85, 0.86); // Soft Cyan
+            vec3 colorD = vec3(0.16, 0.62, 0.56); // Teal/Green
+            vec3 colorE = vec3(0.11, 0.21, 0.34); // Dark Navy
 
             float random(vec2 st) {
                 return fract(sin(dot(st.xy, vec2(12.9898,78.233))) * 43758.5453123);

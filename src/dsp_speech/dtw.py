@@ -59,4 +59,3 @@ def recognize_digit(
         raise ValueError("templates must contain at least one example")
     label = min(scores, key=scores.get)
     return label, scores[label]
-

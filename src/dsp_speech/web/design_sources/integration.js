@@ -13,7 +13,7 @@
   const screens = [...document.querySelectorAll("#app-container .screen")];
   if (screens.length) window.stopCycle?.();
 
-  const fadeMs = 260;
+  const fadeMs = 240;
   let activeScreenId = screenByPath[window.location.pathname] || "screen-overview";
   let isTransitioning = false;
   if (screens.length) {
@@ -109,7 +109,7 @@
   function startCycle() {
     stopCycle();
     if (!overviewRows.length || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    cycleTimer = window.setInterval(cycleRows, 3300);
+    cycleTimer = window.setInterval(cycleRows, 4800);
   }
   function stopCycle() {
     if (cycleTimer) window.clearInterval(cycleTimer);
@@ -129,51 +129,60 @@
       "/": "page-home", "/index.html": "page-home", "/speaker.html": "page-speaker",
       "/digits.html": "page-digits", "/docs.html": "page-docs", "/templates.html": "page-docs",
     };
-    const desktopPathByPage = Object.fromEntries(Object.entries(desktopPageByPath).map(([path, page]) => [page, path]));
-    const desktopPages = [...document.querySelectorAll(".page")];
-    let activeDesktopPage = document.documentElement.dataset.startPage || desktopPageByPath[window.location.pathname] || "page-home";
-    let desktopTransitioning = false;
-    desktopPages.forEach((page) => {
-      const isActive = page.id === activeDesktopPage;
-      page.classList.toggle("active", isActive);
-      page.classList.remove("is-entering", "is-leaving");
-      page.setAttribute("aria-hidden", String(!isActive));
-    });
-    document.documentElement.removeAttribute("data-start-page");
-    window.currentPageId = activeDesktopPage;
-    function showDesktopPage(pageId, options = {}) {
-      const target = document.getElementById(pageId);
-      const current = document.getElementById(activeDesktopPage);
-      if (!target || pageId === activeDesktopPage || desktopTransitioning) return;
-      desktopTransitioning = true;
-      if (options.updateHistory !== false) {
-        const targetPath = desktopPathByPage[pageId] || "/";
-        if (window.location.pathname !== targetPath) window.history.pushState({ pageId }, "", targetPath);
+    const initialPage = document.documentElement.dataset.startPage || desktopPageByPath[window.location.pathname] || "page-home";
+    if (initialPage !== "page-home") window.showPage?.(initialPage);
+  }
+
+  // The speaker page uses the same live microphone path, but posts to its own MFCC+DTW endpoint.
+  const speakerScope = document.getElementById("page-speaker") || document.getElementById("screen-speaker");
+  if (speakerScope) {
+    let speakerPanel = speakerScope.querySelector(".panel");
+    let speakerWave = speakerScope.querySelector(".waveform-container");
+    let speakerControls = speakerScope.querySelector(".controls");
+    let speakerResult = speakerScope.querySelector(".speaker-id");
+    let speakerMeta = speakerScope.querySelector(".card-meta");
+    let speakerList = speakerScope.querySelector(".comparison-list");
+    if (!speakerPanel) {
+      const content = speakerScope.querySelector(".page-content");
+      if (content) {
+        content.innerHTML = `<h1 class="large-title">说话人识别</h1><p>对着麦克风说一段话，停止后查看匹配结果。</p><section class="panel-box"><div id="speaker-wave" class="wave-container"></div><div class="mobile-mic-controls"><label>输入设备</label><select id="speaker-mic"><option value="">系统默认麦克风</option></select><button id="speaker-refresh" type="button">授权 / 刷新</button></div><p id="speaker-hint" aria-live="polite">首次使用请授权麦克风。</p><button id="speaker-start" type="button">开始录音</button><button id="speaker-stop" type="button" disabled>停止并识别</button><p id="speaker-status">等待录音</p></section><section class="result-card"><h2 id="speaker-result">等待录音</h2><p id="speaker-meta"></p><div id="speaker-scores"></div></section>`;
       }
-      current?.classList.remove("active", "is-entering");
-      current?.classList.add("is-leaving");
-      current?.setAttribute("aria-hidden", "true");
-      target.classList.remove("is-leaving");
-      target.classList.add("active", "is-entering");
-      target.setAttribute("aria-hidden", "false");
-      activeDesktopPage = pageId;
-      window.currentPageId = pageId;
-      requestAnimationFrame(() => target.classList.remove("is-entering"));
-      window.setTimeout(() => {
-        current?.classList.remove("is-leaving");
-        desktopTransitioning = false;
-      }, fadeMs + 30);
-      if (window.digitRecorder?.isRecording()) window.digitRecorder.stopWithoutRecognition();
     }
-    window.showPage = (pageId) => showDesktopPage(pageId);
-    window.addEventListener("popstate", () => {
-      const pageId = desktopPageByPath[window.location.pathname] || "page-home";
-      showDesktopPage(pageId, { updateHistory: false });
-    });
+    const wave = speakerWave || speakerScope.querySelector("#speaker-wave");
+    const start = speakerScope.querySelector("#speaker-start") || speakerControls?.querySelector(".btn:first-child");
+    const stop = speakerScope.querySelector("#speaker-stop") || speakerControls?.querySelector(".btn:nth-child(2)");
+    let select = speakerScope.querySelector("#speaker-mic");
+    let hint = speakerScope.querySelector("#speaker-hint") || speakerScope.querySelector(".mic-hint");
+    let status = speakerScope.querySelector("#speaker-status") || speakerScope.querySelector(".status-tag");
+    const result = speakerResult || speakerScope.querySelector("#speaker-result");
+    const meta = speakerMeta || speakerScope.querySelector("#speaker-meta");
+    const scoresBox = speakerList || speakerScope.querySelector("#speaker-scores");
+    if (wave && start && stop && result && scoresBox) {
+      start.id = "speaker-start"; stop.id = "speaker-stop"; stop.disabled = true;
+      if (status) status.textContent = "● 等待录音";
+      if (meta) meta.textContent = "四位组员数据已载入；开始录音后显示匹配结果。";
+      scoresBox.replaceChildren();
+      if (!select) {
+        const controls = document.createElement("div"); controls.className="speaker-device-controls";controls.style.cssText="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px";
+        controls.innerHTML='<label for="speaker-mic">输入设备</label><select id="speaker-mic"><option value="">系统默认麦克风</option></select><button id="speaker-refresh" type="button">授权 / 刷新</button><span id="speaker-hint" aria-live="polite">允许麦克风权限后可选择耳机麦克风。</span>';
+        (speakerControls || speakerPanel).append(controls); select=controls.querySelector("select");hint=controls.querySelector("span");
+      }
+      if (result.classList.contains("speaker-id")) result.textContent = "—";
+      if (select) select.id = "speaker-mic";
+      const canvas = document.createElement("canvas"); canvas.style.cssText = "width:100%;height:100%;display:block"; wave.replaceChildren(canvas);
+      const ctx = canvas.getContext("2d"); let stream=null, ac=null, proc=null, source=null, chunks=[];
+      const draw=(samples)=>{const r=canvas.getBoundingClientRect(),d=Math.min(devicePixelRatio||1,2);if(!r.width||!r.height)return;canvas.width=r.width*d;canvas.height=r.height*d;ctx.setTransform(d,0,0,d,0,0);ctx.clearRect(0,0,r.width,r.height);ctx.strokeStyle="#173b62";ctx.beginPath();ctx.moveTo(0,r.height/2);ctx.lineTo(r.width,r.height/2);if(samples.length){for(let x=0;x<r.width;x++){const i=Math.floor(x*samples.length/r.width),v=Math.max(-1,Math.min(1,samples[i]||0))*r.height*.42;ctx.moveTo(x,r.height/2-v);ctx.lineTo(x,r.height/2+v)}}ctx.stroke()};
+      const refresh=async()=>{try{const dev=(await navigator.mediaDevices.enumerateDevices()).filter(x=>x.kind==="audioinput"),old=select?.value;if(select){select.replaceChildren(new Option("系统默认麦克风",""));dev.forEach((x,i)=>select.add(new Option(x.label||`麦克风 ${i+1}`,x.deviceId)));if([...select.options].some(x=>x.value===old))select.value=old}}catch(e){if(hint)hint.textContent=e.message}};
+      const authorize=async()=>{try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());await refresh()}catch(e){if(hint)hint.textContent=`麦克风权限失败：${e.message}`}};
+      const refreshBtn=speakerScope.querySelector("#speaker-refresh");refreshBtn?.addEventListener("click",authorize);
+      start.addEventListener("click",async()=>{try{chunks=[];const constraints={channelCount:1,echoCancellation:true,noiseSuppression:true};if(select?.value)constraints.deviceId={exact:select.value};stream=await navigator.mediaDevices.getUserMedia({audio:constraints});ac=new(window.AudioContext||window.webkitAudioContext)();await ac.resume();source=ac.createMediaStreamSource(stream);proc=ac.createScriptProcessor(4096,1,1);proc.onaudioprocess=e=>{chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));e.outputBuffer.getChannelData(0).fill(0);draw(chunks[chunks.length-1])};source.connect(proc);proc.connect(ac.destination);start.disabled=true;stop.disabled=false;if(status)status.textContent="正在录音（最长8秒）";if(hint)hint.textContent="说一段自然语音，再点击停止并识别。";setTimeout(()=>{if(ac)stop.click()},8000)}catch(e){if(hint)hint.textContent=`无法开始录音：${e.message}`}});
+      stop.addEventListener("click",async()=>{if(!ac)return;const rate=ac.sampleRate;proc.disconnect();source.disconnect();stream.getTracks().forEach(t=>t.stop());await ac.close();ac=null;const n=chunks.reduce((s,a)=>s+a.length,0),samples=new Float32Array(n);let off=0;chunks.forEach(a=>{samples.set(a,off);off+=a.length});draw(samples);start.disabled=false;stop.disabled=true;if(status)status.textContent="正在识别…";try{const res=await fetch("/speaker/recognize",{method:"POST",headers:{"Content-Type":"application/octet-stream","X-Sample-Rate":String(rate)},body:samples.buffer}),data=await res.json();if(!res.ok)throw Error(data.error||"识别失败");result.textContent=data.speaker_name; if(meta)meta.textContent=`最小 DTW 距离 ${Number(data.distance).toFixed(2)} · 有效语音 ${Number(data.audio.speech_seconds).toFixed(2)} 秒`;const entries=Object.entries(data.scores);scoresBox.replaceChildren(...entries.map(([sid,v])=>{const row=document.createElement("div");row.className="comparison-item";row.innerHTML=`<div class="comp-header"><span></span><span></span></div><div class="comp-bar-bg"><div class="comp-bar-fill"></div></div>`;row.querySelector(".comp-header span:first-child").textContent=v.name;row.querySelector(".comp-header span:last-child").textContent=Number(v.distance).toFixed(2);row.querySelector(".comp-bar-fill").style.width=`${Math.max(4,100*v.distance/Math.max(...entries.map(([,x])=>x.distance)))}%`;return row}));if(status)status.textContent="识别完成"}catch(e){if(status)status.textContent="识别失败";if(hint)hint.textContent=e.message}});
+      refresh();
+    }
   }
 
   const startButton = document.getElementById("digit-start");
-  const recognitionProgress = document.getElementById("recognition-progress");
+  const stopButton = document.getElementById("digit-stop");
   const micSelect = document.getElementById("mic-select");
   const micRefresh = document.getElementById("mic-refresh");
   const micHint = document.getElementById("mic-hint");
@@ -183,7 +192,7 @@
   const resultDigit = document.getElementById("result-digit");
   const resultMeta = document.getElementById("result-meta");
   const scoreList = document.getElementById("score-list");
-  if (!startButton || !waveformContainer) return;
+  if (!startButton || !stopButton || !waveformContainer) return;
 
   const scoreRows = new Map();
   const desktopScores = scoreList.classList.contains("dtw-list");
@@ -210,20 +219,9 @@
   let recordingStartedAt = 0;
   let timerId = null;
   let recordedSamples = new Float32Array(0);
-  let isStopping = false;
-  let isRecognizing = false;
 
   function setStatus(text) {
     micStatus.textContent = text;
-  }
-
-  function setRecordButton(state, label, disabled = false) {
-    startButton.dataset.state = state;
-    startButton.textContent = label;
-    startButton.disabled = disabled;
-    startButton.setAttribute("aria-pressed", String(state === "recording"));
-    recognitionProgress?.classList.toggle("is-active", state === "recognizing");
-    recognitionProgress?.setAttribute("aria-hidden", String(state !== "recognizing"));
   }
 
   function resizeCanvas() {
@@ -360,15 +358,12 @@
   }
 
   async function startRecording() {
-    if (isRecognizing || audioContext) return;
     if (!navigator.mediaDevices?.getUserMedia) {
       micHint.textContent = "请使用支持麦克风的手机浏览器，并通过 HTTPS 打开网页。";
       return;
     }
     clearResult();
     micHint.textContent = "";
-    setRecordButton("starting", "正在连接麦克风…", true);
-    setStatus("● 正在连接麦克风");
     try {
       const audio = { channelCount: 1, echoCancellation: true, noiseSuppression: true, autoGainControl: true };
       if (micSelect.value) audio.deviceId = { exact: micSelect.value };
@@ -393,16 +388,18 @@
       sourceNode.connect(processorNode);
       processorNode.connect(audioContext.destination);
       recordingStartedAt = Date.now();
-      setRecordButton("recording", "停止录音", false);
-      setStatus("● 正在录音 00:00 · 再点一次结束");
+      startButton.disabled = true;
+      stopButton.disabled = false;
+      setStatus("● 正在录音 00:00");
       timerId = window.setInterval(() => {
         const seconds = Math.floor((Date.now() - recordingStartedAt) / 1000);
-        setStatus(`● 正在录音 00:${String(seconds).padStart(2, "0")} · 再点一次结束`);
+        setStatus(`● 正在录音 00:${String(seconds).padStart(2, "0")}`);
         if (seconds >= 8) stopRecording();
       }, 200);
     } catch (error) {
       await releaseMicrophone();
-      setRecordButton("idle", "开始录音", false);
+      startButton.disabled = false;
+      stopButton.disabled = true;
       setStatus("● 等待录音");
       micHint.textContent = error.name === "NotAllowedError"
         ? "麦克风权限未开放，请允许浏览器使用麦克风。"
@@ -411,29 +408,23 @@
   }
 
   async function stopRecording({ recognize = true } = {}) {
-    if (!audioContext || isStopping) return;
-    isStopping = true;
-    isRecognizing = recognize;
-    setRecordButton(recognize ? "recognizing" : "processing", recognize ? "正在识别…" : "正在结束…", true);
-    if (recognize) setStatus("● 正在识别 · 提取特征并匹配模板");
+    if (!audioContext) return;
     const sampleRate = audioContext.sampleRate;
     await releaseMicrophone();
     recordedSamples = combineChunks();
     drawWave(recordedSamples);
-    isStopping = false;
+    startButton.disabled = false;
+    stopButton.disabled = true;
     if (!recognize) {
-      isRecognizing = false;
-      setRecordButton("idle", "开始录音", false);
       setStatus("● 录音已停止");
       return;
     }
     if (recordedSamples.length < sampleRate * .2) {
-      isRecognizing = false;
-      setRecordButton("idle", "开始录音", false);
       setStatus("● 录音太短");
       micHint.textContent = "请完整说完一个数字再停止录音。";
       return;
     }
+    setStatus("● 正在识别");
     try {
       const response = await fetch("/recognize", {
         method: "POST",
@@ -451,16 +442,11 @@
     } catch (error) {
       setStatus("● 识别失败");
       micHint.textContent = error.message;
-    } finally {
-      isRecognizing = false;
-      setRecordButton("idle", "开始录音", false);
     }
   }
 
-  startButton.addEventListener("click", () => {
-    if (audioContext) stopRecording();
-    else startRecording();
-  });
+  startButton.addEventListener("click", startRecording);
+  stopButton.addEventListener("click", () => stopRecording());
   micRefresh.addEventListener("click", authorizeMicrophones);
   micSelect.addEventListener("change", () => {
     const option = micSelect.selectedOptions[0];
