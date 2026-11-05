@@ -1,0 +1,28 @@
+{
+  "experiment": "experiment_2_frequency_and_mfcc",
+  "scope": "member_c_fft_stft_demo",
+  "input_wav": "data/processed/spk01/digits/spk01_digit_0_take01.wav",
+  "sample_rate_hz": 16000,
+  "frame_length_samples": 400,
+  "hop_length_samples": 160,
+  "window": "hamming",
+  "pre_emphasis_coefficient": 0.97,
+  "n_fft": 512,
+  "power_normalization": "abs(FFT)**2 / n_fft",
+  "stft_shape_frames_bins": [281, 257],
+  "tail_frame_policy": "zero-pad final partial frame to preserve the recording tail",
+  "selected_frame_for_spectrum_and_error_plot": 132,
+  "selected_frame_dft_vs_fft_max_abs_error": 1.301350294520042e-12,
+  "pytest": {
+    "file": "reports/experiment2_c_submission/test_week3_c.py",
+    "passed": 9,
+    "failed": 0
+  },
+  "generated_figures": [
+    "week3_waveform.png",
+    "week3_frame_spectrum.png",
+    "week3_spectrogram.png",
+    "week3_dft_vs_fft_error.png"
+  ],
+  "note": "Single real recording demonstration; this output does not claim batch-wide accuracy."
+}

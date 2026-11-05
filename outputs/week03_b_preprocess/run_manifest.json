@@ -1,0 +1,21 @@
+{
+  "input_directory": "data/raw",
+  "output_directory": "outputs/week03_b_preprocess",
+  "input_extension": ".m4a",
+  "input_count": 115,
+  "expected_count": 115,
+  "input_count_matches_expected": true,
+  "status_counts": {
+    "ok": 109,
+    "warning": 6
+  },
+  "spectra_saved": 115,
+  "sample_rate_hz": 16000,
+  "pre_emphasis_coefficient": 0.97,
+  "frame_length_ms": 25.0,
+  "frame_hop_ms": 10.0,
+  "window": "hamming",
+  "n_fft": 512,
+  "spectrum_type": "one-sided linear power spectrum; not playable audio",
+  "qc_note": "Out-of-range decoded peaks are warnings and retained; short or silent files are skipped."
+}

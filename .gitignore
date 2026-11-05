@@ -1,2 +1,23 @@
+.venv/
+.matplotlib/
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.ruff_cache/
+.idea/
+.vscode/
+
+# 原始和处理后音频默认不进入普通Git历史
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# 程序生成结果
+outputs/figures/*
+!outputs/figures/.gitkeep
+outputs/metrics/*
+!outputs/metrics/.gitkeep
+
+# B's generated NPY spectra are reproducible and can be large; keep logs/manifests only.
+outputs/week03_b_preprocess/**/*.npy

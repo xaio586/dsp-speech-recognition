@@ -495,8 +495,8 @@
                     <div class="row-title" vid="22">说话人识别</div>
                     <div class="row-footer sys-text" vid="23">
                         <ul class="spec-list" vid="24">
-                            <li vid="25">MFCC · DTW</li>
-                            <li vid="26">说话人模块预览</li>
+                            <li vid="25">MFCC/LPC · SVM</li>
+                            <li vid="26">说话人身份识别</li>
                         </ul>
                         <ul class="spec-list text-right" vid="27">
                             <li vid="28">模块说明</li>
@@ -561,14 +561,14 @@
             <div class="page-content" vid="61">
                 <h1 class="large-title stagger-el delay-1">说话人识别</h1>
                 <section class="panel-box stagger-el delay-2" aria-live="polite">
-                    <div class="sys-text flex justify-between"><span>模块状态</span><span>暂未接入</span></div>
-                    <p class="module-note">当前在线服务已接入 0—9 孤立数字的实时识别。说话人识别页面目前用于展示模块入口，尚未连接对应的识别算法，因此这里不会显示模拟的识别结果。</p>
+                    <div class="sys-text flex justify-between"><span>模块状态</span><span>已接入在线识别</span></div>
+                    <p class="module-note">对着麦克风说任意一段话即可识别说话人：系统提取 MFCC 与 LPC 的统计特征，用 RBF 核 SVM 在 5 位组员中分类并给出置信度，不依赖所说内容。置信度较低时会明确提示。</p>
                 </section>
                 <section class="panel-box stagger-el delay-3">
-                    <div class="sys-text">后续可接入的处理流程</div>
+                    <div class="sys-text">处理流程</div>
                     <div class="flow-step flex justify-between items-center"><span>语音采集</span><span class="sys-text opacity-60">麦克风输入</span></div>
-                    <div class="flow-step flex justify-between items-center"><span>特征提取</span><span class="sys-text opacity-60">MFCC</span></div>
-                    <div class="flow-step flex justify-between items-center"><span>模板匹配</span><span class="sys-text opacity-60">DTW</span></div>
+                    <div class="flow-step flex justify-between items-center"><span>特征提取</span><span class="sys-text opacity-60">MFCC + LPC</span></div>
+                    <div class="flow-step flex justify-between items-center"><span>统计特征分类</span><span class="sys-text opacity-60">RBF SVM</span></div>
                 </section>
             </div>
         </div>

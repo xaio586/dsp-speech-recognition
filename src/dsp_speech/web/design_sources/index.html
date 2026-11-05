@@ -309,7 +309,7 @@
                     </div>
                     <div class="col-footer" vid="22">
                         <ul class="spec-list" vid="23">
-                            <li vid="24">MFCC · DTW</li>
+                            <li vid="24">MFCC/LPC · SVM</li>
                             <li vid="25">说话人身份识别</li>
                         </ul>
                         <ul class="spec-list" style="text-align: right;" vid="26">
@@ -374,7 +374,7 @@
                     <div class="sys-subtitle" vid="61">VOICE · 数字语音识别实验</div>
                 </div>
                 <div class="sys-meta-right" vid="62">
-                    <div vid="63">MFCC + DTW · LOCAL</div>
+                    <div vid="63">MFCC/LPC + SVM · LOCAL</div>
                     <div vid="64">16 KHZ</div>
                 </div>
             </div>
@@ -382,7 +382,7 @@
             <div class="workspace" vid="65">
                 <div class="hero-section" vid="66">
                     <h1 class="hero-title" vid="67">说话人是谁？</h1>
-                    <p class="hero-desc" vid="68">对着麦克风说任意词语，停止后判断说话人身份。系统将提取 MFCC 特征并与模板库进行动态时间规整（DTW）计算。</p>
+                    <p class="hero-desc" vid="68">对着麦克风说任意一段话，停止后判断说话人身份。系统提取 MFCC 与 LPC 的统计特征，用 RBF 核 SVM 分类，识别结果不依赖所说内容。</p>
                 </div>
 
                 <div class="panel" vid="69">
@@ -422,12 +422,12 @@
                         <div class="panel-header" vid="98">识别结果 / SPEAKER</div>
                         <div class="speaker-id" vid="99">S3</div>
                         <div class="card-meta" vid="100">
-                            最小 DTW 距离 18.42<br vid="101">
+                            SVM 置信度 92.5%<br vid="101">
                             有效语音 2.10 s
                         </div>
                     </div>
                     <div class="result-card" vid="102">
-                        <div class="panel-header" vid="103">各说话人的最小 DTW 距离 / 越小越接近</div>
+                        <div class="panel-header" vid="103">各说话人的 SVM 置信度 / 越大越可能</div>
                         <div class="comparison-list" vid="104">
                             <div class="comparison-item" vid="105">
                                 <div class="comp-header" vid="106">

@@ -1,0 +1,3 @@
+speaker_id,member_code,display_name,source_path
+spk01,A,成员A,C:\path\to\成员A_录音
+spk02,B,成员B,C:\path\to\成员B_录音.zip

@@ -1,0 +1,125 @@
+{
+  "status": "complete",
+  "completed_at_utc": "2026-10-15T01:46:55.163633+00:00",
+  "elapsed_seconds": 86.29189412100004,
+  "environment": {
+    "python": "3.12.15",
+    "numpy": "2.5.4",
+    "scipy": "1.18.1"
+  },
+  "workers": 4,
+  "metadata_sha256": "74c76f2369106ca91ab3b8ca4ec4cd4cd07ba6d370f052ed52064e7386d0fe58",
+  "split_sha256": "d2d33827e94dfb352196b5a0121f56c1a579647e0db6fb4a3f2447252b70fe90",
+  "split_rule": {
+    "train": {
+      "fold1_role": "train",
+      "take": 1
+    },
+    "test": {
+      "fold1_role": "test",
+      "take": 2
+    }
+  },
+  "counts_by_digit": {
+    "train": {
+      "0": 5,
+      "1": 5,
+      "2": 5,
+      "3": 5,
+      "4": 5,
+      "5": 5,
+      "6": 5,
+      "7": 5,
+      "8": 5,
+      "9": 5
+    },
+    "test": {
+      "0": 5,
+      "1": 5,
+      "2": 5,
+      "3": 5,
+      "4": 5,
+      "5": 5,
+      "6": 5,
+      "7": 5,
+      "8": 5,
+      "9": 5
+    }
+  },
+  "shared_config": {
+    "sample_rate": 16000,
+    "frame_ms": 25.0,
+    "hop_ms": 10.0,
+    "window": "hamming",
+    "pre_emphasis": 0.97,
+    "normalize_peak": 0.95,
+    "min_speech_ms": 50.0,
+    "min_silence_ms": 120.0,
+    "zcr_consecutive_frames": 3,
+    "high_energy_ratio": 0.1,
+    "low_energy_ratio": 0.025,
+    "min_zcr_threshold": 0.08,
+    "zcr_noise_multiplier": 2.0
+  },
+  "preprocessing": "load_wav -> analyze_time_domain -> samples[start:end] -> extract_mfcc",
+  "endpoint_failures": 0,
+  "templates": "All train MFCC sequences, grouped by digit; no averaging",
+  "core_source_sha256": {
+    "config.py": "a07f31fcaa4cc238c79f8fd216412fe889cff72d52a6e62ae58d4347cd5aa80d",
+    "io_audio.py": "93f728b27d9fc2bf857105261696f6a2c222dcdc1ed761ad9a2dacccc476856d",
+    "preprocess.py": "1ce264135941f8ad60ccf03cfe64c9751575df1ade62f07c3d96e0dd03c6b2b5",
+    "features.py": "aa32a1709385c57498ee6fac9b15e8e6ace2f8e7f00316dcf53dc7e8c8a3f606",
+    "dtw.py": "82e052d01bed83bac91cb7a29b9c34bb704717a1c01a172d0e68f8053257d6e2"
+  },
+  "confusion_matrix_axes": {
+    "rows": "true_label",
+    "columns": "predicted_label"
+  },
+  "accuracy_unit": "fraction in [0, 1]",
+  "results": [
+    {
+      "config": "baseline",
+      "n_mfcc": 13,
+      "n_filters": 26,
+      "n_fft": 512,
+      "train_count": 50,
+      "test_count": 50,
+      "correct": 42,
+      "accuracy": 0.84,
+      "split_sha256": "d2d33827e94dfb352196b5a0121f56c1a579647e0db6fb4a3f2447252b70fe90"
+    },
+    {
+      "config": "mfcc_20",
+      "n_mfcc": 20,
+      "n_filters": 26,
+      "n_fft": 512,
+      "train_count": 50,
+      "test_count": 50,
+      "correct": 43,
+      "accuracy": 0.86,
+      "split_sha256": "d2d33827e94dfb352196b5a0121f56c1a579647e0db6fb4a3f2447252b70fe90"
+    },
+    {
+      "config": "mel_40",
+      "n_mfcc": 13,
+      "n_filters": 40,
+      "n_fft": 512,
+      "train_count": 50,
+      "test_count": 50,
+      "correct": 40,
+      "accuracy": 0.8,
+      "split_sha256": "d2d33827e94dfb352196b5a0121f56c1a579647e0db6fb4a3f2447252b70fe90"
+    },
+    {
+      "config": "fft_1024",
+      "n_mfcc": 13,
+      "n_filters": 26,
+      "n_fft": 1024,
+      "train_count": 50,
+      "test_count": 50,
+      "correct": 42,
+      "accuracy": 0.84,
+      "split_sha256": "d2d33827e94dfb352196b5a0121f56c1a579647e0db6fb4a3f2447252b70fe90"
+    }
+  ]
+}

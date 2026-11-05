@@ -272,7 +272,7 @@
                 <div class="sys-subtitle" vid="13">VOICE · 数字语音识别实验</div>
             </div>
             <div class="sys-meta-right" vid="14">
-                <div vid="15">MFCC + DTW · LOCAL</div>
+                <div vid="15">MFCC/LPC + SVM · LOCAL</div>
                 <div vid="16">16 KHZ</div>
             </div>
         </div>
@@ -280,7 +280,7 @@
         <div class="workspace" vid="17">
             <div class="hero-section" vid="18">
                 <h1 class="hero-title" vid="19">说话人是谁？</h1>
-                <p class="hero-desc" vid="20">对着麦克风说任意词语，停止后判断说话人身份。系统将提取 MFCC 特征并与模板库进行动态时间规整（DTW）计算。</p>
+                <p class="hero-desc" vid="20">对着麦克风说任意一段话，停止后判断说话人身份。系统提取 MFCC 与 LPC 的统计特征，用 RBF 核 SVM 分类，识别结果不依赖所说内容。</p>
             </div>
 
             <div class="panel" vid="21">
@@ -321,12 +321,12 @@
                     <div class="panel-header" vid="50">识别结果 / SPEAKER</div>
                     <div class="speaker-id" vid="51">S3</div>
                     <div class="card-meta" vid="52">
-                        最小 DTW 距离 18.42<br vid="53">
+                        SVM 置信度 92.5%<br vid="53">
                         有效语音 2.10 s
                     </div>
                 </div>
                 <div class="result-card" vid="54">
-                    <div class="panel-header" vid="55">各说话人的最小 DTW 距离 / 越小越接近</div>
+                    <div class="panel-header" vid="55">各说话人的 SVM 置信度 / 越大越可能</div>
                     <div class="comparison-list" vid="56">
                         <div class="comparison-item" vid="57">
                             <div class="comp-header" vid="58">

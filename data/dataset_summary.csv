@@ -1,0 +1,7 @@
+speaker_id,member_code,digit_count,name_count,total_count,duration_seconds,duration_min_seconds,duration_max_seconds,original_format,original_sample_rate,processed_format,status
+spk01,A,20,3,23,56.067,1.877,3.499,M4A/ALAC,48000,WAV/PCM16/16000Hz/mono,complete
+spk02,B,20,3,23,51.626,1.856,2.837,M4A/AAC,48000,WAV/PCM16/16000Hz/mono,complete
+spk03,C,20,3,23,63.702,2.112,4.139,M4A/AAC,48000,WAV/PCM16/16000Hz/mono,complete
+spk04,D,20,3,23,178.069,6.485,9.493,M4A/AAC,48000,WAV/PCM16/16000Hz/mono,complete
+spk05,E,20,3,23,138.093,4.672,6.955,M4A/AAC,48000,WAV/PCM16/16000Hz/mono,complete
+TOTAL,,100,15,115,487.557,1.856,9.493,,,complete

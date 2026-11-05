@@ -1,0 +1,181 @@
+{
+  "experiment": "MFCC/LPC 统计特征 + RBF SVM 说话人识别（实验四）",
+  "feature": "MFCC+delta+delta2 逐系数均值/标准差（78 维）+ 逐帧 LPC(12) 均值/标准差（24 维），共 102 维定长向量",
+  "speakers": {
+    "spk01": "肖绚聍",
+    "spk02": "王晗宇",
+    "spk04": "李欣彤",
+    "spk05": "赵丹阳",
+    "spk03": "靳博文"
+  },
+  "training_recordings": 40,
+  "test_recordings": 27,
+  "cv_protocol": "训练集按句子 LeaveOneGroupOut（4 折，同句两遍不跨折）",
+  "cv_results": [
+    {
+      "C": 1.0,
+      "gamma": "scale",
+      "fold_accuracies": [
+        1.0,
+        0.9,
+        1.0,
+        1.0
+      ],
+      "mean_accuracy": 0.975
+    },
+    {
+      "C": 1.0,
+      "gamma": 0.03,
+      "fold_accuracies": [
+        0.9,
+        0.7,
+        0.9,
+        1.0
+      ],
+      "mean_accuracy": 0.875
+    },
+    {
+      "C": 1.0,
+      "gamma": 0.1,
+      "fold_accuracies": [
+        0.6,
+        0.4,
+        0.4,
+        0.5
+      ],
+      "mean_accuracy": 0.475
+    },
+    {
+      "C": 10.0,
+      "gamma": "scale",
+      "fold_accuracies": [
+        1.0,
+        0.9,
+        1.0,
+        1.0
+      ],
+      "mean_accuracy": 0.975
+    },
+    {
+      "C": 10.0,
+      "gamma": 0.03,
+      "fold_accuracies": [
+        0.9,
+        0.7,
+        0.9,
+        1.0
+      ],
+      "mean_accuracy": 0.875
+    },
+    {
+      "C": 10.0,
+      "gamma": 0.1,
+      "fold_accuracies": [
+        0.6,
+        0.4,
+        0.4,
+        0.5
+      ],
+      "mean_accuracy": 0.475
+    },
+    {
+      "C": 100.0,
+      "gamma": "scale",
+      "fold_accuracies": [
+        1.0,
+        0.9,
+        1.0,
+        1.0
+      ],
+      "mean_accuracy": 0.975
+    },
+    {
+      "C": 100.0,
+      "gamma": 0.03,
+      "fold_accuracies": [
+        0.9,
+        0.7,
+        0.9,
+        1.0
+      ],
+      "mean_accuracy": 0.875
+    },
+    {
+      "C": 100.0,
+      "gamma": 0.1,
+      "fold_accuracies": [
+        0.6,
+        0.4,
+        0.4,
+        0.5
+      ],
+      "mean_accuracy": 0.475
+    }
+  ],
+  "selected_hyperparameters": {
+    "C": 1.0,
+    "gamma": "scale"
+  },
+  "accuracy_overall": 0.9629629629629629,
+  "accuracy_personal_free_speech": 0.8571428571428571,
+  "accuracy_shared_prompts": 1.0,
+  "per_speaker_recall": {
+    "spk01": 1.0,
+    "spk02": 1.0,
+    "spk03": 0.8333333333333334,
+    "spk04": 1.0,
+    "spk05": 1.0
+  },
+  "confusion_matrix": {
+    "spk01": {
+      "spk01": 5,
+      "spk02": 0,
+      "spk03": 0,
+      "spk04": 0,
+      "spk05": 0
+    },
+    "spk02": {
+      "spk01": 0,
+      "spk02": 5,
+      "spk03": 0,
+      "spk04": 0,
+      "spk05": 0
+    },
+    "spk03": {
+      "spk01": 0,
+      "spk02": 0,
+      "spk03": 5,
+      "spk04": 1,
+      "spk05": 0
+    },
+    "spk04": {
+      "spk01": 0,
+      "spk02": 0,
+      "spk03": 0,
+      "spk04": 5,
+      "spk05": 0
+    },
+    "spk05": {
+      "spk01": 0,
+      "spk02": 0,
+      "spk03": 0,
+      "spk04": 0,
+      "spk05": 6
+    }
+  },
+  "misclassified": [
+    {
+      "file_name": "wav/spk03/spk03_test_personal01.wav",
+      "prompt_id": "personal01",
+      "content_group": "personal",
+      "true_speaker_id": "spk03",
+      "true_name": "靳博文",
+      "predicted_speaker_id": "spk04",
+      "predicted_name": "李欣彤",
+      "correct": false,
+      "confidence": 0.6827,
+      "low_confidence": false
+    }
+  ],
+  "low_confidence_count": 0
+}

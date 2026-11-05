@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 import numpy as np
 
 from .recognize import load_digit_templates, recognize_utterance
-from .speaker_recognition import load_speaker_templates, recognize_speaker
+from .speaker_recognition import SpeakerSVM, load_speaker_model, recognize_speaker
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DESIGN_DIR = Path(__file__).resolve().parent / "web" / "design_sources"
@@ -61,7 +61,7 @@ TRANSITION_STYLE = b"""<style id=\"e3-page-transition\">
 
 class RecognitionHandler(BaseHTTPRequestHandler):
     templates: dict[str, list[np.ndarray]] = {}
-    speaker_templates: dict[str, list[np.ndarray]] = {}
+    speaker_model: SpeakerSVM | None = None
     speaker_names: dict[str, str] = {}
 
     def log_message(self, format: str, *args: object) -> None:
@@ -127,9 +127,11 @@ class RecognitionHandler(BaseHTTPRequestHandler):
                     "ready": bool(self.templates),
                     "template_count": sum(len(items) for items in self.templates.values()),
                     "digits": {label: len(items) for label, items in self.templates.items()},
-                    "speaker_ready": bool(self.speaker_templates),
-                    "speaker_count": len(self.speaker_templates),
-                    "speaker_templates": {sid: len(items) for sid, items in self.speaker_templates.items()},
+                    "speaker_ready": self.speaker_model is not None,
+                    "speaker_count": len(self.speaker_model.speaker_ids) if self.speaker_model else 0,
+                    "speaker_templates": dict(self.speaker_model.training_counts) if self.speaker_model else {},
+                    "speaker_algorithm": "MFCC/LPC statistics + RBF SVM",
+                    "speaker_feature_dim": self.speaker_model.feature_dim if self.speaker_model else 0,
                 },
             )
             return
@@ -159,7 +161,9 @@ class RecognitionHandler(BaseHTTPRequestHandler):
                 raise ValueError("录音数据传输不完整，请重新录制")
             samples = np.frombuffer(raw, dtype="<f4").astype(np.float32, copy=True)
             if path == "/speaker/recognize":
-                result = recognize_speaker(samples, sample_rate, self.speaker_templates, self.speaker_names)
+                if self.speaker_model is None:
+                    raise ValueError("说话人模型尚未加载完成")
+                result = recognize_speaker(samples, sample_rate, self.speaker_model, self.speaker_names)
             else:
                 result = recognize_utterance(samples, sample_rate, self.templates)
             self._json(200, result)
@@ -175,13 +179,13 @@ def main() -> None:
     print("正在读取 data/processed/metadata.csv 并建立数字模板……")
     templates = load_digit_templates(PROJECT_ROOT)
     RecognitionHandler.templates = templates
-    speaker_templates, speaker_names = load_speaker_templates(PROJECT_ROOT)
-    RecognitionHandler.speaker_templates = speaker_templates
+    speaker_model, speaker_names = load_speaker_model(PROJECT_ROOT)
+    RecognitionHandler.speaker_model = speaker_model
     RecognitionHandler.speaker_names = speaker_names
     server = ThreadingHTTPServer((host, port), RecognitionHandler)
     print(f"实验三实时识别已启动：http://{host}:{port}")
     print(f"模板数量：{sum(len(items) for items in templates.values())} 条（数字0—9）")
-    print(f"说话人模板：{sum(len(items) for items in speaker_templates.values())} 条（{len(speaker_templates)} 人）")
+    print(f"说话人模型：RBF SVM，{sum(speaker_model.training_counts.values())} 条训练向量（{len(speaker_model.speaker_ids)} 人，{speaker_model.feature_dim} 维特征）")
     print("在浏览器打开页面并允许麦克风权限；按 Ctrl+C 可退出。")
     try:
         server.serve_forever()

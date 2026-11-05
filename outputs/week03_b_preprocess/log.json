@@ -1,0 +1,1630 @@
+[
+  {
+    "input_file": "spk01/digits/digit_0_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.816,
+    "peak": 0.31831976771354675,
+    "rms": 0.036227474109408624,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_0_take01.npy",
+    "spectrum_shape": [
+      281,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_0_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.2186875,
+    "peak": 0.5127782821655273,
+    "rms": 0.08384872093012091,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_0_take02.npy",
+    "spectrum_shape": [
+      221,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_1_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.56,
+    "peak": 0.2734606862068176,
+    "rms": 0.04232669703812852,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_1_take01.npy",
+    "spectrum_shape": [
+      255,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_1_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 1.8773125,
+    "peak": 0.42965060472488403,
+    "rms": 0.08102221031643153,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_1_take02.npy",
+    "spectrum_shape": [
+      187,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_2_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.2186875,
+    "peak": 0.4416685402393341,
+    "rms": 0.043730030322490086,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_2_take01.npy",
+    "spectrum_shape": [
+      221,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_2_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 1.9626875,
+    "peak": 0.9248949289321899,
+    "rms": 0.10747147043917701,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_2_take02.npy",
+    "spectrum_shape": [
+      195,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_3_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.2186875,
+    "peak": 0.5657393932342529,
+    "rms": 0.053168063140108024,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_3_take01.npy",
+    "spectrum_shape": [
+      221,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_3_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.4746875,
+    "peak": 0.9109107255935669,
+    "rms": 0.09383003212481188,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_3_take02.npy",
+    "spectrum_shape": [
+      246,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_4_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.4746875,
+    "peak": 0.3281434178352356,
+    "rms": 0.03505828159688136,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_4_take01.npy",
+    "spectrum_shape": [
+      246,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_4_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.304,
+    "peak": 0.619941234588623,
+    "rms": 0.06768555233098823,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_4_take02.npy",
+    "spectrum_shape": [
+      229,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_5_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.3893125,
+    "peak": 0.21401187777519226,
+    "rms": 0.02380168071787602,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_5_take01.npy",
+    "spectrum_shape": [
+      238,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_5_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.048,
+    "peak": 0.4475748836994171,
+    "rms": 0.056146899430521584,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_5_take02.npy",
+    "spectrum_shape": [
+      204,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_6_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.304,
+    "peak": 0.6966879367828369,
+    "rms": 0.07769903587124866,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_6_take01.npy",
+    "spectrum_shape": [
+      229,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_6_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.1333125,
+    "peak": 0.9777163863182068,
+    "rms": 0.09842753737223695,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_6_take02.npy",
+    "spectrum_shape": [
+      212,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_7_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.048,
+    "peak": 0.6800491809844971,
+    "rms": 0.07476590063769505,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_7_take01.npy",
+    "spectrum_shape": [
+      204,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_7_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.2186875,
+    "peak": 0.681794285774231,
+    "rms": 0.060170366994105516,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_7_take02.npy",
+    "spectrum_shape": [
+      221,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_8_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.4746875,
+    "peak": 0.4937283992767334,
+    "rms": 0.04552648428684913,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_8_take01.npy",
+    "spectrum_shape": [
+      246,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_8_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.2186875,
+    "peak": 0.672158420085907,
+    "rms": 0.0749376735000544,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_8_take02.npy",
+    "spectrum_shape": [
+      221,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_9_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.7306875,
+    "peak": 0.4128436744213104,
+    "rms": 0.03979607582072826,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_9_take01.npy",
+    "spectrum_shape": [
+      272,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/digits/digit_9_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.4746875,
+    "peak": 0.7349605560302734,
+    "rms": 0.05912841281483667,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/digits/digit_9_take02.npy",
+    "spectrum_shape": [
+      246,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/names/name_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 3.4986875,
+    "peak": 0.8266637325286865,
+    "rms": 0.08301940148821135,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/names/name_take01.npy",
+    "spectrum_shape": [
+      349,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/names/name_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 3.2426875,
+    "peak": 0.7171515226364136,
+    "rms": 0.07955221514263415,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/names/name_take02.npy",
+    "spectrum_shape": [
+      323,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk01/names/name_take03.m4a",
+    "status": "ok",
+    "duration_seconds": 3.1573125,
+    "peak": 0.5582388043403625,
+    "rms": 0.0665689130389949,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk01/names/name_take03.npy",
+    "spectrum_shape": [
+      315,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_0_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 7.2746875,
+    "peak": 0.9164186120033264,
+    "rms": 0.08450888761868934,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_0_take01.npy",
+    "spectrum_shape": [
+      726,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_0_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 7.68,
+    "peak": 1.0098364353179932,
+    "rms": 0.0784771043075456,
+    "clipped_ratio": 1.6276041666666666e-05,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_0_take02.npy",
+    "spectrum_shape": [
+      767,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_1_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 6.976,
+    "peak": 0.9156147837638855,
+    "rms": 0.10308151994033403,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_1_take01.npy",
+    "spectrum_shape": [
+      697,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_1_take02.m4a",
+    "status": "warning",
+    "duration_seconds": 6.4853125,
+    "peak": 1.2037341594696045,
+    "rms": 0.13838393921962266,
+    "clipped_ratio": 0.002043078109189033,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_1_take02.npy",
+    "spectrum_shape": [
+      648,
+      257
+    ],
+    "dtype": "float32",
+    "warnings": [
+      "possible_clipping"
+    ]
+  },
+  {
+    "input_file": "spk02/digits/digit_2_take01.m4a",
+    "status": "warning",
+    "duration_seconds": 7.296,
+    "peak": 1.423673391342163,
+    "rms": 0.11267653693967665,
+    "clipped_ratio": 0.0039148163377192985,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_2_take01.npy",
+    "spectrum_shape": [
+      729,
+      257
+    ],
+    "dtype": "float32",
+    "warnings": [
+      "possible_clipping"
+    ]
+  },
+  {
+    "input_file": "spk02/digits/digit_2_take02.m4a",
+    "status": "warning",
+    "duration_seconds": 6.72,
+    "peak": 1.4189867973327637,
+    "rms": 0.10153123831770025,
+    "clipped_ratio": 0.001832217261904762,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_2_take02.npy",
+    "spectrum_shape": [
+      671,
+      257
+    ],
+    "dtype": "float32",
+    "warnings": [
+      "possible_clipping"
+    ]
+  },
+  {
+    "input_file": "spk02/digits/digit_3_take01.m4a",
+    "status": "warning",
+    "duration_seconds": 6.656,
+    "peak": 1.4011762142181396,
+    "rms": 0.1312100077413223,
+    "clipped_ratio": 0.005164513221153846,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_3_take01.npy",
+    "spectrum_shape": [
+      665,
+      257
+    ],
+    "dtype": "float32",
+    "warnings": [
+      "possible_clipping"
+    ]
+  },
+  {
+    "input_file": "spk02/digits/digit_3_take02.m4a",
+    "status": "warning",
+    "duration_seconds": 7.7226875,
+    "peak": 1.4071452617645264,
+    "rms": 0.1102697981888415,
+    "clipped_ratio": 0.0022984226669795975,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_3_take02.npy",
+    "spectrum_shape": [
+      771,
+      257
+    ],
+    "dtype": "float32",
+    "warnings": [
+      "possible_clipping"
+    ]
+  },
+  {
+    "input_file": "spk02/digits/digit_4_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 7.6373125,
+    "peak": 1.3858309984207153,
+    "rms": 0.06564054949340528,
+    "clipped_ratio": 0.00043372586888385146,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_4_take01.npy",
+    "spectrum_shape": [
+      763,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_4_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 7.2533125,
+    "peak": 1.3958196640014648,
+    "rms": 0.07863984104032772,
+    "clipped_ratio": 0.0007582742367711305,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_4_take02.npy",
+    "spectrum_shape": [
+      724,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_5_take01.m4a",
+    "status": "warning",
+    "duration_seconds": 6.7626875,
+    "peak": 1.2200493812561035,
+    "rms": 0.1277130047200444,
+    "clipped_ratio": 0.0012199292071384342,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_5_take01.npy",
+    "spectrum_shape": [
+      675,
+      257
+    ],
+    "dtype": "float32",
+    "warnings": [
+      "possible_clipping"
+    ]
+  },
+  {
+    "input_file": "spk02/digits/digit_5_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 7.04,
+    "peak": 0.5544142723083496,
+    "rms": 0.04789103880253168,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_5_take02.npy",
+    "spectrum_shape": [
+      703,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_6_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 8.256,
+    "peak": 1.115971565246582,
+    "rms": 0.058163649352815136,
+    "clipped_ratio": 6.813226744186046e-05,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_6_take01.npy",
+    "spectrum_shape": [
+      825,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_6_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 8.4693125,
+    "peak": 1.3933868408203125,
+    "rms": 0.08369031697039929,
+    "clipped_ratio": 0.0007231991971012996,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_6_take02.npy",
+    "spectrum_shape": [
+      846,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_7_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 7.936,
+    "peak": 0.6082544922828674,
+    "rms": 0.0354293008020696,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_7_take01.npy",
+    "spectrum_shape": [
+      793,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_7_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 7.616,
+    "peak": 0.4783983826637268,
+    "rms": 0.03488810430204638,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_7_take02.npy",
+    "spectrum_shape": [
+      761,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_8_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 8.1066875,
+    "peak": 0.9780768752098083,
+    "rms": 0.073460697295856,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_8_take01.npy",
+    "spectrum_shape": [
+      810,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_8_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 7.7226875,
+    "peak": 0.8527086973190308,
+    "rms": 0.06845287018751514,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_8_take02.npy",
+    "spectrum_shape": [
+      771,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_9_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 8.256,
+    "peak": 0.9500714540481567,
+    "rms": 0.05147818410882113,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_9_take01.npy",
+    "spectrum_shape": [
+      825,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/digits/digit_9_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 8.5973125,
+    "peak": 0.966386616230011,
+    "rms": 0.05165838649939083,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk02/digits/digit_9_take02.npy",
+    "spectrum_shape": [
+      859,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/names/name_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 9.4933125,
+    "peak": 0.4722083508968353,
+    "rms": 0.04838662268401539,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk02/names/name_take01.npy",
+    "spectrum_shape": [
+      948,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/names/name_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 9.3866875,
+    "peak": 0.6495689153671265,
+    "rms": 0.06050357509333021,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk02/names/name_take02.npy",
+    "spectrum_shape": [
+      938,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk02/names/name_take03.m4a",
+    "status": "ok",
+    "duration_seconds": 8.7253125,
+    "peak": 0.5902205109596252,
+    "rms": 0.0605508030676041,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk02/names/name_take03.npy",
+    "spectrum_shape": [
+      872,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_0_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.5813125,
+    "peak": 0.34455204010009766,
+    "rms": 0.04555910722439744,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_0_take01.npy",
+    "spectrum_shape": [
+      257,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_0_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.4533125,
+    "peak": 0.8761723637580872,
+    "rms": 0.03510787999777447,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_0_take02.npy",
+    "spectrum_shape": [
+      244,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_1_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.3893125,
+    "peak": 0.25337332487106323,
+    "rms": 0.025664614989575906,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_1_take01.npy",
+    "spectrum_shape": [
+      238,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_1_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.4106875,
+    "peak": 0.08657553791999817,
+    "rms": 0.012210751797436862,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_1_take02.npy",
+    "spectrum_shape": [
+      240,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_2_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.304,
+    "peak": 0.25064411759376526,
+    "rms": 0.022340844226369776,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_2_take01.npy",
+    "spectrum_shape": [
+      229,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_2_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.2613125,
+    "peak": 0.2515694797039032,
+    "rms": 0.025564410635275748,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_2_take02.npy",
+    "spectrum_shape": [
+      225,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_3_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.1973125,
+    "peak": 0.1485804170370102,
+    "rms": 0.02275106929481839,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_3_take01.npy",
+    "spectrum_shape": [
+      219,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_3_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.1973125,
+    "peak": 0.2962954044342041,
+    "rms": 0.020725598625729105,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_3_take02.npy",
+    "spectrum_shape": [
+      219,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_4_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 1.984,
+    "peak": 0.7379374504089355,
+    "rms": 0.06049153109184583,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_4_take01.npy",
+    "spectrum_shape": [
+      197,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_4_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 1.9626875,
+    "peak": 0.3389444351196289,
+    "rms": 0.027997583477614656,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_4_take02.npy",
+    "spectrum_shape": [
+      195,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_5_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 1.9626875,
+    "peak": 0.22799664735794067,
+    "rms": 0.037355680007263685,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_5_take01.npy",
+    "spectrum_shape": [
+      195,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_5_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 1.92,
+    "peak": 0.3103330433368683,
+    "rms": 0.04826183096299318,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_5_take02.npy",
+    "spectrum_shape": [
+      191,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_6_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.2186875,
+    "peak": 0.46926695108413696,
+    "rms": 0.06304639357199981,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_6_take01.npy",
+    "spectrum_shape": [
+      221,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_6_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 1.856,
+    "peak": 0.35758695006370544,
+    "rms": 0.04375453922492085,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_6_take02.npy",
+    "spectrum_shape": [
+      185,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_7_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.3893125,
+    "peak": 0.7146700620651245,
+    "rms": 0.06382378525488402,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_7_take01.npy",
+    "spectrum_shape": [
+      238,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_7_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 1.856,
+    "peak": 0.13873067498207092,
+    "rms": 0.023253081495915498,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_7_take02.npy",
+    "spectrum_shape": [
+      185,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_8_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.0266875,
+    "peak": 0.2750864028930664,
+    "rms": 0.03589581606091444,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_8_take01.npy",
+    "spectrum_shape": [
+      202,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_8_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.4106875,
+    "peak": 0.12015029788017273,
+    "rms": 0.015644734589279424,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_8_take02.npy",
+    "spectrum_shape": [
+      240,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_9_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.176,
+    "peak": 0.24963334202766418,
+    "rms": 0.03881159311184042,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_9_take01.npy",
+    "spectrum_shape": [
+      217,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/digits/digit_9_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.112,
+    "peak": 0.197292298078537,
+    "rms": 0.029873228040363402,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/digits/digit_9_take02.npy",
+    "spectrum_shape": [
+      210,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/names/name_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.5813125,
+    "peak": 0.25873205065727234,
+    "rms": 0.028083401414876415,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/names/name_take01.npy",
+    "spectrum_shape": [
+      257,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/names/name_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.5386875,
+    "peak": 0.18807873129844666,
+    "rms": 0.02817836681519732,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/names/name_take02.npy",
+    "spectrum_shape": [
+      253,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk03/names/name_take03.m4a",
+    "status": "ok",
+    "duration_seconds": 2.8373125,
+    "peak": 0.26664406061172485,
+    "rms": 0.0306402092007025,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk03/names/name_take03.npy",
+    "spectrum_shape": [
+      283,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_0_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.2826875,
+    "peak": 0.40470194816589355,
+    "rms": 0.049094806209264714,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_0_take01.npy",
+    "spectrum_shape": [
+      227,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_0_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.5386875,
+    "peak": 0.36536288261413574,
+    "rms": 0.049132708824841005,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_0_take02.npy",
+    "spectrum_shape": [
+      253,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_1_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.304,
+    "peak": 0.25556573271751404,
+    "rms": 0.03431604313836265,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_1_take01.npy",
+    "spectrum_shape": [
+      229,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_1_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.496,
+    "peak": 0.30869314074516296,
+    "rms": 0.04118328687667378,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_1_take02.npy",
+    "spectrum_shape": [
+      249,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_2_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.1546875,
+    "peak": 0.7916067838668823,
+    "rms": 0.046356072411899985,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_2_take01.npy",
+    "spectrum_shape": [
+      214,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_2_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.9013125,
+    "peak": 0.5289568901062012,
+    "rms": 0.030415407089707268,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_2_take02.npy",
+    "spectrum_shape": [
+      289,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_3_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.4533125,
+    "peak": 0.5159591436386108,
+    "rms": 0.041330740038043386,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_3_take01.npy",
+    "spectrum_shape": [
+      244,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_3_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.9226875,
+    "peak": 0.46661922335624695,
+    "rms": 0.034977022363907005,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_3_take02.npy",
+    "spectrum_shape": [
+      291,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_4_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.56,
+    "peak": 0.42160648107528687,
+    "rms": 0.04082657996819837,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_4_take01.npy",
+    "spectrum_shape": [
+      255,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_4_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 3.1786875,
+    "peak": 0.30173149704933167,
+    "rms": 0.02639612445224538,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_4_take02.npy",
+    "spectrum_shape": [
+      317,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_5_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.7093125,
+    "peak": 0.4903164207935333,
+    "rms": 0.06215892126744339,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_5_take01.npy",
+    "spectrum_shape": [
+      270,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_5_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.816,
+    "peak": 0.4574674963951111,
+    "rms": 0.04917315186483068,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_5_take02.npy",
+    "spectrum_shape": [
+      281,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_6_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.944,
+    "peak": 0.5677276849746704,
+    "rms": 0.062029335321914056,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_6_take01.npy",
+    "spectrum_shape": [
+      293,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_6_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 3.2426875,
+    "peak": 0.5799568891525269,
+    "rms": 0.04723918715448075,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_6_take02.npy",
+    "spectrum_shape": [
+      323,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_7_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.3253125,
+    "peak": 0.37071335315704346,
+    "rms": 0.03765369553775142,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_7_take01.npy",
+    "spectrum_shape": [
+      232,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_7_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.5173125,
+    "peak": 0.36154496669769287,
+    "rms": 0.038377294099887556,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_7_take02.npy",
+    "spectrum_shape": [
+      251,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_8_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.112,
+    "peak": 0.43659937381744385,
+    "rms": 0.02950372211761665,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_8_take01.npy",
+    "spectrum_shape": [
+      210,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_8_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.2613125,
+    "peak": 0.4947352409362793,
+    "rms": 0.03890949420356025,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_8_take02.npy",
+    "spectrum_shape": [
+      225,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_9_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 2.176,
+    "peak": 0.47260889410972595,
+    "rms": 0.046144951581148,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_9_take01.npy",
+    "spectrum_shape": [
+      217,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/digits/digit_9_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 2.88,
+    "peak": 0.41994011402130127,
+    "rms": 0.03576695632420047,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/digits/digit_9_take02.npy",
+    "spectrum_shape": [
+      287,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/names/name_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 4.032,
+    "peak": 0.4316695034503937,
+    "rms": 0.04533718190253076,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/names/name_take01.npy",
+    "spectrum_shape": [
+      402,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/names/name_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 4.1386875,
+    "peak": 0.395779550075531,
+    "rms": 0.04055321877499117,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/names/name_take02.npy",
+    "spectrum_shape": [
+      413,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk04/names/name_take03.m4a",
+    "status": "ok",
+    "duration_seconds": 3.7546875,
+    "peak": 0.433349609375,
+    "rms": 0.04544813379773978,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk04/names/name_take03.npy",
+    "spectrum_shape": [
+      374,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_0_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 5.9093125,
+    "peak": 0.9001697897911072,
+    "rms": 0.08488570968048433,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_0_take01.npy",
+    "spectrum_shape": [
+      590,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_0_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 6.8906875,
+    "peak": 0.8010779023170471,
+    "rms": 0.07776412118261923,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_0_take02.npy",
+    "spectrum_shape": [
+      688,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_1_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 6.528,
+    "peak": 0.5184342861175537,
+    "rms": 0.05211794634500986,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_1_take01.npy",
+    "spectrum_shape": [
+      652,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_1_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 5.9306875,
+    "peak": 0.5510200262069702,
+    "rms": 0.06030636246515088,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_1_take02.npy",
+    "spectrum_shape": [
+      592,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_2_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 6.9333125,
+    "peak": 0.7787278294563293,
+    "rms": 0.062203430880784547,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_2_take01.npy",
+    "spectrum_shape": [
+      692,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_2_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 4.672,
+    "peak": 0.8313969373703003,
+    "rms": 0.07447384902816764,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_2_take02.npy",
+    "spectrum_shape": [
+      466,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_3_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 6.08,
+    "peak": 0.8681923151016235,
+    "rms": 0.07481820859190465,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_3_take01.npy",
+    "spectrum_shape": [
+      607,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_3_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 6.2506875,
+    "peak": 0.7714051604270935,
+    "rms": 0.061558901890736956,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_3_take02.npy",
+    "spectrum_shape": [
+      624,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_4_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 5.504,
+    "peak": 0.9617693424224854,
+    "rms": 0.07198190115760865,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_4_take01.npy",
+    "spectrum_shape": [
+      549,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_4_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 4.9493125,
+    "peak": 0.9018857479095459,
+    "rms": 0.06519726222086823,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_4_take02.npy",
+    "spectrum_shape": [
+      494,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_5_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 5.9306875,
+    "peak": 1.0647660493850708,
+    "rms": 0.08019387358925155,
+    "clipped_ratio": 5.269203612565997e-05,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_5_take01.npy",
+    "spectrum_shape": [
+      592,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_5_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 6.208,
+    "peak": 0.5832799673080444,
+    "rms": 0.06182356723019134,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_5_take02.npy",
+    "spectrum_shape": [
+      620,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_6_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 6.3786875,
+    "peak": 1.0586224794387817,
+    "rms": 0.08382755514841418,
+    "clipped_ratio": 3.9193015804583623e-05,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_6_take01.npy",
+    "spectrum_shape": [
+      637,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_6_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 5.2266875,
+    "peak": 1.112386703491211,
+    "rms": 0.09224060309862381,
+    "clipped_ratio": 0.0002152414889927894,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_6_take02.npy",
+    "spectrum_shape": [
+      522,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_7_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 5.8026875,
+    "peak": 0.8297787308692932,
+    "rms": 0.07596038820777673,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_7_take01.npy",
+    "spectrum_shape": [
+      579,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_7_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 5.5466875,
+    "peak": 0.469442754983902,
+    "rms": 0.05828534953138069,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_7_take02.npy",
+    "spectrum_shape": [
+      554,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_8_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 6.2506875,
+    "peak": 1.0096274614334106,
+    "rms": 0.09218140034323363,
+    "clipped_ratio": 1.9997800241973383e-05,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_8_take01.npy",
+    "spectrum_shape": [
+      624,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_8_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 5.4826875,
+    "peak": 0.8221124410629272,
+    "rms": 0.07259691481747159,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_8_take02.npy",
+    "spectrum_shape": [
+      547,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_9_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 6.656,
+    "peak": 1.280259132385254,
+    "rms": 0.08487913709420944,
+    "clipped_ratio": 0.0004131610576923077,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_9_take01.npy",
+    "spectrum_shape": [
+      665,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/digits/digit_9_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 6.9546875,
+    "peak": 1.0141701698303223,
+    "rms": 0.08820962531609795,
+    "clipped_ratio": 2.6960233655358346e-05,
+    "output_file": "outputs/week03_b_preprocess/spk05/digits/digit_9_take02.npy",
+    "spectrum_shape": [
+      694,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/names/name_take01.m4a",
+    "status": "ok",
+    "duration_seconds": 5.6533125,
+    "peak": 0.7737422585487366,
+    "rms": 0.07021435826230839,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/names/name_take01.npy",
+    "spectrum_shape": [
+      564,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/names/name_take02.m4a",
+    "status": "ok",
+    "duration_seconds": 6.6773125,
+    "peak": 0.782081663608551,
+    "rms": 0.06021154135149913,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/names/name_take02.npy",
+    "spectrum_shape": [
+      667,
+      257
+    ],
+    "dtype": "float32"
+  },
+  {
+    "input_file": "spk05/names/name_take03.m4a",
+    "status": "ok",
+    "duration_seconds": 5.6746875,
+    "peak": 0.8210639953613281,
+    "rms": 0.09015619402773159,
+    "clipped_ratio": 0.0,
+    "output_file": "outputs/week03_b_preprocess/spk05/names/name_take03.npy",
+    "spectrum_shape": [
+      566,
+      257
+    ],
+    "dtype": "float32"
+  }
+]
