@@ -17,6 +17,7 @@ from .speaker_recognition import SpeakerSVM, load_speaker_model, recognize_speak
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DESIGN_DIR = Path(__file__).resolve().parent / "web" / "design_sources"
+ASSETS_DIR = Path(__file__).resolve().parent / "web" / "assets"
 PAGE_ROUTES = {
     "/": "overview",
     "/index.html": "overview",
@@ -121,6 +122,20 @@ class RecognitionHandler(BaseHTTPRequestHandler):
                 self._json(500, {"error": f"界面接口文件读取失败：{error}"})
                 return
             self._send(200, body, "text/javascript; charset=utf-8")
+            return
+        if path.startswith("/assets/"):
+            asset = (ASSETS_DIR / path[len("/assets/"):]).resolve()
+            if not str(asset).startswith(str(ASSETS_DIR.resolve())) or not asset.is_file():
+                self._json(404, {"error": "资源不存在"})
+                return
+            content_type = {
+                ".png": "image/png",
+                ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg",
+                ".svg": "image/svg+xml",
+                ".webp": "image/webp",
+            }.get(asset.suffix.lower(), "application/octet-stream")
+            self._send(200, asset.read_bytes(), content_type)
             return
         if path == "/health":
             ecapa = self.speaker_ecapa

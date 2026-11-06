@@ -255,7 +255,7 @@
         
         #page-docs .frame-bottom { align-items: center; } 
         #page-docs .main-content { flex-grow: 1; display: flex; width: 100%; pointer-events: auto; overflow: hidden; }
-        #page-docs .doc-section { height: 100%; border-right: var(--line-weight) solid var(--ui-color); display: flex; flex-direction: column; padding: 32px; }
+        #page-docs .doc-section { height: 100%; border-right: var(--line-weight) solid var(--ui-color); display: flex; flex-direction: column; padding: 32px; overflow-y: auto; }
         #page-docs .doc-section:last-child { border-right: none; }
         #page-docs .section-left { flex: 1.5; }
         #page-docs .section-right { flex: 1; background: rgba(255, 255, 255, 0.05); }
@@ -275,6 +275,9 @@
         #page-docs .step-label { font-weight: 500; display: block; margin-bottom: 4px; }
         #page-docs .stats-block { margin-top: auto; border: var(--line-weight) solid var(--ui-color); padding: 20px; display: flex; flex-direction: column; gap: 8px; }
         #page-docs .stat-item { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; display: flex; justify-content: space-between; }
+        #page-docs .doc-fig { width: 100%; border: var(--line-weight) solid var(--ui-color); background: #fff; display: block; margin: 14px 0 6px; }
+        #page-docs .doc-cap { font-size: 11px; opacity: 0.72; line-height: 1.6; margin-bottom: 14px; }
+        #page-docs .doc-h { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; font-weight: 600; opacity: 0.85; margin: 20px 0 10px; }
         
         @media (max-width: 1024px) {
             #page-docs .main-content { flex-direction: column; overflow-y: auto; }
@@ -577,106 +580,64 @@
             <div class="main-content" vid="211">
                 <div class="doc-section section-left" vid="212">
                     <div class="page-header" vid="213">
-                        <h1 class="page-title" vid="214">训练文档 <span vid="215">/ TEMPLATES</span></h1>
+                        <h1 class="page-title" vid="214">训练文档 <span vid="215">/ METHODS</span></h1>
                     </div>
 
-                    <div class="list-container" vid="216">
-                        <div class="data-row" vid="217">
-                            <div vid="218">speaker_a_01.wav</div>
-                            <div class="row-dim" vid="219">0:03</div>
-                            <div vid="220">说话人 A</div>
-                        </div>
-                        <div class="data-row" vid="221">
-                            <div vid="222">speaker_b_take2.wav</div>
-                            <div class="row-dim" vid="223">0:07</div>
-                            <div vid="224">说话人 B</div>
-                        </div>
-                        <div class="data-row" vid="225">
-                            <div vid="226">digits_full_09.wav</div>
-                            <div class="row-dim" vid="227">0:12</div>
-                            <div vid="228">数字 0–9</div>
-                        </div>
-                        <div class="data-row" vid="229">
-                            <div vid="230">noise_floor_ref.wav</div>
-                            <div class="row-dim" vid="231">0:05</div>
-                            <div vid="232">环境底噪参考</div>
-                        </div>
-                        <div class="data-row" vid="233">
-                            <div vid="234">vocal_range_01.wav</div>
-                            <div class="row-dim" vid="235">0:15</div>
-                            <div vid="236">元音共振峰模板</div>
-                        </div>
-                        <div class="data-row" vid="237">
-                            <div vid="238">command_start.wav</div>
-                            <div class="row-dim" vid="239">0:02</div>
-                            <div vid="240">激活指令库</div>
-                        </div>
-                        <div class="data-row" vid="241">
-                            <div vid="242">speaker_c_base.wav</div>
-                            <div class="row-dim" vid="243">0:06</div>
-                            <div vid="244">说话人 C</div>
-                        </div>
-                        <div class="data-row" vid="245">
-                            <div vid="246">isolated_digit_5.wav</div>
-                            <div class="row-dim" vid="247">0:01</div>
-                            <div vid="248">数字 5 单项</div>
-                        </div>
+                    <h2 class="doc-h">实验原理 / 语音信号处理链路</h2>
+                    <div class="step">
+                        <div class="step-num">01</div>
+                        <div class="step-content"><span class="step-label">预处理</span>16 kHz 重采样、去直流；预加重 y[n]=x[n]−0.97x[n−1] 补偿高频衰减；25 ms 分帧、10 ms 帧移、Hamming 加窗。</div>
                     </div>
+                    <div class="step">
+                        <div class="step-num">02</div>
+                        <div class="step-content"><span class="step-label">端点检测（双门限）</span>短时能量 + 过零率自动定位语音起止，剔除静音；检测失败会拒绝并提示重录。</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">03</div>
+                        <div class="step-content"><span class="step-label">MFCC 特征</span>FFT 功率谱 → Mel 滤波器组 → 对数能量 → DCT，得 13 维倒谱系数，另加一阶/二阶差分描述谱动态。</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">04</div>
+                        <div class="step-content"><span class="step-label">LPC 特征（说话人）</span>12 阶线性预测系数（自相关法 + Levinson-Durbin 递推），刻画声道共振特性，与 MFCC 互补。</div>
+                    </div>
+                    <img class="doc-fig" src="/assets/docs/waveform_mfcc.png" alt="真实录音波形与 MFCC 序列">
+                    <p class="doc-cap">组员真实训练录音：上为波形（红色区间为端点检测出的有效语音），下为对应的 13 维 MFCC 序列。</p>
 
-                    <div class="summary-footer" vid="249">
-                        100 TEMPLATES · 16 kHz · WAV mono
+                    <div class="stats-block">
+                        <div class="stat-item"><span>训练录音</span><span>243 条（含 203 段自由朗读）</span></div>
+                        <div class="stat-item"><span>留出测试</span><span>27 条 · 另有雅思 86 段仅测试</span></div>
+                        <div class="stat-item"><span>采样 / 分帧</span><span>16 kHz · 25ms/10ms</span></div>
+                        <div class="stat-item"><span>特征维度</span><span>SVM 102 维 · 嵌入 192 维</span></div>
                     </div>
                 </div>
 
                 <div class="doc-section section-right" vid="250">
                     <div class="pipeline-container" vid="251">
-                        <h2 class="pipeline-title" vid="252">识别流程 / PIPELINE</h2>
-                        
-                        <div class="step" vid="253">
-                            <div class="step-num" vid="254">01</div>
-                            <div class="step-content" vid="255">
-                                <span class="step-label" vid="256">预处理</span>
-                                对原始信号进行预加重、分帧及加窗处理，增强高频信号并确保信号准平稳性。
-                            </div>
-                        </div>
+                        <h2 class="pipeline-title" vid="252">实验四方案与结果 / EXPERIMENT 4</h2>
 
-                        <div class="step" vid="257">
-                            <div class="step-num" vid="258">02</div>
-                            <div class="step-content" vid="259">
-                                <span class="step-label" vid="260">端点检测 (VAD)</span>
-                                基于能量阈值和过零率自动识别语音起始与结束位置，剔除无声片段。
-                            </div>
+                        <h3 class="doc-h">方案一（自研）：MFCC/LPC 统计特征 + RBF SVM</h3>
+                        <div class="step">
+                            <div class="step-num">A</div>
+                            <div class="step-content">逐帧特征在时间轴上取均值/标准差，组成 102 维定长向量（只留嗓音统计特性，不含语句内容）；RBF 核 SVM 分类，C=10、γ=scale 由训练集分组交叉验证选定；训练侧声道增强抵抗设备偏移。</div>
                         </div>
+                        <img class="doc-fig" src="/assets/docs/svm_confusion.png" alt="SVM 混淆矩阵">
+                        <p class="doc-cap">27 条留出测试 26/27；蓝牙模拟 25/27；雅思随机内容 65/82 ≈ 79.3%。</p>
 
-                        <div class="step" vid="261">
-                            <div class="step-num" vid="262">03</div>
-                            <div class="step-content" vid="263">
-                                <span class="step-label" vid="264">MFCC 特征提取</span>
-                                通过倒谱分析模拟人类听觉感知，提取反映语音本质特征的倒谱系数矢量。
-                            </div>
+                        <h3 class="doc-h">方案二（部署）：ECAPA-TDNN 深度声纹嵌入</h3>
+                        <div class="step">
+                            <div class="step-num">B</div>
+                            <div class="step-content">预训练 ECAPA-TDNN（VoxCeleb）输出 192 维声纹嵌入；每人训练嵌入均值为注册质心，余弦相似度比对。ONNX 导出部署，线上仅需 onnxruntime。页面可切换两套算法对比。</div>
                         </div>
+                        <img class="doc-fig" src="/assets/docs/ecapa_scatter.png" alt="声纹嵌入二维投影">
+                        <p class="doc-cap">嵌入 PCA 投影：五人各自聚簇，雅思英语录音（★）仍落在肖绚聍簇内。</p>
+                        <img class="doc-fig" src="/assets/docs/algo_comparison.png" alt="两种方案准确率对比">
+                        <p class="doc-cap">ECAPA 三组测试全部 100%；内容越随机、信道差异越大，两种方案差距越明显。</p>
 
-                        <div class="step" vid="265">
-                            <div class="step-num" vid="266">04</div>
-                            <div class="step-content" vid="267">
-                                <span class="step-label" vid="268">DTW 模板匹配</span>
-                                采用动态时间规整算法计算测试语音与模板库之间的最小累计距离进行分类。
-                            </div>
-                        </div>
-
-                        <div class="stats-block" vid="269">
-                            <div class="stat-item" vid="270">
-                                <span vid="271">Capacity</span>
-                                <span vid="272">10 CLASSES</span>
-                            </div>
-                            <div class="stat-item" vid="273">
-                                <span vid="274">Database</span>
-                                <span vid="275">100 TEMPLATES</span>
-                            </div>
-                            <div class="stat-item" vid="276">
-                                <span vid="277">Environment</span>
-                                <span vid="278">LOCAL SERVICE</span>
-                            </div>
+                        <div class="stats-block">
+                            <div class="stat-item"><span>干净测试集</span><span>SVM 26/27 · ECAPA 27/27</span></div>
+                            <div class="stat-item"><span>蓝牙声道模拟</span><span>SVM 25/27 · ECAPA 27/27</span></div>
+                            <div class="stat-item"><span>雅思随机内容</span><span>SVM 79.3% · ECAPA 100%</span></div>
+                            <div class="stat-item"><span>部署</span><span>RENDER · ONNX RUNTIME</span></div>
                         </div>
                     </div>
                 </div>

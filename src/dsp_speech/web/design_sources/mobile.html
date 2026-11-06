@@ -377,6 +377,9 @@
         .score-row.is-best .score-fill { background:#17574c; }
         .score-row[hidden] { display:none; }
         .mobile-record-controls .status { grid-column:1 / -1; margin-left:0; text-align:right; }
+        .doc-fig { width:100%; border:var(--line-weight) solid var(--ui-color); background:#fff; display:block; margin-top:12px; }
+        .doc-cap { font-size:11px; opacity:.72; line-height:1.6; margin-top:6px; }
+        .doc-h { font-size:12px; letter-spacing:.08em; text-transform:uppercase; opacity:.8; margin-bottom:8px; font-weight:600; }
         .back-btn { border:0; background:transparent; color:inherit; font:inherit; }
         @media(max-height:740px) { .page-content { gap:20px; padding-top:18px; padding-bottom:18px; } }
         @supports (padding: max(0px)) {
@@ -637,50 +640,44 @@
             <div class="page-content" vid="152">
                 <div class="stagger-el delay-1" vid="153">
                     <h1 class="large-title mb-2" vid="154">训练文档</h1>
-                    <div class="sys-text" vid="155">160 TEMPLATES · WAV</div>
-                </div>
-                
-                <div class="flex flex-col gap-6 stagger-el delay-2 mt-4" vid="156">
-                    <div class="sys-text opacity-60" vid="157">RECOGNITION PIPELINE</div>
-                    
-                    <div class="flex flex-col gap-6" vid="158">
-                        <div class="flow-step flex justify-between items-center" vid="159">
-                            <span class="font-medium" vid="160">01. AUDIO INPUT</span>
-                            <span class="sys-text opacity-60" vid="161">16kHz Mono</span>
-                        </div>
-                        <div class="flow-step flex justify-between items-center" vid="162">
-                            <span class="font-medium" vid="163">02. 端点检测与预处理</span>
-                            <span class="sys-text opacity-60" vid="164">去直流、归一化</span>
-                        </div>
-                        <div class="flow-step flex justify-between items-center" vid="165">
-                            <span class="font-medium" vid="166">03. MFCC EXTRACTION</span>
-                            <span class="sys-text opacity-60" vid="167">13 Features / Frame</span>
-                        </div>
-                        <div class="flow-step flex justify-between items-center" style="border-bottom: var(--line-weight) solid var(--ui-color);" vid="168">
-                            <span class="font-medium" vid="169">04. DTW MATCHING</span>
-                            <span class="sys-text opacity-60" vid="170">Dynamic Time Warping</span>
-                        </div>
-                    </div>
+                    <div class="sys-text" vid="155">METHODS · RESULTS</div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 mt-8 stagger-el delay-3" vid="171">
-                    <div class="panel-box items-center text-center" vid="172">
-                        <div class="text-3xl font-light mb-1" vid="173">160</div>
-                        <div class="sys-text opacity-60" vid="174">TOTAL TEMPLATES</div>
-                    </div>
-                    <div class="panel-box items-center text-center" vid="175">
-                        <div class="text-3xl font-light mb-1" vid="176">13</div>
-                        <div class="sys-text opacity-60" vid="177">MFCC DIMS</div>
-                    </div>
-                    <div class="panel-box items-center text-center" vid="178">
-                        <div class="text-3xl font-light mb-1" vid="179">25<span class="text-sm" vid="180">ms</span></div>
-                        <div class="sys-text opacity-60" vid="181">FRAME SIZE</div>
-                    </div>
-                    <div class="panel-box items-center text-center" vid="182">
-                        <div class="text-3xl font-light mb-1" vid="183">10<span class="text-sm" vid="184">ms</span></div>
-                        <div class="sys-text opacity-60" vid="185">FRAME SHIFT</div>
-                    </div>
+                <section class="panel-box stagger-el delay-2">
+                    <div class="doc-h">实验原理 / 语音信号处理链路</div>
+                    <p class="module-note">所有识别共用同一条前端处理链：16 kHz 重采样与去直流；预加重 y[n]=x[n]−0.97x[n−1] 补偿高频衰减；25 ms 分帧、10 ms 帧移、Hamming 加窗；双门限端点检测（短时能量+过零率）切除静音；随后提取 13 维 MFCC（FFT → Mel 滤波器组 → 对数能量 → DCT）及一阶/二阶差分，说话人识别另加 12 阶 LPC 系数（自相关法 + Levinson-Durbin 递推）。</p>
+                    <img class="doc-fig" src="/assets/docs/waveform_mfcc.png" alt="真实录音波形与 MFCC 序列">
+                    <p class="doc-cap">组员真实训练录音：上为波形（红色区间为端点检测出的有效语音），下为对应的 13 维 MFCC 序列。</p>
+                </section>
+
+                <div class="grid grid-cols-2 gap-4 stagger-el delay-3">
+                    <div class="panel-box items-center text-center"><div class="text-3xl font-light mb-1">243</div><div class="sys-text opacity-60">训练录音</div></div>
+                    <div class="panel-box items-center text-center"><div class="text-3xl font-light mb-1">27</div><div class="sys-text opacity-60">留出测试</div></div>
+                    <div class="panel-box items-center text-center"><div class="text-3xl font-light mb-1">102</div><div class="sys-text opacity-60">SVM 特征维数</div></div>
+                    <div class="panel-box items-center text-center"><div class="text-3xl font-light mb-1">192</div><div class="sys-text opacity-60">声纹嵌入维数</div></div>
                 </div>
+
+                <section class="panel-box stagger-el delay-4">
+                    <div class="doc-h">实验四 · 方案一（自研）：MFCC/LPC 统计特征 + RBF SVM</div>
+                    <p class="module-note">对每帧特征在时间轴上取均值与标准差，组成 102 维定长向量——只保留嗓音统计特性，不含语句内容；标准化后用 RBF 核 SVM 分类（C=10、γ=scale，仅用训练集按原始录音分组交叉验证选定）。训练侧做声道增强（电话带通、6 kHz 低通、20 dB 加噪）抵抗换设备带来的信道偏移。</p>
+                    <img class="doc-fig" src="/assets/docs/svm_confusion.png" alt="SVM 混淆矩阵">
+                    <p class="doc-cap">27 条留出测试 26/27 正确（唯一误判：靳博文 45 秒自由稿 → 李欣彤）；蓝牙声道模拟 25/27；组长雅思录音（英语随机内容）65/82 ≈ 79.3%。</p>
+                </section>
+
+                <section class="panel-box stagger-el delay-5">
+                    <div class="doc-h">实验四 · 方案二（部署）：ECAPA-TDNN 深度声纹嵌入</div>
+                    <p class="module-note">预训练 ECAPA-TDNN（VoxCeleb 数据集）把任意长度语音压缩为 192 维声纹嵌入；每位组员的训练嵌入均值经归一化作为注册质心，识别时比较余弦相似度取最大者。嵌入空间对内容、语言、信道天然鲁棒。模型以 ONNX 导出部署，线上仅需 onnxruntime；说话人页面可在两套算法间一键切换对比。</p>
+                    <img class="doc-fig" src="/assets/docs/ecapa_scatter.png" alt="声纹嵌入二维投影">
+                    <p class="doc-cap">192 维嵌入经 PCA 投影：五人各自聚簇，雅思英语录音（★）仍落在肖绚聍簇内——这是 86/86 的几何解释。</p>
+                    <img class="doc-fig" src="/assets/docs/ecapa_confusion.png" alt="ECAPA 混淆矩阵">
+                    <p class="doc-cap">27 条留出测试全部正确，蓝牙声道模拟同样 27/27。</p>
+                </section>
+
+                <section class="panel-box stagger-el delay-6">
+                    <div class="doc-h">两种方案对比与结论</div>
+                    <img class="doc-fig" src="/assets/docs/algo_comparison.png" alt="两种方案准确率对比">
+                    <p class="doc-cap">内容越随机、信道差异越大，自研统计特征与深度声纹的差距越明显。实验四最终采用 ECAPA-TDNN 上线，自研 SVM 管线作为课程实现完整保留，页面可直接切换对比。系统为五人闭集识别，低置信度时页面会明确提示。</p>
+                </section>
 
             </div>
         </div>
