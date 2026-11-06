@@ -7,7 +7,7 @@ import os
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 import numpy as np
 
@@ -140,6 +140,10 @@ class RecognitionHandler(BaseHTTPRequestHandler):
                         "ECAPA-TDNN embeddings + cosine centroids (ONNX)" if ecapa
                         else "MFCC/LPC statistics + RBF SVM"
                     ),
+                    "speaker_algorithms": {
+                        "ecapa": bool(ecapa),
+                        "svm": bool(self.speaker_model),
+                    },
                     "speaker_feature_dim": 192 if ecapa else (self.speaker_model.feature_dim if self.speaker_model else 0),
                 },
             )
@@ -170,10 +174,16 @@ class RecognitionHandler(BaseHTTPRequestHandler):
                 raise ValueError("录音数据传输不完整，请重新录制")
             samples = np.frombuffer(raw, dtype="<f4").astype(np.float32, copy=True)
             if path == "/speaker/recognize":
-                if self.speaker_ecapa is not None:
+                algo = parse_qs(urlparse(self.path).query).get("algo", [""])[0].lower()
+                if algo == "svm" and self.speaker_model is not None:
+                    result = recognize_speaker(samples, sample_rate, self.speaker_model, self.speaker_names)
+                    result["algorithm"] = "svm"
+                elif self.speaker_ecapa is not None:
                     result = recognize_speaker_ecapa(samples, sample_rate, self.speaker_ecapa, self.speaker_names)
+                    result["algorithm"] = "ecapa"
                 elif self.speaker_model is not None:
                     result = recognize_speaker(samples, sample_rate, self.speaker_model, self.speaker_names)
+                    result["algorithm"] = "svm"
                 else:
                     raise ValueError("说话人模型尚未加载完成")
             else:
@@ -194,12 +204,12 @@ def main() -> None:
     ecapa_bundle = load_ecapa_recognizer(PROJECT_ROOT)
     if ecapa_bundle:
         RecognitionHandler.speaker_ecapa, RecognitionHandler.speaker_names = ecapa_bundle
-        print(f"说话人模型：ECAPA-TDNN 嵌入 + 余弦质心（{len(ecapa_bundle[0].centroids)} 人，ONNX 推理）")
-    else:
-        speaker_model, speaker_names = load_speaker_model(PROJECT_ROOT)
-        RecognitionHandler.speaker_model = speaker_model
-        RecognitionHandler.speaker_names = speaker_names
-        print(f"说话人模型：RBF SVM，{sum(speaker_model.training_counts.values())} 条训练向量（{len(speaker_model.speaker_ids)} 人，{speaker_model.feature_dim} 维特征）")
+        print(f"说话人模型（默认）：ECAPA-TDNN 嵌入 + 余弦质心（{len(ecapa_bundle[0].centroids)} 人，ONNX 推理）")
+    speaker_model, svm_names = load_speaker_model(PROJECT_ROOT)
+    RecognitionHandler.speaker_model = speaker_model
+    if not RecognitionHandler.speaker_names:
+        RecognitionHandler.speaker_names = svm_names
+    print(f"说话人模型（页面可切换）：RBF SVM，{sum(speaker_model.training_counts.values())} 条训练向量（{len(speaker_model.speaker_ids)} 人，{speaker_model.feature_dim} 维特征）")
     server = ThreadingHTTPServer((host, port), RecognitionHandler)
     print(f"实验三实时识别已启动：http://{host}:{port}")
     print(f"模板数量：{sum(len(items) for items in templates.values())}")

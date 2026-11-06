@@ -162,6 +162,28 @@
       if (status) status.textContent = "● 等待录音";
       if (meta) meta.textContent = "";
       scoresBox.replaceChildren();
+      // Algorithm switch: deployed ECAPA voiceprint embeddings vs the self-built MFCC/LPC + RBF SVM pipeline.
+      let speakerAlgo = "ecapa";
+      const controlsRow = start.closest(".mobile-record-controls") || start.parentElement;
+      if (controlsRow && controlsRow.parentElement && !speakerScope.querySelector("#speaker-algo")) {
+        const sw = document.createElement("div");
+        sw.id = "speaker-algo";
+        sw.style.cssText = "display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px";
+        const baseBtn = "border:1px solid currentColor;color:inherit;font:inherit;font-size:11px;padding:8px 4px;cursor:pointer;min-height:36px;touch-action:manipulation";
+        sw.innerHTML = `<button type="button" data-algo="ecapa" style="${baseBtn};opacity:1;background:rgba(255,255,255,.36);font-weight:600">声纹嵌入 ECAPA</button><button type="button" data-algo="svm" style="${baseBtn};opacity:.55;background:transparent;font-weight:400">自研 SVM</button>`;
+        sw.addEventListener("click", e => {
+          const btn = e.target.closest("button[data-algo]");
+          if (!btn) return;
+          speakerAlgo = btn.dataset.algo;
+          sw.querySelectorAll("button").forEach(b => {
+            const on = b.dataset.algo === speakerAlgo;
+            b.style.opacity = on ? "1" : ".55";
+            b.style.fontWeight = on ? "600" : "400";
+            b.style.background = on ? "rgba(255,255,255,.36)" : "transparent";
+          });
+        });
+        controlsRow.parentElement.insertBefore(sw, controlsRow);
+      }
       if (!select) {
         const controls = document.createElement("div"); controls.className="speaker-device-controls";controls.style.cssText="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px";
         controls.innerHTML='<label for="speaker-mic">输入设备</label><select id="speaker-mic"><option value="">系统默认麦克风</option></select><button id="speaker-refresh" type="button">授权 / 刷新</button><span id="speaker-hint" aria-live="polite">允许麦克风权限后可选择耳机麦克风。</span>';
@@ -176,7 +198,7 @@
       const authorize=async()=>{try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());await refresh()}catch(e){if(hint)hint.textContent=`麦克风权限失败：${e.message}`}};
       const refreshBtn=speakerScope.querySelector("#speaker-refresh");refreshBtn?.addEventListener("click",authorize);
       start.addEventListener("click",async()=>{try{chunks=[];const constraints={channelCount:1,echoCancellation:true,noiseSuppression:true};if(select?.value)constraints.deviceId={exact:select.value};stream=await navigator.mediaDevices.getUserMedia({audio:constraints});ac=new(window.AudioContext||window.webkitAudioContext)();await ac.resume();source=ac.createMediaStreamSource(stream);proc=ac.createScriptProcessor(4096,1,1);proc.onaudioprocess=e=>{chunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));e.outputBuffer.getChannelData(0).fill(0);draw(chunks[chunks.length-1])};source.connect(proc);proc.connect(ac.destination);start.disabled=true;stop.disabled=false;if(status)status.textContent="正在录音（最长8秒）";if(hint)hint.textContent="说一段自然语音，再点击停止并识别。";setTimeout(()=>{if(ac)stop.click()},8000)}catch(e){if(hint)hint.textContent=`无法开始录音：${e.message}`}});
-      stop.addEventListener("click",async()=>{if(!ac)return;const rate=ac.sampleRate;proc.disconnect();source.disconnect();stream.getTracks().forEach(t=>t.stop());await ac.close();ac=null;const n=chunks.reduce((s,a)=>s+a.length,0),samples=new Float32Array(n);let off=0;chunks.forEach(a=>{samples.set(a,off);off+=a.length});draw(samples);start.disabled=false;stop.disabled=true;if(status)status.textContent="正在识别…";try{const res=await fetch("/speaker/recognize",{method:"POST",headers:{"Content-Type":"application/octet-stream","X-Sample-Rate":String(rate)},body:samples.buffer}),data=await res.json();if(!res.ok)throw Error(data.error||"识别失败");result.textContent=data.speaker_name;const confidencePct=(100*Number(data.confidence)).toFixed(1);if(meta)meta.textContent=`声纹置信度 ${confidencePct}% · 有效语音 ${Number(data.audio.speech_seconds).toFixed(2)} 秒${data.low_confidence?" · 置信度较低，可能不在这 5 位组员内，结果仅供参考":""}`;const entries=Object.entries(data.scores);scoresBox.replaceChildren(...entries.map(([sid,v])=>{const row=document.createElement("div");row.className="comparison-item";row.innerHTML=`<div class="comp-header"><span></span><span></span></div><div class="comp-bar-bg"><div class="comp-bar-fill"></div></div>`;row.querySelector(".comp-header span:first-child").textContent=v.name;row.querySelector(".comp-header span:last-child").textContent=`${(100*Number(v.probability)).toFixed(1)}%`;row.querySelector(".comp-bar-fill").style.width=`${Math.max(4,100*Number(v.probability))}%`;return row}));if(status)status.textContent=data.low_confidence?"识别完成（低置信度）":"识别完成"}catch(e){if(status)status.textContent="识别失败";if(hint)hint.textContent=e.message}});
+      stop.addEventListener("click",async()=>{if(!ac)return;const rate=ac.sampleRate;proc.disconnect();source.disconnect();stream.getTracks().forEach(t=>t.stop());await ac.close();ac=null;const n=chunks.reduce((s,a)=>s+a.length,0),samples=new Float32Array(n);let off=0;chunks.forEach(a=>{samples.set(a,off);off+=a.length});draw(samples);start.disabled=false;stop.disabled=true;if(status)status.textContent="正在识别…";try{const res=await fetch("/speaker/recognize?algo="+speakerAlgo,{method:"POST",headers:{"Content-Type":"application/octet-stream","X-Sample-Rate":String(rate)},body:samples.buffer}),data=await res.json();if(!res.ok)throw Error(data.error||"识别失败");result.textContent=data.speaker_name;const confidencePct=(100*Number(data.confidence)).toFixed(1);const algoLabel=data.algorithm==="svm"?"SVM 置信度":"声纹置信度";if(meta)meta.textContent=`${algoLabel} ${confidencePct}% · 有效语音 ${Number(data.audio.speech_seconds).toFixed(2)} 秒${data.low_confidence?" · 置信度较低，可能不在这 5 位组员内，结果仅供参考":""}`;const entries=Object.entries(data.scores);scoresBox.replaceChildren(...entries.map(([sid,v])=>{const row=document.createElement("div");row.className="comparison-item";row.innerHTML=`<div class="comp-header"><span></span><span></span></div><div class="comp-bar-bg"><div class="comp-bar-fill"></div></div>`;row.querySelector(".comp-header span:first-child").textContent=v.name;row.querySelector(".comp-header span:last-child").textContent=`${(100*Number(v.probability)).toFixed(1)}%`;row.querySelector(".comp-bar-fill").style.width=`${Math.max(4,100*Number(v.probability))}%`;return row}));if(status)status.textContent=data.low_confidence?"识别完成（低置信度）":"识别完成"}catch(e){if(status)status.textContent="识别失败";if(hint)hint.textContent=e.message}});
       refresh();
     }
   }
