@@ -145,7 +145,7 @@
     if (!speakerPanel) {
       const content = speakerScope.querySelector(".page-content");
       if (content) {
-        content.innerHTML = `<h1 class="large-title">说话人识别</h1><p>对着麦克风说一段话，停止后查看匹配结果。</p><section class="panel-box"><div id="speaker-wave" class="wave-container"></div><div class="mobile-mic-controls"><label>输入设备</label><select id="speaker-mic"><option value="">系统默认麦克风</option></select><button id="speaker-refresh" type="button">授权 / 刷新</button></div><p id="speaker-hint" aria-live="polite">首次使用请授权麦克风。</p><button id="speaker-start" type="button">开始录音</button><button id="speaker-stop" type="button" disabled>停止并识别</button><p id="speaker-status">等待录音</p></section><section class="result-card"><h2 id="speaker-result">等待录音</h2><p id="speaker-meta"></p><div id="speaker-scores"></div></section>`;
+        content.innerHTML = `<h1 class="large-title">说话人识别</h1><p>对着麦克风说一段话，停止后查看匹配结果。</p><section class="panel-box waveform-panel"><div id="speaker-wave" class="wave-container"></div><div class="mobile-mic-controls"><label>输入设备</label><select id="speaker-mic"><option value="">系统默认麦克风</option></select><button id="speaker-refresh" type="button">授权 / 刷新</button></div><p class="mic-hint" id="speaker-hint" aria-live="polite">首次使用请授权麦克风。</p></section><div class="mobile-record-controls"><button class="btn-outline" id="speaker-start" type="button">开始录音</button><button class="btn-outline btn-primary" id="speaker-stop" type="button" disabled>停止并识别</button><span class="status" id="speaker-status">● 等待录音</span></div><section class="result-card"><h2 id="speaker-result">等待录音</h2><p id="speaker-meta"></p><div id="speaker-scores"></div></section>`;
       }
     }
     const wave = speakerWave || speakerScope.querySelector("#speaker-wave");
@@ -160,7 +160,7 @@
     if (wave && start && stop && result && scoresBox) {
       start.id = "speaker-start"; stop.id = "speaker-stop"; stop.disabled = true;
       if (status) status.textContent = "● 等待录音";
-      if (meta) meta.textContent = "四位组员数据已载入；开始录音后显示匹配结果。";
+      if (meta) meta.textContent = "";
       scoresBox.replaceChildren();
       if (!select) {
         const controls = document.createElement("div"); controls.className="speaker-device-controls";controls.style.cssText="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px";
