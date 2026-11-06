@@ -89,7 +89,7 @@ def grouped_cv(train_rows, vectors_by_speaker) -> list[dict[str, object]]:
         for gamma in GRID_GAMMA:
             scores = []
             for fit_idx, hold_idx in logo.split(matrix, labels_arr, groups_arr):
-                clf = make_pipeline(StandardScaler(), SVC(kernel="rbf", C=c, gamma=gamma))
+                clf = make_pipeline(StandardScaler(), SVC(kernel="rbf", C=c, gamma=gamma, class_weight="balanced"))
                 clf.fit(matrix[fit_idx], labels_arr[fit_idx])
                 scores.append(float(np.mean(clf.predict(matrix[hold_idx]) == labels_arr[hold_idx])))
             results.append({"C": c, "gamma": gamma, "mean_accuracy": float(np.mean(scores))})

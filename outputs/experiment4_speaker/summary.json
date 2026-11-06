@@ -9,12 +9,12 @@
   },
   "training_recordings": 40,
   "test_recordings": 27,
-  "correct": 25,
-  "accuracy": 0.9259259259259259,
+  "correct": 23,
+  "accuracy": 0.8518518518518519,
   "confusion_matrix": {
     "spk01": {
-      "spk01": 5,
-      "spk02": 0,
+      "spk01": 4,
+      "spk02": 1,
       "spk03": 0,
       "spk04": 0,
       "spk05": 0
@@ -27,9 +27,9 @@
       "spk05": 0
     },
     "spk03": {
-      "spk01": 0,
+      "spk01": 1,
       "spk02": 0,
-      "spk03": 5,
+      "spk03": 4,
       "spk04": 0,
       "spk05": 1
     },

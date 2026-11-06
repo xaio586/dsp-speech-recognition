@@ -1,0 +1,162 @@
+{
+  "experiment": "ECAPA-TDNN 嵌入 + 余弦质心说话人识别（实验四部署版，ONNX 推理）",
+  "encoder": "SpeechBrain spkrec-ecapa-voxceleb（ONNX 导出，fp32）",
+  "enrollment": "每位说话人全部训练录音的嵌入均值，L2 归一化为质心",
+  "decision": "余弦相似度 argmax；softmax(相似度×10) 作为展示置信度，阈值 0.55 标记低置信度",
+  "speakers": {
+    "spk01": "肖绚聍",
+    "spk02": "王晗宇",
+    "spk04": "李欣彤",
+    "spk05": "赵丹阳",
+    "spk03": "靳博文"
+  },
+  "training_recordings": 243,
+  "test_recordings": 27,
+  "clean_channel": {
+    "n": 27,
+    "accuracy": 1.0,
+    "per_speaker_recall": {
+      "spk01": 1.0,
+      "spk02": 1.0,
+      "spk03": 1.0,
+      "spk04": 1.0,
+      "spk05": 1.0
+    },
+    "confusion_matrix": {
+      "spk01": {
+        "spk01": 5,
+        "spk02": 0,
+        "spk03": 0,
+        "spk04": 0,
+        "spk05": 0
+      },
+      "spk02": {
+        "spk01": 0,
+        "spk02": 5,
+        "spk03": 0,
+        "spk04": 0,
+        "spk05": 0
+      },
+      "spk03": {
+        "spk01": 0,
+        "spk02": 0,
+        "spk03": 6,
+        "spk04": 0,
+        "spk05": 0
+      },
+      "spk04": {
+        "spk01": 0,
+        "spk02": 0,
+        "spk03": 0,
+        "spk04": 5,
+        "spk05": 0
+      },
+      "spk05": {
+        "spk01": 0,
+        "spk02": 0,
+        "spk03": 0,
+        "spk04": 0,
+        "spk05": 6
+      }
+    },
+    "misclassified": []
+  },
+  "simulated_bluetooth_channel": {
+    "n": 27,
+    "accuracy": 1.0,
+    "per_speaker_recall": {
+      "spk01": 1.0,
+      "spk02": 1.0,
+      "spk03": 1.0,
+      "spk04": 1.0,
+      "spk05": 1.0
+    },
+    "confusion_matrix": {
+      "spk01": {
+        "spk01": 5,
+        "spk02": 0,
+        "spk03": 0,
+        "spk04": 0,
+        "spk05": 0
+      },
+      "spk02": {
+        "spk01": 0,
+        "spk02": 5,
+        "spk03": 0,
+        "spk04": 0,
+        "spk05": 0
+      },
+      "spk03": {
+        "spk01": 0,
+        "spk02": 0,
+        "spk03": 6,
+        "spk04": 0,
+        "spk05": 0
+      },
+      "spk04": {
+        "spk01": 0,
+        "spk02": 0,
+        "spk03": 0,
+        "spk04": 5,
+        "spk05": 0
+      },
+      "spk05": {
+        "spk01": 0,
+        "spk02": 0,
+        "spk03": 0,
+        "spk04": 0,
+        "spk05": 6
+      }
+    },
+    "misclassified": []
+  },
+  "spk01_extra_ielts": {
+    "n": 86,
+    "accuracy": 1.0,
+    "per_speaker_recall": {
+      "spk01": 1.0,
+      "spk02": 0.0,
+      "spk03": 0.0,
+      "spk04": 0.0,
+      "spk05": 0.0
+    },
+    "confusion_matrix": {
+      "spk01": {
+        "spk01": 86,
+        "spk02": 0,
+        "spk03": 0,
+        "spk04": 0,
+        "spk05": 0
+      },
+      "spk02": {
+        "spk01": 0,
+        "spk02": 0,
+        "spk03": 0,
+        "spk04": 0,
+        "spk05": 0
+      },
+      "spk03": {
+        "spk01": 0,
+        "spk02": 0,
+        "spk03": 0,
+        "spk04": 0,
+        "spk05": 0
+      },
+      "spk04": {
+        "spk01": 0,
+        "spk02": 0,
+        "spk03": 0,
+        "spk04": 0,
+        "spk05": 0
+      },
+      "spk05": {
+        "spk01": 0,
+        "spk02": 0,
+        "spk03": 0,
+        "spk04": 0,
+        "spk05": 0
+      }
+    },
+    "misclassified": []
+  }
+}

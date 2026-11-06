@@ -495,7 +495,7 @@
                     <div class="row-title" vid="22">说话人识别</div>
                     <div class="row-footer sys-text" vid="23">
                         <ul class="spec-list" vid="24">
-                            <li vid="25">MFCC/LPC · SVM</li>
+                            <li vid="25">ECAPA-TDNN · 声纹嵌入</li>
                             <li vid="26">说话人身份识别</li>
                         </ul>
                         <ul class="spec-list text-right" vid="27">
@@ -562,13 +562,13 @@
                 <h1 class="large-title stagger-el delay-1">说话人识别</h1>
                 <section class="panel-box stagger-el delay-2" aria-live="polite">
                     <div class="sys-text flex justify-between"><span>模块状态</span><span>已接入在线识别</span></div>
-                    <p class="module-note">对着麦克风说任意一段话即可识别说话人：系统提取 MFCC 与 LPC 的统计特征，用 RBF 核 SVM 在 5 位组员中分类并给出置信度，不依赖所说内容。置信度较低时会明确提示。</p>
+                    <p class="module-note">对着麦克风说任意一段话即可识别说话人：系统用预训练 ECAPA-TDNN 深度网络提取声纹嵌入，与 5 位组员的注册声纹做余弦相似度比对并给出置信度，不依赖所说内容。置信度较低时会明确提示。</p>
                 </section>
                 <section class="panel-box stagger-el delay-3">
                     <div class="sys-text">处理流程</div>
                     <div class="flow-step flex justify-between items-center"><span>语音采集</span><span class="sys-text opacity-60">麦克风输入</span></div>
-                    <div class="flow-step flex justify-between items-center"><span>特征提取</span><span class="sys-text opacity-60">MFCC + LPC</span></div>
-                    <div class="flow-step flex justify-between items-center"><span>统计特征分类</span><span class="sys-text opacity-60">RBF SVM</span></div>
+                    <div class="flow-step flex justify-between items-center"><span>声纹嵌入提取</span><span class="sys-text opacity-60">ECAPA-TDNN</span></div>
+                    <div class="flow-step flex justify-between items-center"><span>注册声纹比对</span><span class="sys-text opacity-60">余弦相似度</span></div>
                 </section>
             </div>
         </div>

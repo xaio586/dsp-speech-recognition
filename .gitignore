@@ -21,3 +21,11 @@ outputs/metrics/*
 
 # B's generated NPY spectra are reproducible and can be large; keep logs/manifests only.
 outputs/week03_b_preprocess/**/*.npy
+
+# 实验四本地数据与缓存（不进仓库）
+data/speaker_recognition/wav/
+data/speaker_recognition/data/
+pretrained_ecapa/
+spk01_extra_test/
+tmp_*/
+*.log

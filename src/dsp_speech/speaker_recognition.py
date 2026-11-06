@@ -73,16 +73,14 @@ def extract_lpc_frames(samples: np.ndarray, sample_rate: int, order: int = LPC_O
     return result
 
 
-def prepare_speaker_utterance(
+def trim_utterance(
     samples: np.ndarray, sample_rate: int
-) -> tuple[np.ndarray, np.ndarray, dict[str, float]]:
-    """Trim/resample one utterance and return (MFCC frames, LPC frames, details).
+) -> tuple[np.ndarray, dict[str, float]]:
+    """Validate, resample, normalize and endpoint-trim one utterance.
 
-    Mirrors recognize.prepare_utterance (shared with experiment 3) but also
-    returns the LPC frame sequence needed by the speaker feature vector.
+    Returns the cropped waveform (16 kHz) plus diagnostics. Shared by the SVM
+    feature path and the ECAPA embedding path.
     """
-    mfcc, details = prepare_utterance(samples, sample_rate)
-
     values = np.asarray(samples, dtype=np.float32)
     if sample_rate != DEFAULT_CONFIG.sample_rate:
         divisor = int(np.gcd(sample_rate, DEFAULT_CONFIG.sample_rate))
@@ -91,12 +89,43 @@ def prepare_speaker_utterance(
         ).astype(np.float32)
         sample_rate = DEFAULT_CONFIG.sample_rate
     values = remove_dc(values)
+    peak = float(np.max(np.abs(values)))
+    rms = float(np.sqrt(np.mean(values.astype(np.float64) ** 2)))
+    if peak < 0.008 or rms < 0.0015:
+        raise ValueError("录音声音太小或接近静音，请靠近麦克风再试一次")
     normalized = normalize_amplitude(values, peak=DEFAULT_CONFIG.normalize_peak)
     start, end = detect_endpoint(normalized, sample_rate)
     if end <= start or (end - start) / sample_rate < 0.18:
         start, end = _fallback_endpoint(normalized, sample_rate)
+    if end <= start or (end - start) / sample_rate < 0.18:
+        raise ValueError("没有检测到有效语音，请说话后再停止录音")
     cropped = np.ascontiguousarray(normalized[start:end], dtype=np.float32)
-    lpc = extract_lpc_frames(cropped, sample_rate)
+    details = {
+        "sample_rate": float(sample_rate),
+        "start_seconds": start / sample_rate,
+        "end_seconds": end / sample_rate,
+        "speech_seconds": len(cropped) / sample_rate,
+        "peak": peak,
+        "rms": rms,
+        "frame_count": float(len(cropped)),
+    }
+    return cropped, details
+
+
+def prepare_speaker_utterance(
+    samples: np.ndarray, sample_rate: int
+) -> tuple[np.ndarray, np.ndarray, dict[str, float]]:
+    """Trim/resample one utterance and return (MFCC frames, LPC frames, details).
+
+    Mirrors recognize.prepare_utterance (shared with experiment 3) but also
+    returns the LPC frame sequence needed by the speaker feature vector.
+    """
+    _, details = prepare_utterance(samples, sample_rate)  # shared validation path
+    cropped, _ = trim_utterance(samples, sample_rate)
+    mfcc = extract_mfcc(cropped, DEFAULT_CONFIG.sample_rate)
+    if not mfcc.size or not np.isfinite(mfcc).all():
+        raise ValueError("语音特征提取失败，请重新录制")
+    lpc = extract_lpc_frames(cropped, DEFAULT_CONFIG.sample_rate)
     return mfcc, lpc, details
 
 
@@ -225,7 +254,9 @@ def train_speaker_svm(
     if len(set(labels)) < 2:
         raise ValueError("说话人模板不足：至少需要两位说话人的训练录音")
     matrix = np.stack(vectors)
-    classifier = make_pipeline(StandardScaler(), SVC(kernel="rbf", C=c, gamma=gamma))
+    classifier = make_pipeline(
+        StandardScaler(), SVC(kernel="rbf", C=c, gamma=gamma, class_weight="balanced")
+    )
     classifier.fit(matrix, labels)
     return SpeakerSVM(
         classifier=classifier,
@@ -287,7 +318,10 @@ def build_training_vectors(
             if augment:
                 signals = signals + channel_augmentations(audio.samples, audio.sample_rate)
             for signal in signals:
-                mfcc, lpc, _ = prepare_speaker_utterance(signal, audio.sample_rate)
+                try:
+                    mfcc, lpc, _ = prepare_speaker_utterance(signal, audio.sample_rate)
+                except ValueError:
+                    continue  # 个别增强变体（如强带通后的弱段）端点检测失败，跳过即可
                 vectors.setdefault(row["speaker_id"], []).append(utterance_feature_vector(mfcc, lpc))
     return vectors, names
 
